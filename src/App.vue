@@ -3,22 +3,28 @@
     <Header />
     <WalkThroughView />
     <h1>Planning Poker</h1>
-    <div v-if="showTab == 'about'">
-      <AboutView />
-    </div>
-    <div v-if="showTab != 'about'">
+    <div>
       <div class="game-params">
         <MyName :socket="socket" />
-        <GameName :socket="socket" />
+        <TeamName :socket="socket" />
       </div>
       <div class="container">
-        <div v-if="showTab == 'facilitator'" :class="{'not-host' : !isHost}">
+        <div>
           <div class="connections">
             Current server connections: {{ connections.connections }} / {{ connections.maxConnections }}
           </div>
         </div>
-        <div v-if="showTab == 'game'">
-          <Poker :socket="socket" />
+        <div>
+          <table class="poker-table" border>
+            <tr>
+              <td class="backlog">
+                <Backlog :socket="socket" />
+              </td>
+              <td class="poker">
+                <Poker :socket="socket" />
+              </td>
+            </tr>
+          </table>
         </div>
       </div>
     </div>
@@ -31,20 +37,20 @@ import io from 'socket.io-client'
 import params from './lib/params.js'
 
 import Header from './components/Header.vue'
-import AboutView from './components/about/AboutView.vue'
 import WalkThroughView from './components/about/WalkThroughView.vue'
 import MyName from './components/MyName.vue'
-import GameName from './components/GameName.vue'
+import TeamName from './components/TeamName.vue'
+import Backlog from './components/Backlog.vue'
 import Poker from './components/Poker.vue'
 
 export default {
   name: 'App',
   components: {
     Header,
-    AboutView,
     WalkThroughView,
     MyName,
-    GameName,
+    TeamName,
+    Backlog,
     Poker
   },
   computed: {
@@ -57,14 +63,8 @@ export default {
     showTab() {
       return this.$store.getters.getShowTab
     },
-    workshopName() {
-      return this.$store.getters.getWorkshopName
-    },
-    gameName() {
-      return this.$store.getters.getGameName
-    },
-    gameState() {
-      return this.$store.getters.getGameState
+    teamName() {
+      return this.$store.getters.getTeamName
     },
     connections() {
       return this.$store.getters.getConnections
@@ -83,33 +83,21 @@ export default {
       this.$store.dispatch('updateHost', true)
     }
 
-    if (params.getParam('game')) {
-      const game = params.getParam('game')
-      this.$store.dispatch('updateGameName', game)
-      localStorage.setItem('gameName-cg', game)
+    const teamName = localStorage.getItem('teamName-pp')
+    if (teamName) {
+      this.$store.dispatch('updateTeamName', teamName)
+      this.socket.emit('loadTeam', {teamName: teamName})
     }
 
-    const gameName = localStorage.getItem('gameName-cg')
-    if (gameName) {
-      this.$store.dispatch('updateGameName', gameName)
-      this.socket.emit('loadGame', {gameName: gameName})
-    }
-
-    let myName = localStorage.getItem('myName-cg')
+    let myName = localStorage.getItem('myName-pp')
     if (myName) {
       myName = JSON.parse(myName)
-      this.$store.dispatch('setMyName', myName)
+      this.$store.dispatch('updateMyName', myName)
     }
 
-    this.socket.on('updateGameState', (data) => {
-      if (this.gameName == data.gameName) {
-        this.$store.dispatch('updateGameState', data)
-      }
-    })
-
-    this.socket.on('updateWorkshopResults', (data) => {
-      if (this.workshopName == data.workshopName) {
-        this.$store.dispatch('updateWorkshopResults', data)
+    this.socket.on('loadTeam', (data) => {
+      if (this.teamName == data.teamName) {
+        this.$store.dispatch('loadTeam', data)
       }
     })
 
@@ -122,11 +110,24 @@ export default {
 
 <style lang="scss">
   .not-host { height: 0px; visibility: hidden; }
-  #clickCoins { margin-left: -2rem; }
-
   .connections {
     text-align: right;
     margin: 6px
+  }
+  .game-params {
+    height: 40px;
+  }
+  .poker-table {
+    margin: 0 auto;
+    width: 100%;
+    .backlog {
+      width: 25%;
+      vertical-align: top;
+    }
+    .poker {
+      width: 75%;
+      vertical-align: top;
+    }
   }
 
 </style>

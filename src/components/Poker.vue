@@ -1,41 +1,185 @@
 <template>
-  <table class="poker">
-    <tr>
-      <td>
-        <div class="poker-card rounded">
-          <div class="poker-card-value">1</div>
+
+  <div>
+    <div class="selected-card">
+      <h4 v-if="selectedCard">{{ selectedCard.title }}</h4>
+      <p v-if="selectedCard">{{ selectedCard.description }}</p>
+    </div>
+    <div class="estimation-type">
+      Estimate Using:
+      <select id="set-estimation-type" @change="setEstimationType()">
+        <option v-for="(estType, index) in estimationTypes" :key="index" :selected="estType == estimationType">{{ estType }}</option>
+      </select>
+    </div>
+    <div class="final-estimate">
+      <div>
+        <span>Agreed Estimate: </span>
+        <select id="agreed-estimate-value">
+          <option value=""> </option>
+          <option v-for="(value, index) in estimationValues" :key="index">{{ value }}</option>
+        </select>
+        <button class="btn btn-sm btn-secondary smaller-font" :disabled="!selectedCard" @click="saveAgreedEstimate()">Submit</button>
+      </div>
+      <div>
+        <button v-if="!revealed" class="btn btn-sm btn-secondary smaller-font reveal" @click="reveal(true)">Reveal Estimates</button>
+        <button v-if="revealed" class="btn btn-sm btn-secondary smaller-font reveal" @click="reveal(false)">Hide Estimates</button>
+      </div>
+    </div>
+    <div class="members">
+      <div v-for="(teamMember, index) in teamMembers" :key="index" class="member">
+        <div><b>{{ teamMember.name }}</b></div>
+        <div v-if="teamMember.id == myName.id || revealed" class="poker-card rounded">
+          <div v-if="estimating" class="poker-card-value">
+            <select :id="'estimate-value-' + myName.id" @change="saveEstimate()">
+              <option value=""> </option>
+              <option v-for="(value, index) in estimationValues" :key="index">{{ value }}</option>
+            </select>
+          </div>
+          <div v-if="!estimating" class="poker-card-value" @click="startEstimating()">{{ teamMember.estimate || 'TBD' }}</div>
         </div>
-      </td>
-      <td>
-        <div class="poker-card back rounded">
-          <div class="poker-card-value"></div>
+        <div v-if="teamMember.id != myName.id && !revealed" class="poker-card back rounded">
+          <div v-if="teamMember.voted" class="poker-card-voted rounded-circle voted">&#10004;</div>
+          <div v-if="!teamMember.voted" class="poker-card-voted rounded-circle not-voted">&#10008;</div>
         </div>
-      </td>
-    </tr>
-  </table>
+      </div>
+    </div>
+  </div>
+
 </template>
+
+<script>
+export default {
+  props: [
+    'socket'
+  ],
+  data() {
+    return {
+      estimating: false
+    }
+  },
+  computed: {
+    myName() {
+      return this.$store.getters.getMyName
+    },
+    teamName() {
+      return this.$store.getters.getTeamName
+    },
+    selectedCard() {
+      return this.$store.getters.getSelectedCard
+    },
+    teamMembers() {
+      return this.$store.getters.getTeamMembers
+    },
+    estimationType() {
+      return this.$store.getters.getEstimationType
+    },
+    estimationTypes() {
+      return this.$store.getters.getEstimationTypes
+    },
+    estimationValues() {
+      return this.$store.getters.getEstimationValues
+    },
+    revealed() {
+      return this.$store.getters.getRevealed
+    }
+  },
+  methods: {
+    setEstimationType() {
+      const estimationType = document.getElementById('set-estimation-type').value
+      this.$store.dispatch('updateEstimationType', estimationType)
+    },
+    startEstimating() {
+      this.estimating = true
+    },
+    saveEstimate(estimate) {
+      const estimationValue = document.getElementById('estimate-value-' + this.myName.id).value
+      this.$store.dispatch('updateEstimateValue', estimationValue)
+      this.socket.emit('updateEstimateValue', {teamName: this.teamName, teamMember: this.myName, value: estimationValue})
+      this.estimating = false
+    },
+    reveal(value) {
+      this.$store.dispatch('updateRevealed', value)
+    },
+    saveAgreedEstimate() {
+      const estimationValue = document.getElementById('agreed-estimate-value').value
+      this.$store.dispatch('updateAgreedEstimateValue', estimationValue)
+    }
+  }
+}
+</script>
 
 <style lang="scss">
   td {
     padding: 12px;
   }
-  .poker-card {
-    height: 144px;
-    width: 103px;
-    border: 6px solid #888;
+  .selected-card {
+    min-height: 76px;
+    border: 1px solid;
+    margin-bottom: 24px;
+  }
+  .estimation-type {
+    text-align: right;
+    height: 30px;
+  }
+  .final-estimate {
+    div {
+      margin-bottom: 6px;
 
-    &.back {
-      background-image: url("../assets/img/card-back.jpg");
-      background-size: contain;
-      background-repeat: no-repeat;
-      background-position-x: center;
+      button {
+        margin: 0 4px;
+
+        &.reveal {
+          width: 130px;
+        }
+      }
     }
+  }
+  .members {
+    .member {
+      width: 140px;
+      height: 200px;
+      float: left;
+      border: 1px solid;
+      margin: 2px;
 
-    .poker-card-value {
-      font-size: 40px;
-      margin-top: 27px;
-      font-weight: bold;
-      color: #888;
+      select {
+        font-size: 20px;
+      }
+
+      .poker-card {
+        margin: 0 auto;
+        height: 144px;
+        width: 103px;
+        border: 6px solid #888;
+
+        &.back {
+          background-image: url("../assets/img/card-back.jpg");
+          background-size: contain;
+          background-repeat: no-repeat;
+          background-position-x: center;
+        }
+        .poker-card-value {
+          font-size: 40px;
+          margin-top: 24px;
+          font-weight: bold;
+          color: #888;
+        }
+        .poker-card-voted {
+          width: 24px;
+          height: 24px;
+          background-color: #fff;
+          border: 1px solid #888;
+          margin: 44px auto 0 auto;
+
+          &.voted {
+            color: green;
+          }
+
+          &.not-voted {
+            color: red;
+          }
+        }
+      }
     }
   }
 </style>

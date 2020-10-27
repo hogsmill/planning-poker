@@ -1,5 +1,5 @@
 <template>
-  <div class="my-name float-right" v-if="!showAbout">
+  <div class="my-name float-right">
     <button class="btn btn-sm btn-secondary smaller-font" v-if="!myName" @click="show">
       Set My Name
     </button>
@@ -14,12 +14,14 @@
       <div class="mt-4">
         <h4>Enter Your Name</h4>
         <div class="set-my-name">
-          <input type="text" id="my-name" class="form-control">
+          <select id="my-name">
+            <option value=""> -- Select -- </option>
+            <option v-for="(teamMember, index) in teamMembers" :key="index" :value="teamMember.id" :selected="myName.id == teamMember.id">{{ teamMember.name }}</option>
+          </select>
           <button class="btn btn-sm btn-secondary smaller-font" @click="saveMyName">
             Save
           </button>
         </div>
-        <div>I am the facilitator/host <input type="checkbox" id="host"></div>
       </div>
     </modal>
   </div>
@@ -33,11 +35,11 @@ export default {
     'socket'
   ],
   computed: {
-    showAbout() {
-      return this.$store.getters.getShowAbout
+    teamName() {
+      return this.$store.getters.getTeamName
     },
-    gameName() {
-      return this.$store.getters.getGameName
+    teamMembers() {
+      return this.$store.getters.getTeamMembers
     },
     myName() {
       return this.$store.getters.getMyName
@@ -51,23 +53,16 @@ export default {
       this.$modal.hide('set-my-name')
     },
     saveMyName: function() {
-      const oldName = this.myName
-      const newName = document.getElementById('my-name').value
-      let myNameData
-      if (!oldName.id) {
-        const uuid = uuidv4()
-        myNameData = {id: uuid, name: newName}
-        this.$store.dispatch('setMyName', myNameData)
-      } else {
-        myNameData = {id: this.myName.id, name: newName}
-        this.$store.dispatch('changeName', {name: newName})
-        localStorage.setItem('myName-cg', JSON.stringify(myNameData))
-        if (this.gameName) {
-          this.socket.emit('changeName', {gameName: this.gameName, name: oldName, newName: newName})
-        }
-      }
-      this.socket.emit('addPlayer', {gameName: this.gameName, name: myNameData})
-      this.$store.dispatch('updateHost', document.getElementById('host').value)
+      const id = document.getElementById('my-name').value
+      const name = this.teamMembers.find(function(m) {
+        return m.id == id
+      })
+      console.log(name)
+      this.$store.dispatch('updateMyName', name)
+      localStorage.setItem('myName-pp', JSON.stringify(name))
+      //if (this.teamName) {
+      //  this.socket.emit('changeName', {teamName: this.teamName, name: oldName, newName: newName})
+      //}
       this.hide()
     }
   }

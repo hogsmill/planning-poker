@@ -48,9 +48,12 @@ function doDb(fun, data) {
     const db = client.db('db')
 
     switch(fun) {
-      //case 'loadGame':
-      //  dbStore.loadGame(err, client, db, io, data, debugOn)
-      //  break
+      case 'loadGame':
+        dbStore.loadTeam(err, client, db, io, data, debugOn)
+        break
+      case 'updateEstimateValue':
+        dbStore.updateEstimateValue(err, client, db, io, data, debugOn)
+        break
       default:
         console.log('Unknown function ', fun)
     }
@@ -75,7 +78,9 @@ io.on('connection', (socket) => {
     emit('updateConnections', {connections: connections, maxConnections: maxConnections})
   })
 
-  //socket.on('loadGame', (data) => { doDb('loadGame', data) })
+  socket.on('loadTeam', (data) => { doDb('loadGame', data) })
+
+  socket.on('updateEstimateValue', (data) => { doDb('updateEstimateValue', data) })
 })
 
 const port = process.argv[2] || 3004

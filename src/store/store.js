@@ -8,65 +8,22 @@ export const store = new Vuex.Store({
     connections: 0,
     walkThrough: false,
     host: false,
-    showTab: 'game',
-    workshop: false,
-    workshopName: '',
-    workshopResults: [],
-    gameName: '',
-    myName: '',
-    clickedRole: {},
-    gameState: {
-      interval: 250,
-      stopped: false,
-      currency: { major: '&pound;', minor: 'p'},
-      denominations: {
-        200: 1,
-        100: 7,
-        50: 11,
-        20: 21,
-        10: 6,
-        5: 6,
-        2: 10,
-        1: 20,
-      },
-      timeLimit: { demo: 60, click: 120 },
-      valueTimeLimit: { demo: 10, click: 20 },
-      clickOnCoins: true,
-      round: 0,
-      total: 0,
-      valueDelivered: 0,
-      players: [],
-      roles: [
-        { role: 'Product Owner', include: true, name: '' },
-        { role: 'Developer', include: true, name: '' },
-        { role: 'Tester', include: true, name: '' },
-        { role: 'Integrator', include: true, name: '' },
-        { role: 'Customer', include: true, name: '' },
-      ],
-      rounds: [
-        {
-          name: 'Batch',
-          roles: [],
-          running: false,
-          delivered: 0,
-          time: 0,
-        },
-        {
-          name: 'Kanban',
-          roles: [],
-          running: false,
-          delivered: 0,
-          time: 0,
-        },
-        {
-          name: 'Value First',
-          roles: [],
-          running: false,
-          delivered: 0,
-          time: 0,
-        },
-      ],
-    },
+    myName: {},
+    teamName: '',
+    teams: [
+      { name: 'Eagle' },
+      { name: 'Dragon' },
+      { name: 'Lion' },
+      { name: 'Gryphen' }
+    ],
+    teamMembers: [],
+    backlog: [],
+    revealed: false,
+    estimationType: 't-shirt',
+    estimationValues: {
+      't-shirt': ['XS', 'S', 'M', 'L', 'XL'],
+      'fibonacci': ['1', '2', '3', '5', '8', '13']
+    }
   },
   getters: {
     getWalkThrough: (state) => {
@@ -75,11 +32,41 @@ export const store = new Vuex.Store({
     getHost: (state) => {
       return state.host
     },
-    getShowTab: (state) => {
-      return state.showTab
+    getMyName: (state) => {
+      return state.myName
+    },
+    getTeamName: (state) => {
+      return state.teamName
+    },
+    getTeams: (state) => {
+      return state.teams
+    },
+    getTeamMembers: (state) => {
+      return state.teamMembers
+    },
+    getSelectedCard: (state) => {
+      const card = state.backlog.find(function(c) {
+        return c.selected
+      })
+      return card ? card : false
+    },
+    getEstimationType: (state) => {
+      return state.estimationType
+    },
+    getRevealed: (state) => {
+      return state.revealed
+    },
+    getEstimationTypes: (state) => {
+      return Object.keys(state.estimationValues)
+    },
+    getEstimationValues: (state) => {
+      return state.estimationValues[state.estimationType]
     },
     getConnections: (state) => {
       return state.connections
+    },
+    getBacklog: (state) => {
+      return state.backlog
     }
   },
   mutations: {
@@ -89,11 +76,50 @@ export const store = new Vuex.Store({
     updateHost: (state, payload) => {
       state.host = payload
     },
-    updateShowTab: (state, payload) => {
-      state.showTab = payload
+    updateMyName: (state, payload) => {
+      state.myName = payload
+    },
+    updateTeamName: (state, payload) => {
+      state.teamName = payload
+    },
+    updateSelectedCard: (state, payload) => {
+      let card
+      card = state.backlog.find(function(c) {
+        return c.selected
+      })
+      if (card) {
+        card.selected = false
+      }
+      card = state.backlog.find(function(c) {
+        return c.id == payload
+      })
+      card.selected = true
+    },
+    updateRevealed: (state, payload) => {
+      state.revealed = payload
+    },
+    updateEstimationType: (state, payload) => {
+      state.estimationType = payload
+    },
+    updateEstimateValue: (state, payload) => {
+      const member = state.teamMembers.find(function(m) {
+        return m.id == state.myName.id
+      })
+      member.estimate = payload
+    },
+    updateAgreedEstimateValue: (state, payload) => {
+      const card = state.backlog.find(function(c) {
+        return c.selected
+      })
+      card.estimate = payload
     },
     updateConnections: (state, payload) => {
       state.connections = payload
+    },
+    loadTeam: (state, payload) => {
+      state.teamMembers = payload.teamMembers
+      state.backlog = payload.backlog
+      console.log(state)
     }
   },
   actions: {
@@ -103,8 +129,29 @@ export const store = new Vuex.Store({
     updateHost: ({ commit }, payload) => {
       commit('updateHost', payload)
     },
-    updateShowTab: ({ commit }, payload) => {
-      commit('updateShowTab', payload)
+    updateMyName: ({ commit }, payload) => {
+      commit('updateMyName', payload)
+    },
+    updateTeamName: ({ commit }, payload) => {
+      commit('updateTeamName', payload)
+    },
+    updateSelectedCard: ({ commit }, payload) => {
+      commit('updateSelectedCard', payload)
+    },
+    updateRevealed: ({ commit }, payload) => {
+      commit('updateRevealed', payload)
+    },
+    updateEstimationType: ({ commit }, payload) => {
+      commit('updateEstimationType', payload)
+    },
+    updateEstimateValue: ({ commit }, payload) => {
+      commit('updateEstimateValue', payload)
+    },
+    updateAgreedEstimateValue: ({ commit }, payload) => {
+      commit('updateAgreedEstimateValue', payload)
+    },
+    loadTeam: ({ commit }, payload) => {
+      commit('loadTeam', payload)
     },
     updateConnections: ({ commit }, payload) => {
       commit('updateConnections', payload)
