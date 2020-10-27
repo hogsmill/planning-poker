@@ -14,7 +14,7 @@
             Current server connections: {{ connections.connections }} / {{ connections.maxConnections }}
           </div>
         </div>
-        <div>
+        <div v-if="teamName">
           <table class="poker-table" border>
             <tr>
               <td class="backlog">
