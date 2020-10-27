@@ -51,8 +51,14 @@ function doDb(fun, data) {
       case 'loadGame':
         dbStore.loadTeam(err, client, db, io, data, debugOn)
         break
+      case 'selectCard':
+        dbStore.selectCard(err, client, db, io, data, debugOn)
+        break
       case 'updateEstimateValue':
         dbStore.updateEstimateValue(err, client, db, io, data, debugOn)
+        break
+      case 'updateAgreedEstimate':
+        dbStore.updateAgreedEstimate(err, client, db, io, data, debugOn)
         break
       default:
         console.log('Unknown function ', fun)
@@ -80,7 +86,16 @@ io.on('connection', (socket) => {
 
   socket.on('loadTeam', (data) => { doDb('loadGame', data) })
 
+  socket.on('updateEstimationType', (data) => { emit('updateEstimationType', data) })
+
+  socket.on('selectCard', (data) => { doDb('selectCard', data) })
+
   socket.on('updateEstimateValue', (data) => { doDb('updateEstimateValue', data) })
+
+  socket.on('updateAgreedEstimate', (data) => { doDb('updateAgreedEstimate', data) })
+
+  socket.on('reveal', (data) => { emit('reveal', data) })
+
 })
 
 const port = process.argv[2] || 3004

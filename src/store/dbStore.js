@@ -54,6 +54,40 @@ module.exports = {
     })
   },
 
+  selectCard:  function(err, client, db, io, data, debugOn) {
+
+    if (debugOn) { console.log('clearEstimates', data) }
+
+    db.collection('planningPoker').findOne({teamName: data.teamName}, function(err, res) {
+      if (err) throw err
+      if (res) {
+        let i
+        const members = [], backlog = []
+        for (i = 0; i < res.teamMembers.length; i++) {
+          res.teamMembers[i].voted = false
+          res.teamMembers[i].estimate = 0
+          members.push(res.teamMembers[i])
+        }
+        res.teamMembers = members
+        for (i = 0; i < res.backlog.length; i++) {
+          if (res.backlog[i].id == data.selectedCard) {
+            res.backlog[i].selected = true
+          } else {
+            res.backlog[i].selected = false
+          }
+          backlog.push(res.backlog[i])
+        }
+        res.backlog = backlog
+        const team = res
+        db.collection('planningPoker').updateOne({'_id': res._id}, {$set: {backlog: backlog}}, function(err, res) {
+          if (err) throw err
+          io.emit('loadTeam', team)
+          client.close()
+        })
+      }
+    })
+  },
+
   updateEstimateValue:  function(err, client, db, io, data, debugOn) {
 
     if (debugOn) { console.log('updateEstimateValue', data) }
@@ -61,8 +95,7 @@ module.exports = {
     db.collection('planningPoker').findOne({teamName: data.teamName}, function(err, res) {
       if (err) throw err
       if (res) {
-        let members = []
-        console.log(res.teamMembers)
+        const members = []
         for (let i = 0; i < res.teamMembers.length; i++) {
           if (res.teamMembers[i].id == data.teamMember.id) {
             res.teamMembers[i].voted = true
@@ -70,14 +103,40 @@ module.exports = {
           }
           members.push(res.teamMembers[i])
         }
-        console.log(members)
         res.teamMembers = members
+        const team = res
         db.collection('planningPoker').updateOne({'_id': res._id}, {$set: {teamMembers: members}}, function(err, res) {
           if (err) throw err
-          io.emit('loadTeam', res)
+          io.emit('loadTeam', team)
+          client.close()
+        })
+      }
+    })
+  },
+
+  updateAgreedEstimate:  function(err, client, db, io, data, debugOn) {
+
+    if (debugOn) { console.log('updateAgreedEstimate', data) }
+
+    db.collection('planningPoker').findOne({teamName: data.teamName}, function(err, res) {
+      if (err) throw err
+      if (res) {
+        const backlog = []
+        for (let i = 0; i < res.backlog.length; i++) {
+          if (res.backlog[i].id == data.selectedCard.id) {
+            res.backlog[i].estimate = data.value
+          }
+          backlog.push(res.backlog[i])
+        }
+        res.backlog = backlog
+        const team = res
+        db.collection('planningPoker').updateOne({'_id': res._id}, {$set: {backlog: backlog}}, function(err, res) {
+          if (err) throw err
+          io.emit('loadTeam', team)
           client.close()
         })
       }
     })
   }
+
 }

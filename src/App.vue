@@ -101,6 +101,18 @@ export default {
       }
     })
 
+    this.socket.on('updateEstimationType', (data) => {
+      if (this.teamName == data.teamName) {
+        this.$store.dispatch('updateEstimationType', data)
+      }
+    })
+
+    this.socket.on('reveal', (data) => {
+      if (this.teamName == data.teamName) {
+        this.$store.dispatch('reveal', data)
+      }
+    })
+
     this.socket.on('updateConnections', (data) => {
       this.$store.dispatch('updateConnections', data)
     })

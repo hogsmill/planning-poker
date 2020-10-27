@@ -82,36 +82,8 @@ export const store = new Vuex.Store({
     updateTeamName: (state, payload) => {
       state.teamName = payload
     },
-    updateSelectedCard: (state, payload) => {
-      let card
-      card = state.backlog.find(function(c) {
-        return c.selected
-      })
-      if (card) {
-        card.selected = false
-      }
-      card = state.backlog.find(function(c) {
-        return c.id == payload
-      })
-      card.selected = true
-    },
-    updateRevealed: (state, payload) => {
-      state.revealed = payload
-    },
     updateEstimationType: (state, payload) => {
-      state.estimationType = payload
-    },
-    updateEstimateValue: (state, payload) => {
-      const member = state.teamMembers.find(function(m) {
-        return m.id == state.myName.id
-      })
-      member.estimate = payload
-    },
-    updateAgreedEstimateValue: (state, payload) => {
-      const card = state.backlog.find(function(c) {
-        return c.selected
-      })
-      card.estimate = payload
+      state.estimationType = payload.estimationType
     },
     updateConnections: (state, payload) => {
       state.connections = payload
@@ -119,8 +91,10 @@ export const store = new Vuex.Store({
     loadTeam: (state, payload) => {
       state.teamMembers = payload.teamMembers
       state.backlog = payload.backlog
-      console.log(state)
-    }
+    },
+    reveal: (state, payload) => {
+      state.revealed = payload.reveal
+    },
   },
   actions: {
     updateWalkThrough: ({ commit }, payload) => {
@@ -135,23 +109,14 @@ export const store = new Vuex.Store({
     updateTeamName: ({ commit }, payload) => {
       commit('updateTeamName', payload)
     },
-    updateSelectedCard: ({ commit }, payload) => {
-      commit('updateSelectedCard', payload)
-    },
-    updateRevealed: ({ commit }, payload) => {
-      commit('updateRevealed', payload)
-    },
     updateEstimationType: ({ commit }, payload) => {
       commit('updateEstimationType', payload)
     },
-    updateEstimateValue: ({ commit }, payload) => {
-      commit('updateEstimateValue', payload)
-    },
-    updateAgreedEstimateValue: ({ commit }, payload) => {
-      commit('updateAgreedEstimateValue', payload)
-    },
     loadTeam: ({ commit }, payload) => {
       commit('loadTeam', payload)
+    },
+    reveal: ({ commit }, payload) => {
+      commit('reveal', payload)
     },
     updateConnections: ({ commit }, payload) => {
       commit('updateConnections', payload)

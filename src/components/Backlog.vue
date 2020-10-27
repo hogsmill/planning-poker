@@ -1,5 +1,4 @@
 <template>
-
   <div>
     <h4>Backlog</h4>
     <table border>
@@ -19,7 +18,6 @@
       </tbody>
     </table>
   </div>
-
 </template>
 
 <script>
@@ -28,13 +26,16 @@ export default {
     'socket'
   ],
   computed: {
+    teamName() {
+      return this.$store.getters.getTeamName
+    },
     backlog() {
       return this.$store.getters.getBacklog
     }
   },
   methods: {
-    selectCard(n) {
-      this.$store.dispatch('updateSelectedCard', n)
+    selectCard(id) {
+      this.socket.emit('selectCard', {teamName: this.teamName, selectedCard: id})
     }
   }
 }

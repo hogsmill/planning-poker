@@ -1,50 +1,70 @@
 <template>
-
   <div>
     <div class="selected-card">
-      <h4 v-if="selectedCard">{{ selectedCard.title }}</h4>
-      <p v-if="selectedCard">{{ selectedCard.description }}</p>
+      <h4 v-if="selectedCard">
+        {{ selectedCard.title }}
+      </h4>
+      <p v-if="selectedCard">
+        {{ selectedCard.description }}
+      </p>
     </div>
     <div class="estimation-type">
       Estimate Using:
       <select id="set-estimation-type" @change="setEstimationType()">
-        <option v-for="(estType, index) in estimationTypes" :key="index" :selected="estType == estimationType">{{ estType }}</option>
+        <option v-for="(estType, index) in estimationTypes" :key="index" :selected="estType == estimationType">
+          {{ estType }}
+        </option>
       </select>
     </div>
-    <div class="final-estimate">
+    <div v-if="selectedCard" class="final-estimate">
       <div>
         <span>Agreed Estimate: </span>
         <select id="agreed-estimate-value">
-          <option value=""> </option>
-          <option v-for="(value, index) in estimationValues" :key="index">{{ value }}</option>
+          <option value="" />
+          <option v-for="(value, index) in estimationValues" :key="index">
+            {{ value }}
+          </option>
         </select>
-        <button class="btn btn-sm btn-secondary smaller-font" :disabled="!selectedCard" @click="saveAgreedEstimate()">Submit</button>
+        <button class="btn btn-sm btn-secondary smaller-font" :disabled="!selectedCard" @click="saveAgreedEstimate()">
+          Submit
+        </button>
       </div>
       <div>
-        <button v-if="!revealed" class="btn btn-sm btn-secondary smaller-font reveal" @click="reveal(true)">Reveal Estimates</button>
-        <button v-if="revealed" class="btn btn-sm btn-secondary smaller-font reveal" @click="reveal(false)">Hide Estimates</button>
+        <button v-if="!revealed" class="btn btn-sm btn-secondary smaller-font reveal" @click="reveal(true)">
+          Reveal Estimates
+        </button>
+        <button v-if="revealed" class="btn btn-sm btn-secondary smaller-font reveal" @click="reveal(false)">
+          Hide Estimates
+        </button>
       </div>
     </div>
-    <div class="members">
+    <div v-if="selectedCard" class="members">
       <div v-for="(teamMember, index) in teamMembers" :key="index" class="member">
         <div><b>{{ teamMember.name }}</b></div>
         <div v-if="teamMember.id == myName.id || revealed" class="poker-card rounded">
           <div v-if="estimating" class="poker-card-value">
             <select :id="'estimate-value-' + myName.id" @change="saveEstimate()">
-              <option value=""> </option>
-              <option v-for="(value, index) in estimationValues" :key="index">{{ value }}</option>
+              <option value="" />
+              <option v-for="(value, ind) in estimationValues" :key="ind">
+                {{ value }}
+              </option>
             </select>
           </div>
-          <div v-if="!estimating" class="poker-card-value" @click="startEstimating()">{{ teamMember.estimate || 'TBD' }}</div>
+          <div v-if="!estimating" class="poker-card-value" @click="startEstimating()">
+            {{ teamMember.estimate || 'TBD' }}
+          </div>
         </div>
         <div v-if="teamMember.id != myName.id && !revealed" class="poker-card back rounded">
-          <div v-if="teamMember.voted" class="poker-card-voted rounded-circle voted">&#10004;</div>
-          <div v-if="!teamMember.voted" class="poker-card-voted rounded-circle not-voted">&#10008;</div>
+          <div v-if="teamMember.voted" class="poker-card-voted rounded-circle voted">
+            &#10004;
+          </div>
+          <div v-if="!teamMember.voted" class="poker-card-voted rounded-circle not-voted">
+            &#10008;
+          </div>
         </div>
       </div>
     </div>
   </div>
-
 </template>
 
 <script>
@@ -86,23 +106,22 @@ export default {
   methods: {
     setEstimationType() {
       const estimationType = document.getElementById('set-estimation-type').value
-      this.$store.dispatch('updateEstimationType', estimationType)
+      this.socket.emit('updateEstimationType', {teamName: this.teamName, estimationType: estimationType})
     },
     startEstimating() {
       this.estimating = true
     },
     saveEstimate(estimate) {
       const estimationValue = document.getElementById('estimate-value-' + this.myName.id).value
-      this.$store.dispatch('updateEstimateValue', estimationValue)
       this.socket.emit('updateEstimateValue', {teamName: this.teamName, teamMember: this.myName, value: estimationValue})
       this.estimating = false
     },
     reveal(value) {
-      this.$store.dispatch('updateRevealed', value)
+      this.socket.emit('reveal', {teamName: this.teamName, reveal: value})
     },
     saveAgreedEstimate() {
       const estimationValue = document.getElementById('agreed-estimate-value').value
-      this.$store.dispatch('updateAgreedEstimateValue', estimationValue)
+      this.socket.emit('updateAgreedEstimate', {teamName: this.teamName, selectedCard: this.selectedCard, value: estimationValue})
     }
   }
 }

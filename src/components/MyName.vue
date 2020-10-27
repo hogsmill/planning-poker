@@ -15,8 +15,12 @@
         <h4>Enter Your Name</h4>
         <div class="set-my-name">
           <select id="my-name">
-            <option value=""> -- Select -- </option>
-            <option v-for="(teamMember, index) in teamMembers" :key="index" :value="teamMember.id" :selected="myName.id == teamMember.id">{{ teamMember.name }}</option>
+            <option value="">
+              -- Select --
+            </option>
+            <option v-for="(teamMember, index) in teamMembers" :key="index" :value="teamMember.id" :selected="myName.id == teamMember.id">
+              {{ teamMember.name }}
+            </option>
           </select>
           <button class="btn btn-sm btn-secondary smaller-font" @click="saveMyName">
             Save

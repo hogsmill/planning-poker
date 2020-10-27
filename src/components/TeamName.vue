@@ -17,8 +17,12 @@
         </h4>
         <div class="set-team-name">
           <select id="team-name">
-            <option value=""> -- Select -- </option>
-            <option v-for="(team, index) in teams" :key="index" :value="team.name" :selected="team.name == teamName">{{ team.name }}</option>
+            <option value="">
+              -- Select --
+            </option>
+            <option v-for="(team, index) in teams" :key="index" :value="team.name" :selected="team.name == teamName">
+              {{ team.name }}
+            </option>
           </select>
           <button class="btn btn-sm btn-secondary smaller-font" @click="saveTeamName">
             Save
