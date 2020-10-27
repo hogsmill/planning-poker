@@ -165,11 +165,12 @@ export default {
           color: #888;
         }
         .poker-card-voted {
-          width: 24px;
-          height: 24px;
+          width: 48px;
+          height: 48px;
           background-color: #fff;
-          border: 1px solid #888;
-          margin: 44px auto 0 auto;
+          border: 2px solid #888;
+          margin: 36px auto 0 auto;
+          font-size: 30px;
 
           &.voted {
             color: green;
