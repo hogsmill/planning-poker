@@ -13,7 +13,7 @@
         <tr v-for="(card, index) in backlog" :key="index" @click="selectCard(card.id)">
           <td>{{ card.id }}</td>
           <td>{{ card.title }}</td>
-          <td><span v-if="card.estimate">{{ card.estimate }}</span></td>
+          <td><span v-if="card.estimate"><b>{{ card.estimate }}</b></span></td>
         </tr>
       </tbody>
     </table>

@@ -51,7 +51,8 @@
             </select>
           </div>
           <div v-if="!estimating" class="poker-card-value" @click="startEstimating()">
-            {{ teamMember.estimate || 'TBD' }}
+            <span v-if="teamMember.estimate">{{ teamMember.estimate }}</span>
+            <span v-if="!teamMember.estimate" class="tbd">TBD</span>
           </div>
         </div>
         <div v-if="teamMember.id != myName.id && !revealed" class="poker-card back rounded">
@@ -177,11 +178,14 @@ export default {
           background-repeat: no-repeat;
           background-position-x: center;
         }
+        .tbd {
+          color: #ddd;
+        }
         .poker-card-value {
           font-size: 40px;
           margin-top: 24px;
           font-weight: bold;
-          color: #888;
+          color: #green;
         }
         .poker-card-voted {
           width: 48px;
