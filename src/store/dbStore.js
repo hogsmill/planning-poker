@@ -1,5 +1,4 @@
 
-
 function createTeam() {
 
   return {
@@ -17,12 +16,7 @@ function createTeam() {
       { name: 'Julia', id: 'fff', voted: false },
       { name: 'Carol', id: 'ggg', voted: false }
     ],
-    backlog: [
-      { id: 1, selected: false, estimate: 0, title: 'Build an API', description: 'Build the API by updating the domain model to allow feature x to connect'},
-      { id: 2, selected: false, estimate: 0, title: 'Do the UI', description: 'Update the GUI to allow product selection. Date comes from the API' },
-      { id: 3, selected: false, estimate: 0, title: 'Build the login', description: 'Store user details in database' },
-      { id: 4, selected: false, estimate: 0, title: 'Add Logging', description: 'Update logging system to log new feature' }
-    ],
+    backlog: [],
     estimationValues: {
       't-shirt': ['XS', 'S', 'M', 'L', 'XL'],
       'fibonacci': ['1', '2', '3', '5', '8', '13']
@@ -51,6 +45,44 @@ module.exports = {
           client.close()
         })
       }
+    })
+  },
+
+  loadBacklog:  function(err, client, db, io, data, debugOn) {
+
+    if (debugOn) { console.log('loadBacklog', data) }
+
+    db.collection('planningPoker').findOne({teamName: data.teamName}, function(err, res) {
+      if (err) throw err
+      if (res) {
+        for (let i = 0; i < data.backlog.length; i++) {
+          res.backlog.push(data.backlog[i])
+        }
+        const team = res
+        db.collection('planningPoker').updateOne({'_id': res._id}, {$set: {backlog: res.backlog}}, function(err, res) {
+          if (err) throw err
+          io.emit('loadTeam', team)
+          client.close()
+       })
+     }
+    })
+  },
+
+  addBacklogCard:  function(err, client, db, io, data, debugOn) {
+
+    if (debugOn) { console.log('addBacklogCard', data) }
+
+    db.collection('planningPoker').findOne({teamName: data.teamName}, function(err, res) {
+      if (err) throw err
+      if (res) {
+        res.backlog.push(data.card)
+        const team = res
+        db.collection('planningPoker').updateOne({'_id': res._id}, {$set: {backlog: res.backlog}}, function(err, res) {
+          if (err) throw err
+          io.emit('loadTeam', team)
+          client.close()
+       })
+     }
     })
   },
 

@@ -3,7 +3,13 @@
     <Header />
     <WalkThroughView />
     <h1>Planning Poker</h1>
-    <div>
+    <div v-if="showTab == 'about'">
+      <AboutView />
+    </div>
+    <div v-if="showTab == 'facilitator'">
+      <FacilitatorView :socket="socket" />
+    </div>
+    <div v-if="showTab == 'game'">
       <div class="game-params">
         <MyName :socket="socket" />
         <TeamName :socket="socket" />
@@ -38,6 +44,8 @@ import params from './lib/params.js'
 
 import Header from './components/Header.vue'
 import WalkThroughView from './components/about/WalkThroughView.vue'
+import AboutView from './components/about/AboutView.vue'
+import FacilitatorView from './components/FacilitatorView.vue'
 import MyName from './components/MyName.vue'
 import TeamName from './components/TeamName.vue'
 import Backlog from './components/Backlog.vue'
@@ -48,6 +56,8 @@ export default {
   components: {
     Header,
     WalkThroughView,
+    AboutView,
+    FacilitatorView,
     MyName,
     TeamName,
     Backlog,

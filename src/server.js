@@ -51,6 +51,12 @@ function doDb(fun, data) {
       case 'loadGame':
         dbStore.loadTeam(err, client, db, io, data, debugOn)
         break
+      case 'loadBacklog':
+        dbStore.loadBacklog(err, client, db, io, data, debugOn)
+        break
+      case 'addBacklogCard':
+        dbStore.addBacklogCard(err, client, db, io, data, debugOn)
+        break
       case 'selectCard':
         dbStore.selectCard(err, client, db, io, data, debugOn)
         break
@@ -85,6 +91,10 @@ io.on('connection', (socket) => {
   })
 
   socket.on('loadTeam', (data) => { doDb('loadGame', data) })
+
+  socket.on('loadBacklog', (data) => { doDb('loadBacklog', data) })
+
+  socket.on('addBacklogCard', (data) => { doDb('addBacklogCard', data) })
 
   socket.on('updateEstimationType', (data) => { emit('updateEstimationType', data) })
 

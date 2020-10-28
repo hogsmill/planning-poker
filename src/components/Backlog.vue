@@ -1,7 +1,7 @@
 <template>
   <div>
     <h4>Backlog</h4>
-    <table border>
+    <table v-if="backlog.length" border>
       <thead>
         <tr>
           <th>ID</th>

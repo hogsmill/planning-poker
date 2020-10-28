@@ -7,6 +7,7 @@ export const store = new Vuex.Store({
   state: {
     connections: 0,
     walkThrough: false,
+    showTab: 'game',
     host: false,
     myName: {},
     teamName: '',
@@ -31,6 +32,9 @@ export const store = new Vuex.Store({
     },
     getHost: (state) => {
       return state.host
+    },
+    getShowTab: (state) => {
+      return state.showTab
     },
     getMyName: (state) => {
       return state.myName
@@ -76,6 +80,9 @@ export const store = new Vuex.Store({
     updateHost: (state, payload) => {
       state.host = payload
     },
+    updateShowTab: (state, payload) => {
+      state.showTab = payload
+    },
     updateMyName: (state, payload) => {
       state.myName = payload
     },
@@ -102,6 +109,9 @@ export const store = new Vuex.Store({
     },
     updateHost: ({ commit }, payload) => {
       commit('updateHost', payload)
+    },
+    updateShowTab: ({ commit }, payload) => {
+      commit('updateShowTab', payload)
     },
     updateMyName: ({ commit }, payload) => {
       commit('updateMyName', payload)
