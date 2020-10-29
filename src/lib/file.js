@@ -1,10 +1,4 @@
 
-const seperators = {
-  tab: '\t',
-  space: '\s',
-  comma: ','
-}
-
 function lineToFields(line, sep) {
   let fields = []
   switch(sep) {

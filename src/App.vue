@@ -11,15 +11,11 @@
     </div>
     <div v-if="showTab == 'game'">
       <div class="game-params">
+        <!-- Put an organisation in here for demo purposes -->
         <MyName :socket="socket" />
         <TeamName :socket="socket" />
       </div>
       <div class="container">
-        <div>
-          <div class="connections">
-            Current server connections: {{ connections.connections }} / {{ connections.maxConnections }}
-          </div>
-        </div>
         <div v-if="teamName">
           <table class="poker-table" border>
             <tr>
@@ -75,9 +71,6 @@ export default {
     },
     teamName() {
       return this.$store.getters.getTeamName
-    },
-    connections() {
-      return this.$store.getters.getConnections
     }
   },
   created() {

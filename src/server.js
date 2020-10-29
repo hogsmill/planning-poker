@@ -48,14 +48,10 @@ function doDb(fun, data) {
     const db = client.db('db')
 
     switch(fun) {
+
+      // Game
       case 'loadGame':
         dbStore.loadTeam(err, client, db, io, data, debugOn)
-        break
-      case 'loadBacklog':
-        dbStore.loadBacklog(err, client, db, io, data, debugOn)
-        break
-      case 'addBacklogCard':
-        dbStore.addBacklogCard(err, client, db, io, data, debugOn)
         break
       case 'selectCard':
         dbStore.selectCard(err, client, db, io, data, debugOn)
@@ -65,6 +61,23 @@ function doDb(fun, data) {
         break
       case 'updateAgreedEstimate':
         dbStore.updateAgreedEstimate(err, client, db, io, data, debugOn)
+        break
+
+      // Facilitator
+      case 'addEstimationValue':
+        dbStore.addEstimationValue(err, client, db, io, data, debugOn)
+        break
+      case 'deleteEstimationValue':
+        dbStore.deleteEstimationValue(err, client, db, io, data, debugOn)
+        break
+      case 'loadBacklog':
+        dbStore.loadBacklog(err, client, db, io, data, debugOn)
+        break
+      case 'addBacklogCard':
+        dbStore.addBacklogCard(err, client, db, io, data, debugOn)
+        break
+      case 'deleteBacklogCard':
+        dbStore.deleteBacklogCard(err, client, db, io, data, debugOn)
         break
       default:
         console.log('Unknown function ', fun)
@@ -90,11 +103,8 @@ io.on('connection', (socket) => {
     emit('updateConnections', {connections: connections, maxConnections: maxConnections})
   })
 
+  // Game
   socket.on('loadTeam', (data) => { doDb('loadGame', data) })
-
-  socket.on('loadBacklog', (data) => { doDb('loadBacklog', data) })
-
-  socket.on('addBacklogCard', (data) => { doDb('addBacklogCard', data) })
 
   socket.on('updateEstimationType', (data) => { emit('updateEstimationType', data) })
 
@@ -102,10 +112,20 @@ io.on('connection', (socket) => {
 
   socket.on('updateEstimateValue', (data) => { doDb('updateEstimateValue', data) })
 
-  socket.on('updateAgreedEstimate', (data) => { doDb('updateAgreedEstimate', data) })
-
   socket.on('reveal', (data) => { emit('reveal', data) })
 
+  socket.on('updateAgreedEstimate', (data) => { doDb('updateAgreedEstimate', data) })
+
+  // Facilitator
+  socket.on('loadBacklog', (data) => { doDb('loadBacklog', data) })
+
+  socket.on('addEstimationValue', (data) => { doDb('addEstimationValue', data) })
+
+  socket.on('deleteEstimationValue', (data) => { doDb('deleteEstimationValue', data) })
+
+  socket.on('addBacklogCard', (data) => { doDb('addBacklogCard', data) })
+
+  socket.on('deleteBacklogCard', (data) => { doDb('deleteBacklogCard', data) })
 })
 
 const port = process.argv[2] || 3004

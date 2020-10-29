@@ -8,14 +8,6 @@
         {{ selectedCard.description }}
       </p>
     </div>
-    <div class="estimation-type">
-      Estimate Using:
-      <select id="set-estimation-type" @change="setEstimationType()">
-        <option v-for="(estType, index) in estimationTypes" :key="index" :selected="estType == estimationType">
-          {{ estType }}
-        </option>
-      </select>
-    </div>
     <div v-if="selectedCard" class="final-estimate">
       <div>
         <span>Agreed Estimate: </span>
@@ -91,12 +83,6 @@ export default {
     teamMembers() {
       return this.$store.getters.getTeamMembers
     },
-    estimationType() {
-      return this.$store.getters.getEstimationType
-    },
-    estimationTypes() {
-      return this.$store.getters.getEstimationTypes
-    },
     estimationValues() {
       return this.$store.getters.getEstimationValues
     },
@@ -105,14 +91,10 @@ export default {
     }
   },
   methods: {
-    setEstimationType() {
-      const estimationType = document.getElementById('set-estimation-type').value
-      this.socket.emit('updateEstimationType', {teamName: this.teamName, estimationType: estimationType})
-    },
     startEstimating() {
       this.estimating = true
     },
-    saveEstimate(estimate) {
+    saveEstimate() {
       const estimationValue = document.getElementById('estimate-value-' + this.myName.id).value
       this.socket.emit('updateEstimateValue', {teamName: this.teamName, teamMember: this.myName, value: estimationValue})
       this.estimating = false
@@ -155,6 +137,7 @@ export default {
     }
   }
   .members {
+
     .member {
       width: 140px;
       height: 200px;

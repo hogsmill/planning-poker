@@ -24,6 +24,12 @@ export const store = new Vuex.Store({
     estimationValues: {
       't-shirt': ['XS', 'S', 'M', 'L', 'XL'],
       'fibonacci': ['1', '2', '3', '5', '8', '13']
+    },
+    editing: {
+      showTeams: false,
+      showTeamMembers: false,
+      showEstimates: false,
+      showBacklog: false
     }
   },
   getters: {
@@ -71,6 +77,18 @@ export const store = new Vuex.Store({
     },
     getBacklog: (state) => {
       return state.backlog
+    },
+    getShowTeams: (state) => {
+      return state.editing.showTeams
+    },
+    getShowTeamMembers: (state) => {
+      return state.editing.showTeamMembers
+    },
+    getShowEstimates: (state) => {
+      return state.editing.showEstimates
+    },
+    getShowBacklog: (state) => {
+      return state.editing.showBacklog
     }
   },
   mutations: {
@@ -92,16 +110,30 @@ export const store = new Vuex.Store({
     updateEstimationType: (state, payload) => {
       state.estimationType = payload.estimationType
     },
-    updateConnections: (state, payload) => {
-      state.connections = payload
-    },
     loadTeam: (state, payload) => {
+      console.log(payload)
       state.teamMembers = payload.teamMembers
       state.backlog = payload.backlog
+      state.estimationValues = payload.estimationValues
     },
     reveal: (state, payload) => {
       state.revealed = payload.reveal
     },
+    setShowTeams: (state, payload) => {
+      state.editing.showTeams = payload
+    },
+    setShowTeamMembers: (state, payload) => {
+      state.editing.showTeamMembers = payload
+    },
+    setShowEstimates: (state, payload) => {
+      state.editing.showEstimates = payload
+    },
+    setShowBacklog: (state, payload) => {
+      state.editing.showBacklog = payload
+    },
+    updateConnections: (state, payload) => {
+      state.connections = payload
+    }
   },
   actions: {
     updateWalkThrough: ({ commit }, payload) => {
@@ -127,6 +159,18 @@ export const store = new Vuex.Store({
     },
     reveal: ({ commit }, payload) => {
       commit('reveal', payload)
+    },
+    setShowTeams: ({ commit }, payload) => {
+      commit('setShowTeams', payload)
+    },
+    setShowTeamMembers: ({ commit }, payload) => {
+      commit('setShowTeamMembers', payload)
+    },
+    setShowEstimates: ({ commit }, payload) => {
+      commit('setShowEstimates', payload)
+    },
+    setShowBacklog: ({ commit }, payload) => {
+      commit('setShowBacklog', payload)
     },
     updateConnections: ({ commit }, payload) => {
       commit('updateConnections', payload)
