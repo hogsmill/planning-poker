@@ -116,6 +116,21 @@ export default {
       }
     })
 
+    this.socket.on('backlogSaved', (data) => {
+      if (this.teamName == data.teamName) {
+      console.log(data)
+        if (data.status) {
+          alert('File Saved')
+        } else if (data.errType == 'fileExists') {
+          if (confirm('File exists, overwrite?')) {
+            this.socket.emit('saveBacklog', {teamName: data.teamName, file: data.file, overwrite: true, backlog: data.backlog, seperator: data.seperator})
+          }
+        } else {
+          alert('Error saving file: ' +  data.err)
+        }
+      }
+    })
+
     this.socket.on('updateConnections', (data) => {
       this.$store.dispatch('updateConnections', data)
     })

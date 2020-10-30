@@ -184,24 +184,30 @@ module.exports = {
     })
   },
 
-  saveBacklog:  function(saveDir, logFile, data, fs, debugOn) {
+  saveBacklog:  function(saveDir, logFile, io, data, fs, debugOn) {
 
     if (debugOn) { console.log('saveBacklog', data) }
 
     const fileName = saveDir + data.file
-    let backlog = []
-    for (let i = 0; i < data.backlog.length; i++) {
-      var str = createOutputRecord(data.backlog[i], data.seperator)
-      backlog.push(str)
-    }
-    backlog = backlog.join('\n')
-    fs.writeFile(fileName, backlog, function (err, data) {
-      if (err) {
-        console.log(err)
-      } else {
-        if (debugOn) { console.log('Backlog written to ', fileName) }
+    if (!data.overwrite && fs.existsSync(fileName)) {
+      data.errType = 'fileExists'
+      io.emit('backlogSaved', data)
+    } else {
+      let backlog = []
+      for (let i = 0; i < data.backlog.length; i++) {
+        var str = createOutputRecord(data.backlog[i], data.seperator)
+        backlog.push(str)
       }
-    })
+      backlog = backlog.join('\n')
+      fs.writeFile(fileName, backlog, function (err, returnData) {
+        if (err) {
+          io.emit('backlogSaved', {teamName: data.teamName, status: false, errType: 'general', err: err})
+        } else {
+          if (debugOn) { console.log('Backlog written to ', fileName) }
+          io.emit('backlogSaved', {teamName: data.teamName, status: true})
+        }
+      })
+    }
   },
 
   addBacklogCard:  function(err, client, db, io, data, debugOn) {

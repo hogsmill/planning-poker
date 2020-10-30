@@ -75,7 +75,7 @@ function doDb(fun, data) {
         dbStore.loadBacklog(err, client, db, io, data, debugOn)
         break
       case 'saveBacklog':
-        dbStore.saveBacklog(saveDir, logFile, data, fs, debugOn)
+        dbStore.saveBacklog(saveDir, logFile, io, data, fs, debugOn)
         break
       case 'addBacklogCard':
         dbStore.addBacklogCard(err, client, db, io, data, debugOn)
