@@ -10,7 +10,7 @@
     <tr v-if="showBacklog">
       <td>
         Load from file<br>
-        <i>(Must be CSV, with first 3 columns Id, Title, Description)</i>
+        <i>(Must be CSV, with columns Id, Title, Description, [Estimate])</i> - estimate optional
       </td>
       <td class="upload">
         <div>
@@ -77,10 +77,37 @@
     </tr>
     <tr v-if="showBacklog">
       <td>
-        Save as file<br>
+        Save backlog to file
       </td>
-      <td class="upload">
-        TBD
+      <td class="inner-table">
+        <table>
+          <tr>
+            <td>
+              Filename <input id="backlog-save-file" type="text">
+            </td>
+            <td>
+              <button class="btn btn-sm btn-secondary smaller-font" @click="saveBacklog()">
+                Save
+              </button>
+            </td>
+          </tr>
+          <tr>
+            <td colspan="2">
+              Seperator
+              <select id="backlog-save-file-seperator">
+                <option value="tab">
+                  \t (tab)
+                </option>
+                <option value="comma">
+                  , (comma)
+                </option>
+                <option value="space">
+                  \s (space)
+                </option>
+              </select>
+            </td>
+          </tr>
+        </table>
       </td>
     </tr>
   </table>
@@ -134,6 +161,11 @@ export default {
         this.socket.emit('deleteBacklogCard', {teamName: this.teamName, card: card})
       }
 
+    },
+    saveBacklog() {
+      const saveFile = document.getElementById('backlog-save-file').value
+      const seperator = document.getElementById('backlog-save-file-seperator').value
+      this.socket.emit('saveBacklog', {teamName: this.teamName, file: saveFile, backlog: this.backlog, seperator: seperator})
     }
   }
 }

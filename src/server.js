@@ -27,8 +27,8 @@ const dbStore = require('./store/dbStore.js')
 
 const MongoClient = require('mongodb').MongoClient
 
-const url = prod ?  'mongodb://127.0.0.1:27017/' : 'mongodb://localhost:27017/'
-
+const url = prod ? 'mongodb://127.0.0.1:27017/' : 'mongodb://localhost:27017/'
+const saveDir = prod ? '/var/www/html/backlogs/' : 'C:/DATA/APPS/planning-poker/backlogs/'
 const connectDebugOff = prod
 const debugOn = !prod
 
@@ -72,6 +72,9 @@ function doDb(fun, data) {
         break
       case 'loadBacklog':
         dbStore.loadBacklog(err, client, db, io, data, debugOn)
+        break
+      case 'saveBacklog':
+        dbStore.saveBacklog(saveDir, logFile, data, fs, debugOn)
         break
       case 'addBacklogCard':
         dbStore.addBacklogCard(err, client, db, io, data, debugOn)
@@ -118,6 +121,8 @@ io.on('connection', (socket) => {
 
   // Facilitator
   socket.on('loadBacklog', (data) => { doDb('loadBacklog', data) })
+
+  socket.on('saveBacklog', (data) => { doDb('saveBacklog', data) })
 
   socket.on('addEstimationValue', (data) => { doDb('addEstimationValue', data) })
 

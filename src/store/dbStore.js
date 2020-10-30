@@ -28,6 +28,28 @@ function cardsMatch(card1, card2) {
   return card1.id == card2.id && card1.title == card2.title && card1.description == card2.description
 }
 
+function createOutputRecord(record, sep) {
+  record = [
+    record.id,
+    record.title,
+    record.description,
+    record.estimate
+  ]
+  let outputRecord = ''
+  switch(sep) {
+    case 'tab':
+      outputRecord = record.join('\t')
+      break
+    case 'comma':
+      outputRecord = record.join(/,/)
+      break
+    case 'space':
+      outputRecord = record.join(/\s/)
+      break
+  }
+  return outputRecord
+}
+
 module.exports = {
 
   // Game
@@ -159,6 +181,26 @@ module.exports = {
           client.close()
        })
      }
+    })
+  },
+
+  saveBacklog:  function(saveDir, logFile, data, fs, debugOn) {
+
+    if (debugOn) { console.log('saveBacklog', data) }
+
+    const fileName = saveDir + data.file
+    let backlog = []
+    for (let i = 0; i < data.backlog.length; i++) {
+      var str = createOutputRecord(data.backlog[i], data.seperator)
+      backlog.push(str)
+    }
+    backlog = backlog.join('\n')
+    fs.writeFile(fileName, backlog, function (err, data) {
+      if (err) {
+        console.log(err)
+      } else {
+        if (debugOn) { console.log('Backlog written to ', fileName) }
+      }
     })
   },
 
