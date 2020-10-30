@@ -142,7 +142,6 @@ export default {
       width: 140px;
       height: 200px;
       float: left;
-      border: 1px solid;
       margin: 2px;
 
       select {
