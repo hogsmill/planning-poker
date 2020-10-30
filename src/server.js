@@ -28,7 +28,7 @@ const dbStore = require('./store/dbStore.js')
 const MongoClient = require('mongodb').MongoClient
 
 const url = prod ? 'mongodb://127.0.0.1:27017/' : 'mongodb://localhost:27017/'
-const saveDir = prod ? '/var/www/html/planning-poker/backlogs' : 'C:/DATA/APPS/planning-poker/backlogs/'
+const saveDir = prod ? '/var/www/html/planning-poker/backlogs/' : 'C:/DATA/APPS/planning-poker/backlogs/'
 
 const connectDebugOff = prod
 const debugOn = !prod
