@@ -171,6 +171,9 @@ module.exports = {
     db.collection('planningPoker').findOne({teamName: data.teamName}, function(err, res) {
       if (err) throw err
       if (res) {
+        if (data.replace) {
+          res.backlog = []
+        }
         for (let i = 0; i < data.backlog.length; i++) {
           res.backlog.push(data.backlog[i])
         }

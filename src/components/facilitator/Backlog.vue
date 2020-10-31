@@ -14,11 +14,8 @@
       </td>
       <td class="upload">
         <div>
-          <input id="backlog-file" type="file" @change="loadBacklog()">
-        </div>
-        <div>
-          Seperator
-          <select id="backlog-file-seperator">
+          separator
+          <select id="backlog-file-separator">
             <option value="tab">
               \t (tab)
             </option>
@@ -29,6 +26,12 @@
               \s (space)
             </option>
           </select>
+        </div>
+        <div>
+          <input id="backlog-file-replace" type="checkbox"> Replace existing backlog?
+        </div>
+        <div>
+          <input id="backlog-file" type="file" @change="loadBacklog()">
         </div>
       </td>
     </tr>
@@ -93,8 +96,8 @@
           </tr>
           <tr>
             <td colspan="2">
-              Seperator
-              <select id="backlog-save-file-seperator">
+              separator
+              <select id="backlog-save-file-separator">
                 <option value="tab">
                   \t (tab)
                 </option>
@@ -136,15 +139,10 @@ export default {
       this.$store.dispatch('setShowBacklog', val)
     },
     loadBacklog() {
-      const uploader = document.getElementById('backlog-file')
-      const seperator = document.getElementById('backlog-file-seperator').value
-      const fr = new FileReader()
-      self = this
-      fr.onload = function() {
-        const backlog = fileFuns.fileToCards(fr.result, seperator)
-        self.socket.emit('loadBacklog', {teamName: self.teamName, backlog: backlog})
-      }
-      fr.readAsText(uploader.files[0])
+      const file = document.getElementById('backlog-file').files[0]
+      const separator = document.getElementById('backlog-file-separator').value
+      const replace = document.getElementById('backlog-file-replace').checked
+      const backlog = fileFuns.loadBacklog(file, separator, this.teamName, replace, this.socket)
     },
     addCard() {
       const card = {
@@ -164,8 +162,8 @@ export default {
     },
     saveBacklog() {
       const saveFile = document.getElementById('backlog-save-file').value
-      const seperator = document.getElementById('backlog-save-file-seperator').value
-      this.socket.emit('saveBacklog', {teamName: this.teamName, file: saveFile, backlog: this.backlog, seperator: seperator})
+      const separator = document.getElementById('backlog-save-file-separator').value
+      this.socket.emit('saveBacklog', {teamName: this.teamName, file: saveFile, backlog: this.backlog, separator: separator})
     }
   }
 }

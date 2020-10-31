@@ -1,46 +1,45 @@
 
-function lineToFields(line, sep) {
-  let fields = []
-  switch(sep) {
-    case 'tab':
-      fields = line.split('\t')
-      break
-    case 'comma':
-      fields = line.split(/,/)
-      break
-    case 'space':
-      fields = line.split(/\s/)
-      break
+const papa = require('papaparse')
+
+function createBacklog(data, teamName, replace, socket) {
+  const backlog = []
+  for (let i = 0; i < data.length; i++) {
+    const card = {
+      id: data[i][0],
+      title: data[i][1],
+      description: data[i][2],
+      estimate: data[i][3] ? data[i][3] : 0,
+      selected: false
+    }
+    backlog.push(card)
   }
-  return fields
-}
-
-function checkLine(fields) {
-  return fields.length > 2
-}
-
-function fieldsToCard(fields) {
-   return {
-     id: fields[0],
-     selected: false,
-     estimate: 0,
-     title: fields[1],
-     description: fields[2]
-   }
+  socket.emit('loadBacklog', {teamName: teamName, backlog: backlog, replace: replace})
 }
 
 const FileFuns = {
 
-  fileToCards: function(text, sep) {
-    const cards = [], lines = text.split(/\r?\n/)
-    for (let i = 0; i < lines.length; i++) {
-      const fields = lineToFields(lines[i], sep)
-      if (checkLine(fields)) {
-        cards.push(fieldsToCard(fields))
-      }
+  loadBacklog: function(file, separator, teamName, replace, socket) {
+
+    switch(separator) {
+      case 'tab':
+        separator = '\t'
+        break
+      case 'comma':
+        separator = ','
+        break
+      case 'space':
+        separator = ' '
+        break
     }
-    return cards
+    const results = papa.parse(file, {
+      delimiter: separator,
+      skipEmptyLines: true,
+	    complete: function(results) {
+		    createBacklog(results.data, teamName, replace, socket)
+	    }
+    })
   }
+
 }
 
 export default FileFuns

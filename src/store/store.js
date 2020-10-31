@@ -111,7 +111,6 @@ export const store = new Vuex.Store({
       state.estimationType = payload.estimationType
     },
     loadTeam: (state, payload) => {
-      console.log(payload)
       state.teamMembers = payload.teamMembers
       state.backlog = payload.backlog
       state.estimationValues = payload.estimationValues

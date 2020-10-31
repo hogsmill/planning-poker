@@ -118,7 +118,6 @@ export default {
 
     this.socket.on('backlogSaved', (data) => {
       if (this.teamName == data.teamName) {
-      console.log(data)
         if (data.status) {
           alert('File Saved')
         } else if (data.errType == 'fileExists') {
