@@ -9,7 +9,12 @@
     </tr>
     <tr v-if="showTeams">
       <td>Add Team</td>
-      <td><input> <button>Add</button></td>
+      <td>
+        <input type="text">
+        <button class="btn btn-sm btn-secondary smaller-font">
+          Add
+        </button>
+      </td>
     </tr>
     <tr v-if="showTeams">
       <td>Teams</td>

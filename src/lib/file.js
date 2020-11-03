@@ -8,7 +8,7 @@ function createBacklog(data, teamName, replace, socket) {
       id: data[i][0],
       title: data[i][1],
       description: data[i][2],
-      estimate: data[i][3] ? data[i][3] : 0,
+      estimate: data[i][3] ? data[i][3] : '',
       selected: false
     }
     backlog.push(card)
@@ -26,6 +26,12 @@ const FileFuns = {
         break
       case 'comma':
         separator = ','
+        break
+      case 'semicolon':
+        separator = ';'
+        break
+      case 'colon':
+        separator = ':'
         break
       case 'space':
         separator = ' '

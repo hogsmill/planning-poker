@@ -11,6 +11,7 @@ export const store = new Vuex.Store({
     host: false,
     myName: {},
     teamName: '',
+    organisation: 'hogsmill',
     teams: [
       { name: 'Eagle' },
       { name: 'Dragon' },
@@ -47,6 +48,9 @@ export const store = new Vuex.Store({
     },
     getTeamName: (state) => {
       return state.teamName
+    },
+    getOrganisation: (state) => {
+      return state.organisation
     },
     getTeams: (state) => {
       return state.teams
@@ -107,6 +111,9 @@ export const store = new Vuex.Store({
     updateTeamName: (state, payload) => {
       state.teamName = payload
     },
+    updateOrganisation: (state, payload) => {
+      state.organisation = payload
+    },
     updateEstimationType: (state, payload) => {
       state.estimationType = payload.estimationType
     },
@@ -149,6 +156,9 @@ export const store = new Vuex.Store({
     },
     updateTeamName: ({ commit }, payload) => {
       commit('updateTeamName', payload)
+    },
+    updateOrganisation: ({ commit }, payload) => {
+      commit('updateOrganisation', payload)
     },
     updateEstimationType: ({ commit }, payload) => {
       commit('updateEstimationType', payload)

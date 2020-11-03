@@ -13,20 +13,7 @@
         <i>(Must be CSV, with columns Id, Title, Description, [Estimate])</i> - estimate optional
       </td>
       <td class="upload">
-        <div>
-          separator
-          <select id="backlog-file-separator">
-            <option value="tab">
-              \t (tab)
-            </option>
-            <option value="comma">
-              , (comma)
-            </option>
-            <option value="space">
-              \s (space)
-            </option>
-          </select>
-        </div>
+        <Delimiter id="backlog-file-separator" />
         <div>
           <input id="backlog-file-replace" type="checkbox"> Replace existing backlog?
         </div>
@@ -65,7 +52,7 @@
         </table>
       </td>
     </tr>
-    <tr v-if="showBacklog">
+    <tr v-if="showBacklog && backlog.length">
       <td>Delete item</td>
       <td>
         <table>
@@ -96,18 +83,7 @@
           </tr>
           <tr>
             <td colspan="2">
-              separator
-              <select id="backlog-save-file-separator">
-                <option value="tab">
-                  \t (tab)
-                </option>
-                <option value="comma">
-                  , (comma)
-                </option>
-                <option value="space">
-                  \s (space)
-                </option>
-              </select>
+              <Delimiter id="backlog-save-file-separator" />
             </td>
           </tr>
         </table>
@@ -119,10 +95,16 @@
 <script>
 import fileFuns from '../../lib/file.js'
 
+import Delimiter from './backlog/Delimiter.vue'
+
 export default {
+  components: {
+    Delimiter
+  },
   props: [
     'socket'
   ],
+
   computed: {
     showBacklog() {
       return this.$store.getters.getShowBacklog
@@ -142,7 +124,9 @@ export default {
       const file = document.getElementById('backlog-file').files[0]
       const separator = document.getElementById('backlog-file-separator').value
       const replace = document.getElementById('backlog-file-replace').checked
-      const backlog = fileFuns.loadBacklog(file, separator, this.teamName, replace, this.socket)
+      if (file) {
+        fileFuns.loadBacklog(file, separator, this.teamName, replace, this.socket)
+      }
     },
     addCard() {
       const card = {

@@ -14,30 +14,28 @@
         </button>
       </div>
       <div class="mt-4" v-if="step == 1">
-        <h4>Welcome to the Coin Game</h4>
+        <h4>Welcome to Planning Poker</h4>
         <div>
           <p>
-            This simulation shows the importance of focussing on value delivery
-            as the best means of satisfying customer need, and the best strategy
-            for reducing risk
+            The classic estimation game in an intuitive, easy to use online
+            format.
           </p>
-          <div class="coin-game-round" />
+          <p>
+            You can estimate in any units you wish, and can upload the items you
+            want to estimate from a file - and save them back out again to save
+            the estimates.
+          </p>
         </div>
       </div>
       <div class="mt-4" v-if="step == 2">
         <h4>Welcome to the Coin Game</h4>
         <div>
           <p>
-            Project work is simulated - in the real game - by the flipping of
-            coins, and the flow of work in a project is simulated by passing the
-            coins from role to role - e.g. from a designer to a dev, to a QA and
-            finally delivery to the customer. (<em>yes, we know teams should be cross-functional and no roles, but
-              this is just for the simulation...</em>)
+            Add host as a URL parameter to see the facilitation tab where you can set units,
+            upload and save items, define teams and team members, and more
           </p>
-          <p>In the online version, coins are played by merely clicking them</p>
           <p>
-            The value delivered is the actual value of coins passed to the
-            customer
+            <a href="http://agilesimulations.co.uk/planning-poker?host">http://agilesimulations.co.uk/planning-poker?host</a>
           </p>
         </div>
       </div>

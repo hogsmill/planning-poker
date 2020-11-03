@@ -1,5 +1,5 @@
 <template>
-  <div class="team-name float-right">
+  <div class="team-name">
     <button class="btn btn-sm btn-secondary smaller-font" v-if="!teamName" @click="show">
       Set Team Name
     </button>
@@ -65,7 +65,9 @@ export default {
 </script>
 
 <style lang="scss">
-
+  .team-name {
+    display: inline-block;
+  }
   .set-team-name {
 
     #team-name {
@@ -74,5 +76,4 @@ export default {
       margin-right: 6px;
     }
   }
-
 </style>

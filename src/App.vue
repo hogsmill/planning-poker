@@ -2,7 +2,7 @@
   <div id="app" class="mb-4">
     <Header />
     <WalkThroughView />
-    <h1>Planning Poker</h1>
+    <h1>Planning Poker <span v-if="organisation">({{ organisation }})</span></h1>
     <div v-if="showTab == 'about'">
       <AboutView />
     </div>
@@ -11,11 +11,11 @@
     </div>
     <div v-if="showTab == 'game'">
       <div class="game-params">
-        <!-- Put an organisation in here for demo purposes -->
-        <MyName :socket="socket" />
-        <TeamName :socket="socket" />
+        <Organisation :socket="socket" />
+        <MyName v-if="organisation" :socket="socket" />
+        <TeamName v-if="organisation" :socket="socket" />
       </div>
-      <div class="container">
+      <div v-if="organisation" class="container">
         <div v-if="teamName">
           <table class="poker-table" border>
             <tr>
@@ -42,6 +42,7 @@ import Header from './components/Header.vue'
 import WalkThroughView from './components/about/WalkThroughView.vue'
 import AboutView from './components/about/AboutView.vue'
 import FacilitatorView from './components/FacilitatorView.vue'
+import Organisation from './components/Organisation.vue'
 import MyName from './components/MyName.vue'
 import TeamName from './components/TeamName.vue'
 import Backlog from './components/Backlog.vue'
@@ -54,6 +55,7 @@ export default {
     WalkThroughView,
     AboutView,
     FacilitatorView,
+    Organisation,
     MyName,
     TeamName,
     Backlog,
@@ -68,6 +70,9 @@ export default {
     },
     showTab() {
       return this.$store.getters.getShowTab
+    },
+    organisation() {
+      return this.$store.getters.getOrganisation
     },
     teamName() {
       return this.$store.getters.getTeamName
@@ -86,10 +91,18 @@ export default {
       this.$store.dispatch('updateHost', true)
     }
 
+    this.socket.emit('setOrganisation', {organisation: organisation})
+
+    const organisation = localStorage.getItem('organisation-pp')
+    if (organisation) {
+      this.$store.dispatch('updateOrganisation', organisation)
+      this.socket.emit('setOrganisation', {organisation: organisation})
+    }
+
     const teamName = localStorage.getItem('teamName-pp')
-    if (teamName) {
+    if (organisation && teamName) {
       this.$store.dispatch('updateTeamName', teamName)
-      this.socket.emit('loadTeam', {teamName: teamName})
+      this.socket.emit('loadTeam', {teamName: teamName, organisation: organisation})
     }
 
     let myName = localStorage.getItem('myName-pp')
@@ -113,6 +126,13 @@ export default {
     this.socket.on('reveal', (data) => {
       if (this.teamName == data.teamName) {
         this.$store.dispatch('reveal', data)
+      }
+    })
+
+    this.socket.on('backlogLoaded', (data) => {
+      if (this.teamName == data.teamName) {
+        alert('Backlog loaded. Backlog now has ' + data.backlogLength + ' items')
+        document.getElementById('backlog-file').value = ''
       }
     })
 
@@ -145,6 +165,7 @@ export default {
   }
   .game-params {
     height: 40px;
+    text-align: center;
   }
   .poker-table {
     margin: 0 auto;

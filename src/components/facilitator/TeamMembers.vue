@@ -11,13 +11,30 @@
       <td>
         <table>
           <tr>
-            <td colspan="2">
-              <input type="text"> <button>Add Team Member</button>
+            <td>
+              Add team member to {{ teamName }}
+            </td><td colspan="2">
+              <input type="text">
+              <button class="btn btn-sm btn-secondary smaller-font">
+                Add
+              </button>
             </td>
           </tr>
-          <tr v-for="(teamMember, index) in teamMembers" :key="index">
-            <td><input type="checkbox"></td>
-            <td>{{ teamMember.name }}</td>
+          <tr>
+            <td>Team Members</td>
+            <td>
+              <table class="inner-table">
+                <tr v-for="(teamMember, index) in teamMembers" :key="index">
+                  <td><input type="checkbox"></td>
+                  <td>{{ teamMember.name }}</td>
+                  <td>
+                    <button class="btn btn-sm btn-secondary smaller-font" @click="deleteMember(card)">
+                      Delete
+                    </button>
+                  </td>
+                </tr>
+              </table>
+            </td>
           </tr>
         </table>
       </td>
@@ -31,6 +48,9 @@ export default {
     'socket'
   ],
   computed: {
+    teamName() {
+      return this.$store.getters.getTeamName
+    },
     showTeamMembers() {
       return this.$store.getters.getShowTeamMembers
     },

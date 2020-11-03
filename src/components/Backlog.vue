@@ -1,6 +1,6 @@
 <template>
   <div>
-    <h4>Backlog</h4>
+    <h4>Backlog <br>({{ items(backlog.length) }})</h4>
     <table v-if="backlog.length" border>
       <thead>
         <tr>
@@ -34,6 +34,9 @@ export default {
     }
   },
   methods: {
+    items(n) {
+      return n == 1 ? '1 item' : n + ' items'
+    },
     selectCard(id) {
       this.socket.emit('selectCard', {teamName: this.teamName, selectedCard: id})
     }

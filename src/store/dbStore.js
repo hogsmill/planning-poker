@@ -1,4 +1,10 @@
 
+const estimationValues = {
+  't-shirt': ['XS', 'S', 'M', 'L', 'XL'],
+  'fibonacci': ['1', '2', '3', '5', '8', '13'],
+  'custom': []
+}
+
 function createTeam() {
 
   return {
@@ -17,10 +23,7 @@ function createTeam() {
       { name: 'Carol', id: 'ggg', voted: false }
     ],
     backlog: [],
-    estimationValues: {
-      't-shirt': ['XS', 'S', 'M', 'L', 'XL'],
-      'fibonacci': ['1', '2', '3', '5', '8', '13']
-    }
+    estimationValues: estimationValues
   }
 }
 
@@ -28,11 +31,31 @@ function cardsMatch(card1, card2) {
   return card1.id == card2.id && card1.title == card2.title && card1.description == card2.description
 }
 
+function escapeField(field, seperator) {
+  switch(seperator) {
+    case 'tab':
+      return field
+      break
+    case 'comma':
+      return field.match(',') ? '"' + field + '"' : field
+      break
+    case 'semicolon':
+      return field.match(';') ? '"' + field + '"' : field
+      break
+    case 'colon':
+      return field.match(':') ? '"' + field + '"' : field
+      break
+    case 'space':
+      return '"' + field.replace(/"/g, '\'') + '"'
+      break
+  }
+}
+
 function createOutputRecord(record, sep) {
   record = [
     record.id,
-    record.title,
-    record.description,
+    record.escapeField(record.title, sep),
+    record.escapeField(record.description, sep),
     record.estimate
   ]
   let outputRecord = ''
@@ -43,6 +66,12 @@ function createOutputRecord(record, sep) {
     case 'comma':
       outputRecord = record.join(/,/)
       break
+    case 'semicolon':
+      outputRecord = record.join(/;/)
+      break
+    case 'colon':
+      outputRecord = record.join(/:/)
+      break
     case 'space':
       outputRecord = record.join(/\s/)
       break
@@ -50,7 +79,32 @@ function createOutputRecord(record, sep) {
   return outputRecord
 }
 
+function addEstimationTypeToOrganisation(err, client, db, io, data, debugOn) {
+}
+
 module.exports = {
+
+  // Organisation
+
+  setOrganisation: function(err, client, db, io, data, debugOn) {
+
+    if (debugOn) { console.log('setOrganisation', data) }
+
+    db.collection('planningPokerOrganisations').findOne({organisation: data.organisation}, function(err, res) {
+      if (err) throw err
+      if (!res) {
+        res = {
+          organisation: data.organisation,
+          teams: [],
+          estimationValues: estimationValues
+        }
+        db.collection('planningPokerOrganisations').insertOne({organisation: data.organisation, teams: []}, function(err, res) {
+          if (err) throw err
+          client.close()
+        })
+      }
+    })
+  },
 
   // Game
 
@@ -58,7 +112,7 @@ module.exports = {
 
     if (debugOn) { console.log('loadTeam', data) }
 
-    db.collection('planningPoker').findOne({teamName: data.teamName}, function(err, res) {
+    db.collection('planningPoker').findOne({teamName: data.teamName, organisation: data.organisation}, function(err, res) {
       if (err) throw err
       if (res) {
         console.log('Loading team \'' + data.teamName + '\'')
@@ -66,6 +120,7 @@ module.exports = {
       } else {
         const team = createTeam()
         team.teamName = data.teamName
+        team.organisation = data.organisation
         team.created = new Date().toISOString()
         console.log('Created new team \'' + data.teamName + '\'')
         db.collection('planningPoker').insertOne(team, function(err, res) {
@@ -178,9 +233,11 @@ module.exports = {
           res.backlog.push(data.backlog[i])
         }
         const team = res
+        team.backlogLength = res.backlog.length
         db.collection('planningPoker').updateOne({'_id': res._id}, {$set: {backlog: res.backlog}}, function(err, res) {
           if (err) throw err
           io.emit('loadTeam', team)
+          io.emit('backlogLoaded', team)
           client.close()
        })
      }
@@ -198,7 +255,7 @@ module.exports = {
     } else {
       let backlog = []
       for (let i = 0; i < data.backlog.length; i++) {
-        var str = createOutputRecord(data.backlog[i], data.seperator)
+        const str = createOutputRecord(data.backlog[i], data.seperator)
         backlog.push(str)
       }
       backlog = backlog.join('\n')
@@ -238,7 +295,8 @@ module.exports = {
     db.collection('planningPoker').findOne({teamName: data.teamName}, function(err, res) {
       if (err) throw err
       if (res) {
-        let backlog = [], found = false
+        const backlog = []
+        let found = false
         for (let i = 0; i < res.backlog.length; i++) {
           if (cardsMatch(res.backlog[i], data.card)) {
             found = true
@@ -249,6 +307,29 @@ module.exports = {
         res.backlog = backlog
         const team = res
         db.collection('planningPoker').updateOne({'_id': res._id}, {$set: {backlog: backlog}}, function(err, res) {
+          if (err) throw err
+          io.emit('loadTeam', team)
+          client.close()
+       })
+     }
+    })
+  },
+
+  addEstimationType:  function(err, client, db, io, data, debugOn) {
+
+    if (debugOn) { console.log('addEstimationType', data) }
+
+    if (!data.teamOnly) {
+      addEstimationTypeToOrganisation(err, client, db, io, data, debugOn)
+    }
+    db.collection('planningPoker').findOne({teamName: data.teamName}, function(err, res) {
+      if (err) throw err
+      if (res) {
+        const estimationValues = res.estimationValues
+        estimationValues[data.estimationType] = []
+        res.estimationValues = estimationValues
+        const team = res
+        db.collection('planningPoker').updateOne({'_id': res._id}, {$set: {estimationTypes: res.estimationTypes}}, function(err, res) {
           if (err) throw err
           io.emit('loadTeam', team)
           client.close()

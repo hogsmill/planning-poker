@@ -51,6 +51,9 @@ function doDb(fun, data) {
     switch(fun) {
 
       // Game
+      case 'setOrganisation':
+        dbStore.setOrganisation(err, client, db, io, data, debugOn)
+        break
       case 'loadGame':
         dbStore.loadTeam(err, client, db, io, data, debugOn)
         break
@@ -65,6 +68,9 @@ function doDb(fun, data) {
         break
 
       // Facilitator
+      case 'addEstimationType':
+        dbStore.addEstimationType(err, client, db, io, data, debugOn)
+        break
       case 'addEstimationValue':
         dbStore.addEstimationValue(err, client, db, io, data, debugOn)
         break
@@ -108,6 +114,8 @@ io.on('connection', (socket) => {
   })
 
   // Game
+  socket.on('setOrganisation', (data) => { doDb('setOrganisation', data) })
+
   socket.on('loadTeam', (data) => { doDb('loadGame', data) })
 
   socket.on('updateEstimationType', (data) => { emit('updateEstimationType', data) })
@@ -124,6 +132,8 @@ io.on('connection', (socket) => {
   socket.on('loadBacklog', (data) => { doDb('loadBacklog', data) })
 
   socket.on('saveBacklog', (data) => { doDb('saveBacklog', data) })
+
+  socket.on('addEstimationType', (data) => { doDb('addEstimationType', data) })
 
   socket.on('addEstimationValue', (data) => { doDb('addEstimationValue', data) })
 

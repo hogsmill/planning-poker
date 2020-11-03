@@ -1,5 +1,5 @@
 <template>
-  <div class="my-name float-right">
+  <div class="my-name">
     <button class="btn btn-sm btn-secondary smaller-font" v-if="!myName" @click="show">
       Set My Name
     </button>
@@ -74,13 +74,15 @@ export default {
 </script>
 
 <style lang="scss">
-
-.set-my-name {
-
-  #my-name {
+  .my-name {
     display: inline-block;
-    width: 30%;
-    margin-right: 6px;
   }
-}
+  .set-my-name {
+
+    #my-name {
+      display: inline-block;
+      width: 30%;
+      margin-right: 6px;
+    }
+  }
 </style>
