@@ -5,6 +5,7 @@ Vue.use(Vuex)
 
 export const store = new Vuex.Store({
   state: {
+    thisGame: 'Planning Poker',
     connections: 0,
     walkThrough: false,
     showTab: 'game',
@@ -34,6 +35,9 @@ export const store = new Vuex.Store({
     }
   },
   getters: {
+    thisGame: (state) => {
+      return state.thisGame
+    },
     getWalkThrough: (state) => {
       return state.walkThrough
     },
