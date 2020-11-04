@@ -42,6 +42,9 @@ export default {
     teamName() {
       return this.$store.getters.getTeamName
     },
+    organisation() {
+      return this.$store.getters.getOrganisation
+    },
     teams() {
       return this.$store.getters.getTeams
     }
@@ -57,7 +60,7 @@ export default {
       const teamName = document.getElementById('team-name').value
       localStorage.setItem('teamName-pp', teamName)
       this.$store.dispatch('updateTeamName', teamName)
-      this.socket.emit('loadTeam', {teamName: teamName})
+      this.socket.emit('loadTeam', {teamName: teamName, organisation: this.organisation})
       this.hide()
     }
   },

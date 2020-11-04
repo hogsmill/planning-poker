@@ -115,14 +115,14 @@ module.exports = {
     db.collection('planningPoker').findOne({teamName: data.teamName, organisation: data.organisation}, function(err, res) {
       if (err) throw err
       if (res) {
-        console.log('Loading team \'' + data.teamName + '\'')
+        console.log('Loading team \'' + data.organisation + ': ' + data.teamName + '\'')
         io.emit('loadTeam', res)
       } else {
         const team = createTeam()
         team.teamName = data.teamName
         team.organisation = data.organisation
         team.created = new Date().toISOString()
-        console.log('Created new team \'' + data.teamName + '\'')
+        console.log('Created new team \'' + data.organisation + ': ' + data.teamName + '\'')
         db.collection('planningPoker').insertOne(team, function(err, res) {
           if (err) throw err
           io.emit('loadTeam', team)
@@ -134,7 +134,7 @@ module.exports = {
 
   selectCard:  function(err, client, db, io, data, debugOn) {
 
-    if (debugOn) { console.log('clearEstimates', data) }
+    if (debugOn) { console.log('selectCard', data) }
 
     db.collection('planningPoker').findOne({teamName: data.teamName}, function(err, res) {
       if (err) throw err
@@ -146,6 +146,7 @@ module.exports = {
           res.teamMembers[i].estimate = 0
           members.push(res.teamMembers[i])
         }
+        console.log(members)
         res.teamMembers = members
         for (i = 0; i < res.backlog.length; i++) {
           if (res.backlog[i].id == data.selectedCard) {
@@ -157,7 +158,7 @@ module.exports = {
         }
         res.backlog = backlog
         const team = res
-        db.collection('planningPoker').updateOne({'_id': res._id}, {$set: {backlog: backlog}}, function(err, res) {
+        db.collection('planningPoker').updateOne({'_id': res._id}, {$set: {backlog: backlog, teamMembers: members}}, function(err, res) {
           if (err) throw err
           io.emit('loadTeam', team)
           client.close()

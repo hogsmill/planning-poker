@@ -48,6 +48,7 @@ export default {
       const organisation = document.getElementById('organisation').value
       localStorage.setItem('organisation-pp', organisation)
       this.socket.emit('setOrganisation', {organisation: organisation})
+      this.hide()
     }
   }
 }
