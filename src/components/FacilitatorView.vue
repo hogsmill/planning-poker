@@ -42,6 +42,10 @@ export default {
     margin: 12px auto;
     border: 1px solid #ccc;
 
+    button {
+      margin-left: 6px;
+    }
+
     .inner-table {
       padding: 0;
       border: none;
@@ -91,12 +95,16 @@ export default {
         }
       }
     }
+    
     input {
-      width: 70px;
+      min-width: 120px;
       height: 24px;
       padding: 2px;
-      text-align: right;
       margin: 0 auto;
+    }
+
+    select {
+      min-width: 120px;
     }
   }
 </style>

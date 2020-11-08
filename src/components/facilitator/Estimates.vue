@@ -2,38 +2,41 @@
   <table class="facilitator-table">
     <tr>
       <td colspan="2">
-        <h4>Estimates</h4>
+        <h4>Estimates (TBD)</h4>
         <span v-if="showEstimates" @click="setShowEstimates(false)" title="collapse" class="toggle">&#9650;</span>
         <span v-if="!showEstimates" @click="setShowEstimates(true)" title="expand" class="toggle">&#9660;</span>
       </td>
     </tr>
+    <Team v-if="showEstimates" :scope="'estimate'"/>
     <tr v-if="showEstimates">
       <td>
         Estimate Using
       </td>
       <td>
-        <table class="inner-table">
-          <tr>
-            <td colspan="2">
-              <select id="set-estimation-type" @change="setEstimationType()">
-                <option v-for="(estType, index) in estimationTypes" :key="index" :selected="estType == estimationType">
-                  {{ estType }}
-                </option>
-              </select>
-            </td>
-          </tr>
-          <tr>
-            <td>
-              <input type="text" id="new-estimation-type">
-            </td>
-            <td>
-              <button class="btn btn-sm btn-secondary smaller-font" @click="addEstimationType()">
-                Add New
-              </button>
-              <input type="checkbox" id="new-estimation-type-team-only"> This team only?
-            </td>
-          </tr>
-        </table>
+        <div v-for="(team, index) in teams" :key="index">
+          <table v-if="team.name == estimateTeam" class="inner-table">
+            <tr>
+              <td colspan="2">
+                <select id="set-estimation-type" @change="setEstimationType()">
+                  <option v-for="(estType, eindex) in team.estimationVaues" :key="eindex" :selected="estType == team.estimationType">
+                    {{ estType }}
+                  </option>
+                </select>
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <input type="text" id="new-estimation-type">
+              </td>
+              <td>
+                <button class="btn btn-sm btn-secondary smaller-font" @click="addEstimationType()">
+                  Add New
+                </button>
+                <input type="checkbox" id="new-estimation-type-team-only"> This team only?
+              </td>
+            </tr>
+          </table>
+        </div>
       </td>
     </tr>
     <tr v-if="showEstimates">
@@ -70,22 +73,32 @@
 </template>
 
 <script>
+import Team from './backlog/Team.vue'
+
 export default {
+  components: {
+    Team
+  },
   props: [
     'socket'
   ],
+  data() {
+    return {
+      estimateTeam: ''
+    }
+  },
   computed: {
     showEstimates() {
       return this.$store.getters.getShowEstimates
     },
-    teamName() {
-      return this.$store.getters.getTeamName
+    organisation() {
+      return this.$store.getters.getOrganisation
+    },
+    teams() {
+      return this.$store.getters.getTeams
     },
     estimationType() {
       return this.$store.getters.getEstimationType
-    },
-    estimationTypes() {
-      return this.$store.getters.getEstimationTypes
     },
     estimationValues() {
       return this.$store.getters.getEstimationValues
@@ -97,20 +110,20 @@ export default {
     },
     setEstimationType() {
       const estimationType = document.getElementById('set-estimation-type').value
-      this.socket.emit('updateEstimationType', {teamName: this.teamName, estimationType: estimationType})
+      this.socket.emit('updateEstimationType', {organisation: this.organisation, teamName: this.estimateTeam, estimationType: estimationType})
     },
     addEstimationType() {
       const estimationType = document.getElementById('new-estimation-type').value
       const thisTeamOnly = document.getElementById('new-estimation-type-team-only').checked
-      this.socket.emit('addEstimationType', {teamName: this.teamName, estimationType: estimationType, thisTeamOnly: thisTeamOnly})
+      this.socket.emit('addEstimationType', {organisation: this.organisation, teamName: this.estimateTeam, estimationType: estimationType, thisTeamOnly: thisTeamOnly})
     },
     addEstimationValue() {
       const estimationValue = document.getElementById('add-estimation-value').value
       const thisTeamOnly = document.getElementById('add-estimation-value-team-only').checked
-      this.socket.emit('addEstimationValue', {teamName: this.teamName, estimationType: this.estimationType, value: estimationValue, thisTeamOnly: thisTeamOnly})
+      this.socket.emit('addEstimationValue', {organisation: this.organisation, teamName: this.estimateTeam, estimationType: this.estimationType, value: estimationValue, thisTeamOnly: thisTeamOnly})
     },
     deleteEstimationValue(value) {
-      this.socket.emit('deleteEstimationValue', {teamName: this.teamName, estimationType: this.estimationType, value: value})
+      this.socket.emit('deleteEstimationValue', {organisation: this.organisation, teamName: this.estimateTeam, estimationType: this.estimationType, value: value})
     }
   }
 }

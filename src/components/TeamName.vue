@@ -20,11 +20,11 @@
             <option value="">
               -- Select --
             </option>
-            <option v-for="(team, index) in teams" :key="index" :value="team.name" :selected="team.name == teamName">
+            <option v-for="(team, index) in includedTeams" :key="index" :value="team.name" :selected="team.name == teamName">
               {{ team.name }}
             </option>
           </select>
-          <button class="btn btn-sm btn-secondary smaller-font" @click="saveTeamName">
+          <button class="btn btn-sm btn-secondary smaller-font" @click="saveTeamName()">
             Save
           </button>
         </div>
@@ -45,8 +45,8 @@ export default {
     organisation() {
       return this.$store.getters.getOrganisation
     },
-    teams() {
-      return this.$store.getters.getTeams
+    includedTeams() {
+      return this.$store.getters.getIncludedTeams
     }
   },
   methods: {
@@ -60,7 +60,7 @@ export default {
       const teamName = document.getElementById('team-name').value
       localStorage.setItem('teamName-pp', teamName)
       this.$store.dispatch('updateTeamName', teamName)
-      this.socket.emit('loadTeam', {teamName: teamName, organisation: this.organisation})
+      this.socket.emit('loadTeam', {organisation: this.organisation, teamName: teamName})
       this.hide()
     }
   },

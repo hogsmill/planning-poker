@@ -1,9 +1,9 @@
 <template>
   <div class="my-name">
-    <button class="btn btn-sm btn-secondary smaller-font" v-if="!myName" @click="show">
+    <button class="btn btn-sm btn-secondary smaller-font" v-if="!myName.uid" @click="show">
       Set My Name
     </button>
-    <span v-if="myName" @click="show" class="mr-2 mt-2 pointer p-2 bg-light">I am: {{ myName.name }}</span>
+    <span v-if="myName.uid" @click="show" class="mr-2 mt-2 pointer p-2 bg-light">I am: {{ myName.name }}</span>
 
     <modal name="set-my-name" :height="140" :classes="['rounded', 'set-my-name']">
       <div class="float-right mr-2 mt-1">
@@ -18,7 +18,7 @@
             <option value="">
               -- Select --
             </option>
-            <option v-for="(teamMember, index) in teamMembers" :key="index" :value="teamMember.id" :selected="myName.id == teamMember.id">
+            <option v-for="(teamMember, index) in teamMembers" :key="index" :value="teamMember.uid" :selected="myName.uid == teamMember.uid">
               {{ teamMember.name }}
             </option>
           </select>
@@ -32,7 +32,7 @@
 </template>
 
 <script>
-import { v4 as uuidv4 } from 'uuid'
+const { v4: uuidv4 } = require('uuid')
 
 export default {
   props: [
@@ -57,11 +57,10 @@ export default {
       this.$modal.hide('set-my-name')
     },
     saveMyName: function() {
-      const id = document.getElementById('my-name').value
+      const uid = document.getElementById('my-name').value
       const name = this.teamMembers.find(function(m) {
-        return m.id == id
+        return m.uid == uid
       })
-      console.log(name)
       this.$store.dispatch('updateMyName', name)
       localStorage.setItem('myName-pp', JSON.stringify(name))
       //if (this.teamName) {

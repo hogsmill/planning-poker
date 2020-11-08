@@ -7,44 +7,50 @@
         <span v-if="!showBacklog" @click="setShowBacklog(true)" title="expand" class="toggle">&#9660;</span>
       </td>
     </tr>
+    <Team v-if="showBacklog" :scope="'backlog'"/>
     <tr v-if="showBacklog">
       <td>
         Load from file<br>
-        <i>(Must be CSV, with columns Id, Title, Description, [Estimate])</i> - estimate optional
+        <i>(Must be CSV, with columns Id, Title, <br>Description, [Estimate])</i> - estimate optional
       </td>
       <td class="upload">
-        <Delimiter id="backlog-file-separator" />
-        <div>
-          <input id="backlog-file-replace" type="checkbox"> Replace existing backlog?
-        </div>
-        <div>
-          <input id="backlog-file" type="file" @change="loadBacklog()">
-        </div>
+        <table class="inner-table">
+          <Delimiter :scope="'load'" />
+          <tr>
+            <td colspan>
+              <input id="backlog-file-replace" type="checkbox">
+            </td>
+            <td>
+              Replace existing backlog?
+            </td>
+          </tr>
+          <tr>
+            <td>
+              <input id="backlog-file" type="file" :disabled="!backlogTeam" @change="loadBacklog()">
+            </td>
+          </tr>
+        </table>
       </td>
     </tr>
     <tr v-if="showBacklog">
       <td>Add item</td>
-      <td class="inner-table">
-        <table>
+      <td>
+        <table class="inner-table">
           <tr>
-            <td class="inner-table">
-              <table class="inner-table">
-                <tr>
-                  <td>Id</td>
-                  <td><input id="card-id" type="text"></td>
-                </tr>
-                <tr>
-                  <td>Title</td>
-                  <td><input id="card-title" type="text"></td>
-                </tr>
-                <tr>
-                  <td>Description</td>
-                  <td><input id="card-description" type="text"></td>
-                </tr>
-              </table>
-            </td>
-            <td>
-              <button class="btn btn-sm btn-secondary smaller-font" @click="addCard()">
+            <td>Id</td>
+            <td><input id="card-id" type="text"></td>
+          </tr>
+          <tr>
+            <td>Title</td>
+            <td><input id="card-title" type="text"></td>
+          </tr>
+          <tr>
+            <td>Description</td>
+            <td><input id="card-description" type="text"></td>
+          </tr>
+          <tr>
+            <td colspan="2">
+              <button class="btn btn-sm btn-secondary smaller-font" :disabled="!backlogTeam" @click="addCard()">
                 Add Card
               </button>
             </td>
@@ -52,17 +58,10 @@
         </table>
       </td>
     </tr>
-    <tr v-if="showBacklog && backlog.length">
+    <tr v-if="showBacklog">
       <td>Delete item</td>
       <td>
-        <table>
-          <tr v-for="(card, index) in backlog" :key="index">
-            <td>{{ card.id }}: {{ card.title }}</td>
-            <button class="btn btn-sm btn-secondary smaller-font" @click="deleteCard(card)">
-              Delete Card
-            </button>
-          </tr>
-        </table>
+        <TeamBacklog :socket="socket" />
       </td>
     </tr>
     <tr v-if="showBacklog">
@@ -71,19 +70,17 @@
       </td>
       <td class="inner-table">
         <table>
+          <Delimiter :scope="'save'" />
           <tr>
-            <td>
+            <td colspan="2">
               Filename <input id="backlog-save-file" type="text">
-            </td>
-            <td>
-              <button class="btn btn-sm btn-secondary smaller-font" @click="saveBacklog()">
-                Save
-              </button>
             </td>
           </tr>
           <tr>
-            <td colspan="2">
-              <Delimiter id="backlog-save-file-separator" />
+            <td>
+              <button class="btn btn-sm btn-secondary smaller-font" :disabled="!backlogTeam" @click="saveBacklog()">
+                Save
+              </button>
             </td>
           </tr>
         </table>
@@ -96,24 +93,30 @@
 import fileFuns from '../../lib/file.js'
 
 import Delimiter from './backlog/Delimiter.vue'
+import Team from './backlog/Team.vue'
+import TeamBacklog from './backlog/TeamBacklog.vue'
 
 export default {
   components: {
+    Team,
+    TeamBacklog,
     Delimiter
   },
   props: [
     'socket'
   ],
-
   computed: {
     showBacklog() {
       return this.$store.getters.getShowBacklog
     },
-    teamName() {
-      return this.$store.getters.getTeamName
+    backlogTeam() {
+      return this.$store.getters.getBacklogTeam
     },
-    backlog() {
-      return this.$store.getters.getBacklog
+    teams() {
+      return this.$store.getters.getTeams
+    },
+    organisation() {
+      return this.$store.getters.getOrganisation
     }
   },
   methods: {
@@ -122,11 +125,9 @@ export default {
     },
     loadBacklog() {
       const file = document.getElementById('backlog-file').files[0]
-      const separator = document.getElementById('backlog-file-separator').value
+      const separator = document.getElementById('backlog-load-file-separator').value
       const replace = document.getElementById('backlog-file-replace').checked
-      if (file) {
-        fileFuns.loadBacklog(file, separator, this.teamName, replace, this.socket)
-      }
+      fileFuns.loadBacklog(file, separator, this.organisation, this.backlogTeam, replace, this.socket)
     },
     addCard() {
       const card = {
@@ -136,18 +137,12 @@ export default {
         title: document.getElementById('card-title').value,
         description: document.getElementById('card-description').value
       }
-      this.socket.emit('addBacklogCard', {teamName: this.teamName, card: card})
-    },
-    deleteCard(card) {
-      if (confirm('Delete card ' + card.id + ': ' + card.title)) {
-        this.socket.emit('deleteBacklogCard', {teamName: this.teamName, card: card})
-      }
-
+      this.socket.emit('addBacklogCard', {organisation: this.organisation, teamName: this.backlogTeam, card: card})
     },
     saveBacklog() {
       const saveFile = document.getElementById('backlog-save-file').value
       const separator = document.getElementById('backlog-save-file-separator').value
-      this.socket.emit('saveBacklog', {teamName: this.teamName, file: saveFile, backlog: this.backlog, separator: separator})
+      this.socket.emit('saveBacklog', {organisation: this.organisation, teamName: this.backlogTeam, file: saveFile, separator: separator})
     }
   }
 }

@@ -33,9 +33,9 @@
     <div v-if="selectedCard" class="members">
       <div v-for="(teamMember, index) in teamMembers" :key="index" class="member">
         <div><b>{{ teamMember.name }}</b></div>
-        <div v-if="teamMember.id == myName.id || revealed" class="poker-card rounded">
+        <div v-if="teamMember.uid == myName.uid || revealed" class="poker-card rounded">
           <div v-if="estimating" class="poker-card-value">
-            <select :id="'estimate-value-' + myName.id" @change="saveEstimate()">
+            <select :id="'estimate-value-' + myName.uid" @change="saveEstimate()">
               <option value="" />
               <option v-for="(value, ind) in estimationValues" :key="ind">
                 {{ value }}
@@ -47,7 +47,7 @@
             <span v-if="!teamMember.estimate" class="tbd">TBD</span>
           </div>
         </div>
-        <div v-if="teamMember.id != myName.id && !revealed" class="poker-card back rounded">
+        <div v-if="teamMember.uid != myName.uid && !revealed" class="poker-card back rounded">
           <div v-if="teamMember.voted" class="poker-card-voted rounded-circle voted">
             &#10004;
           </div>
@@ -77,6 +77,9 @@ export default {
     teamName() {
       return this.$store.getters.getTeamName
     },
+    organisation() {
+      return this.$store.getters.getOrganisation
+    },
     selectedCard() {
       return this.$store.getters.getSelectedCard
     },
@@ -95,16 +98,16 @@ export default {
       this.estimating = true
     },
     saveEstimate() {
-      const estimationValue = document.getElementById('estimate-value-' + this.myName.id).value
-      this.socket.emit('updateEstimateValue', {teamName: this.teamName, teamMember: this.myName, value: estimationValue})
+      const estimationValue = document.getElementById('estimate-value-' + this.myName.uid).value
+      this.socket.emit('updateEstimateValue', {organisation: this.organisation, teamName: this.teamName, teamMember: this.myName, value: estimationValue})
       this.estimating = false
     },
     reveal(value) {
-      this.socket.emit('reveal', {teamName: this.teamName, reveal: value})
+      this.socket.emit('reveal', {organisation: this.organisation, teamName: this.teamName, reveal: value})
     },
     saveAgreedEstimate() {
       const estimationValue = document.getElementById('agreed-estimate-value').value
-      this.socket.emit('updateAgreedEstimate', {teamName: this.teamName, selectedCard: this.selectedCard, value: estimationValue})
+      this.socket.emit('updateAgreedEstimate', {organisation: this.organisation, teamName: this.teamName, selectedCard: this.selectedCard, value: estimationValue})
     }
   }
 }

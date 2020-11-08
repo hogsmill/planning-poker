@@ -10,28 +10,23 @@ export const store = new Vuex.Store({
     walkThrough: false,
     showTab: 'game',
     host: false,
+    demo: false,
     myName: {},
     teamName: '',
-    organisation: 'hogsmill',
-    teams: [
-      { name: 'Eagle' },
-      { name: 'Dragon' },
-      { name: 'Lion' },
-      { name: 'Gryphen' }
-    ],
+    organisation: '',
+    teams: [],
     teamMembers: [],
     backlog: [],
     revealed: false,
-    estimationType: 't-shirt',
-    estimationValues: {
-      't-shirt': ['XS', 'S', 'M', 'L', 'XL'],
-      'fibonacci': ['1', '2', '3', '5', '8', '13']
-    },
+    estimationType: 'fibonacci',
+    estimationValues: {},
     editing: {
       showTeams: false,
       showTeamMembers: false,
       showEstimates: false,
-      showBacklog: false
+      showBacklog: false,
+      backlogTeam: '',
+      estimateTeam: ''
     }
   },
   getters: {
@@ -43,6 +38,9 @@ export const store = new Vuex.Store({
     },
     getHost: (state) => {
       return state.host
+    },
+    getDemo: (state) => {
+      return state.demo
     },
     getShowTab: (state) => {
       return state.showTab
@@ -58,6 +56,16 @@ export const store = new Vuex.Store({
     },
     getTeams: (state) => {
       return state.teams
+    },
+    getIncludedTeams: (state) => {
+      const teams = []
+      for (let i = 0; i < state.teams.length; i++) {
+        console.log(state.teams[i])
+        if (state.teams[i].include) {
+          teams.push(state.teams[i])
+        }
+      }
+      return teams
     },
     getTeamMembers: (state) => {
       return state.teamMembers
@@ -97,6 +105,12 @@ export const store = new Vuex.Store({
     },
     getShowBacklog: (state) => {
       return state.editing.showBacklog
+    },
+    getBacklogTeam: (state) => {
+      return state.editing.backlogTeam
+    },
+    getEstimateTeam: (state) => {
+      return state.editing.estimateTeam
     }
   },
   mutations: {
@@ -118,13 +132,21 @@ export const store = new Vuex.Store({
     updateOrganisation: (state, payload) => {
       state.organisation = payload
     },
+    loadOrganisation: (state, payload) => {
+      state.organisation = payload.organisation
+      state.demo = payload.demo
+      if (payload.teams) {
+        state.teams = payload.teams
+      }
+      state.estimationValues = payload.estimationValues
+    },
     updateEstimationType: (state, payload) => {
       state.estimationType = payload.estimationType
     },
     loadTeam: (state, payload) => {
-      state.teamMembers = payload.teamMembers
-      state.backlog = payload.backlog
-      state.estimationValues = payload.estimationValues
+      state.teamMembers = payload.team.members
+      state.backlog = payload.team.backlog
+      state.estimationValues = payload.team.estimationValues
     },
     reveal: (state, payload) => {
       state.revealed = payload.reveal
@@ -140,6 +162,12 @@ export const store = new Vuex.Store({
     },
     setShowBacklog: (state, payload) => {
       state.editing.showBacklog = payload
+    },
+    setBacklogTeam: (state, payload) => {
+      state.editing.backlogTeam = payload
+    },
+    setEstimateTeam: (state, payload) => {
+      state.editing.estimateTeam = payload
     },
     updateConnections: (state, payload) => {
       state.connections = payload
@@ -164,6 +192,9 @@ export const store = new Vuex.Store({
     updateOrganisation: ({ commit }, payload) => {
       commit('updateOrganisation', payload)
     },
+    loadOrganisation: ({ commit }, payload) => {
+      commit('loadOrganisation', payload)
+    },
     updateEstimationType: ({ commit }, payload) => {
       commit('updateEstimationType', payload)
     },
@@ -184,6 +215,12 @@ export const store = new Vuex.Store({
     },
     setShowBacklog: ({ commit }, payload) => {
       commit('setShowBacklog', payload)
+    },
+    setBacklogTeam: ({ commit }, payload) => {
+      commit('setBacklogTeam', payload)
+    },
+    setEstimateTeam: ({ commit }, payload) => {
+      commit('setEstimateTeam', payload)
     },
     updateConnections: ({ commit }, payload) => {
       commit('updateConnections', payload)

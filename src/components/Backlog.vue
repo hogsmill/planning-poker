@@ -10,7 +10,7 @@
         </tr>
       </thead>
       <tbody>
-        <tr v-for="(card, index) in backlog" :key="index" @click="selectCard(card.id)">
+        <tr v-for="(card, index) in backlog" :key="index" @click="selectCard(card.uid)">
           <td>{{ card.id }}</td>
           <td>{{ card.title }}</td>
           <td><span v-if="card.estimate"><b>{{ card.estimate }}</b></span></td>
@@ -26,6 +26,9 @@ export default {
     'socket'
   ],
   computed: {
+    organisation() {
+      return this.$store.getters.getOrganisation
+    },
     teamName() {
       return this.$store.getters.getTeamName
     },
@@ -37,8 +40,8 @@ export default {
     items(n) {
       return n == 1 ? '1 item' : n + ' items'
     },
-    selectCard(id) {
-      this.socket.emit('selectCard', {teamName: this.teamName, selectedCard: id})
+    selectCard(uid) {
+      this.socket.emit('selectCard', {organisation: this.organisation, teamName: this.teamName, uid: uid})
     }
   }
 }

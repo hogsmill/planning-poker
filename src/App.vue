@@ -2,7 +2,7 @@
   <div id="app" class="mb-4">
     <Header />
     <WalkThroughView />
-    <h1>Planning Poker <span v-if="organisation">({{ organisation }})</span></h1>
+    <h1>Planning Poker<span v-if="organisation">: {{ organisation }}</span> <span v-if="demo">(Demo)</span></h1>
     <div v-if="showTab == 'about'">
       <AboutView />
     </div>
@@ -65,6 +65,9 @@ export default {
     isHost() {
       return this.$store.getters.getHost
     },
+    demo() {
+      return this.$store.getters.getDemo
+    },
     walkThrough() {
       return this.$store.getters.getWalkThrough
     },
@@ -100,7 +103,7 @@ export default {
     const teamName = localStorage.getItem('teamName-pp')
     if (org && teamName) {
       this.$store.dispatch('updateTeamName', teamName)
-      this.socket.emit('loadTeam', {teamName: teamName, organisation: org})
+      this.socket.emit('loadTeam', {organisation: org, teamName: teamName})
     }
 
     let myName = localStorage.getItem('myName-pp')
@@ -112,6 +115,12 @@ export default {
     this.socket.on('loadTeam', (data) => {
       if (this.teamName == data.teamName && this.organisation == data.organisation) {
         this.$store.dispatch('loadTeam', data)
+      }
+    })
+
+    this.socket.on('loadOrganisation', (data) => {
+      if (this.organisation == data.organisation) {
+        this.$store.dispatch('loadOrganisation', data)
       }
     })
 
@@ -128,19 +137,19 @@ export default {
     })
 
     this.socket.on('backlogLoaded', (data) => {
-      if (this.teamName == data.teamName && this.organisation == data.organisation) {
-        alert('Backlog loaded. Backlog now has ' + data.backlogLength + ' items')
+      if (this.organisation == data.organisation) {
+        alert('Backlog for ' + data.teamName + ' loaded. Backlog now has ' + data.backlogLength + ' items')
         document.getElementById('backlog-file').value = ''
       }
     })
 
     this.socket.on('backlogSaved', (data) => {
-      if (this.teamName == data.teamName && this.organisation == data.organisation) {
+      if (this.organisation == data.organisation) {
         if (data.status) {
           alert('File Saved')
         } else if (data.errType == 'fileExists') {
           if (confirm('File exists, overwrite?')) {
-            this.socket.emit('saveBacklog', {teamName: data.teamName, file: data.file, overwrite: true, backlog: data.backlog, seperator: data.seperator})
+            this.socket.emit('saveBacklog', {organisation: data.organisation, teamName: data.teamName, file: data.file, overwrite: true, separator: data.separator})
           }
         } else {
           alert('Error saving file: ' +  data.err)

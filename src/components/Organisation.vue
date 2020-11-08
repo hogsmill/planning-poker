@@ -5,7 +5,7 @@
     </button>
     <span v-if="organisation" @click="show" class="mr-2 mt-2 pointer p-2 bg-light">Organisation: {{ organisation }}</span>
 
-    <modal name="set-organisation" :height="140" :classes="['rounded', 'set-my-organisation']">
+    <modal name="set-organisation" :height="180" :classes="['rounded', 'set-organisation']">
       <div class="float-right mr-2 mt-1">
         <button type="button" class="close" @click="hide" aria-label="Close">
           <span aria-hidden="true">&times;</span>
@@ -19,6 +19,13 @@
             Save
           </button>
         </div>
+        <div>
+          <input type="checkbox" id="demo-mode" :checked="demo"> Demo mode?
+        </div>
+        <p>
+          Demo mode sets up a default set of teams and<br>
+          backlogs so you can explore how the app works.
+        </p>
       </div>
     </modal>
   </div>
@@ -35,6 +42,9 @@ export default {
     },
     organisation() {
       return this.$store.getters.getOrganisation
+    },
+    demo() {
+      return this.$store.getters.getDemo
     }
   },
   methods: {
@@ -46,8 +56,10 @@ export default {
     },
     saveOrganisation() {
       const organisation = document.getElementById('organisation').value
+      const demo = document.getElementById('demo-mode').checked
       localStorage.setItem('organisation-pp', organisation)
-      this.socket.emit('setOrganisation', {organisation: organisation})
+      this.$store.dispatch('loadOrganisation', {organisation: organisation, demo: demo})
+      this.socket.emit('setOrganisation', {organisation: organisation, demo: demo})
       this.hide()
     }
   }
@@ -64,6 +76,13 @@ export default {
       display: inline-block;
       width: 30%;
       margin-right: 6px;
+    }
+
+    p {
+      width: 80%;
+      font-style: italic;
+      margin: 0 auto;
+      font-size: smaller;
     }
   }
 </style>

@@ -68,6 +68,24 @@ function doDb(fun, data) {
         break
 
       // Facilitator
+      case 'addTeam':
+        dbStore.addTeam(err, client, db, io, data, debugOn)
+        break
+      case 'includeTeam':
+        dbStore.includeTeam(err, client, db, io, data, debugOn)
+        break
+      case 'deleteTeam':
+        dbStore.deleteTeam(err, client, db, io, data, debugOn)
+        break
+      case 'addTeamMember':
+        dbStore.addTeamMember(err, client, db, io, data, debugOn)
+        break
+      case 'includeTeamMember':
+        dbStore.includeTeamMember(err, client, db, io, data, debugOn)
+        break
+      case 'deleteTeamMember':
+        dbStore.deleteTeamMember(err, client, db, io, data, debugOn)
+        break
       case 'addEstimationType':
         dbStore.addEstimationType(err, client, db, io, data, debugOn)
         break
@@ -81,7 +99,7 @@ function doDb(fun, data) {
         dbStore.loadBacklog(err, client, db, io, data, debugOn)
         break
       case 'saveBacklog':
-        dbStore.saveBacklog(saveDir, logFile, io, data, fs, debugOn)
+        dbStore.saveBacklog(err, client, db, saveDir, logFile, io, data, fs, debugOn)
         break
       case 'addBacklogCard':
         dbStore.addBacklogCard(err, client, db, io, data, debugOn)
@@ -129,15 +147,27 @@ io.on('connection', (socket) => {
   socket.on('updateAgreedEstimate', (data) => { doDb('updateAgreedEstimate', data) })
 
   // Facilitator
-  socket.on('loadBacklog', (data) => { doDb('loadBacklog', data) })
+  socket.on('addTeam', (data) => { doDb('addTeam', data) })
 
-  socket.on('saveBacklog', (data) => { doDb('saveBacklog', data) })
+  socket.on('includeTeam', (data) => { doDb('includeTeam', data) })
+
+  socket.on('deleteTeam', (data) => { doDb('deleteTeam', data) })
+
+  socket.on('addTeamMember', (data) => { doDb('addTeamMember', data) })
+
+  socket.on('includeTeamMember', (data) => { doDb('includeTeamMember', data) })
+
+  socket.on('deleteTeamMember', (data) => { doDb('deleteTeamMember', data) })
 
   socket.on('addEstimationType', (data) => { doDb('addEstimationType', data) })
 
   socket.on('addEstimationValue', (data) => { doDb('addEstimationValue', data) })
 
   socket.on('deleteEstimationValue', (data) => { doDb('deleteEstimationValue', data) })
+
+  socket.on('loadBacklog', (data) => { doDb('loadBacklog', data) })
+
+  socket.on('saveBacklog', (data) => { doDb('saveBacklog', data) })
 
   socket.on('addBacklogCard', (data) => { doDb('addBacklogCard', data) })
 
