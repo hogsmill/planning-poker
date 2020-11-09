@@ -135,7 +135,6 @@ export default {
     margin-bottom: 24px;
   }
   #team-logo {
-    border: 1px solid;
     height: 65px;
     width: 65px;
     float: right;
