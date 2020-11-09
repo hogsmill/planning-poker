@@ -17,6 +17,10 @@ npm run build
 rm /var/www/html/$APP/css/*
 rm /var/www/html/$APP/js/*
 cp -R dist/* /var/www/html/$APP
+
+rm /var/www/html/$APP/icons/*
+cp icons/* /var/www/html/$APP/icons
+
 if [ -f "src/server.js" ]; then
   SERVER=`ps -ef | grep server.js | grep $PORT | awk {'print $2'}`
   if [ "$SERVER" != "" ]; then

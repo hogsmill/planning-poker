@@ -103,7 +103,7 @@ export default {
   methods: {
     logo() {
       if (this.thisTeam && this.thisTeam.logo) {
-        return 'url("../assets/img/' + this.thisTeam.logo + '")'
+        return 'url("../planning-poker/icons/' + this.thisTeam.logo + '")'
       }
     },
     startEstimating() {
@@ -141,6 +141,9 @@ export default {
     float: right;
     position: relative;
     top: -10px;
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
   }
   .estimation-type {
     text-align: right;
@@ -181,7 +184,7 @@ export default {
           background-image: url("../assets/img/card-back.jpg");
           background-size: contain;
           background-repeat: no-repeat;
-          background-position-x: center;
+          background-position: center;
         }
         .tbd {
           color: #ddd;
