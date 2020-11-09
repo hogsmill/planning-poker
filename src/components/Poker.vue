@@ -7,6 +7,9 @@
       <p v-if="selectedCard">
         {{ selectedCard.description }}
       </p>
+      <p v-if="!selectedCard">
+        <i>Click a backlog card to start</i>
+      </p>
     </div>
     <div v-if="selectedCard" class="final-estimate">
       <div>
@@ -20,6 +23,7 @@
         <button class="btn btn-sm btn-secondary smaller-font" :disabled="!selectedCard" @click="saveAgreedEstimate()">
           Submit
         </button>
+        <div id="team-logo" :style="{ 'background-image': logo() }" />
       </div>
       <div>
         <button v-if="!revealed" class="btn btn-sm btn-secondary smaller-font reveal" @click="reveal(true)">
@@ -77,6 +81,9 @@ export default {
     teamName() {
       return this.$store.getters.getTeamName
     },
+    thisTeam() {
+      return this.$store.getters.getThisTeam
+    },
     organisation() {
       return this.$store.getters.getOrganisation
     },
@@ -94,6 +101,11 @@ export default {
     }
   },
   methods: {
+    logo() {
+      if (this.thisTeam && this.thisTeam.logo) {
+        return 'url("../assets/img/' + this.thisTeam.logo + '")'
+      }
+    },
     startEstimating() {
       this.estimating = true
     },
@@ -121,6 +133,14 @@ export default {
     min-height: 76px;
     border: 1px solid;
     margin-bottom: 24px;
+  }
+  #team-logo {
+    border: 1px solid;
+    height: 65px;
+    width: 65px;
+    float: right;
+    position: relative;
+    top: -10px;
   }
   .estimation-type {
     text-align: right;

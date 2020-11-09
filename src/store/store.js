@@ -13,6 +13,7 @@ export const store = new Vuex.Store({
     demo: false,
     myName: {},
     teamName: '',
+    thisTeam: '',
     organisation: '',
     teams: [],
     teamMembers: [],
@@ -54,13 +55,15 @@ export const store = new Vuex.Store({
     getOrganisation: (state) => {
       return state.organisation
     },
+    getThisTeam: (state) => {
+      return state.thisTeam
+    },
     getTeams: (state) => {
       return state.teams
     },
     getIncludedTeams: (state) => {
       const teams = []
       for (let i = 0; i < state.teams.length; i++) {
-        console.log(state.teams[i])
         if (state.teams[i].include) {
           teams.push(state.teams[i])
         }
@@ -144,6 +147,7 @@ export const store = new Vuex.Store({
       state.estimationType = payload.estimationType
     },
     loadTeam: (state, payload) => {
+      state.thisTeam = payload.team
       state.teamMembers = payload.team.members
       state.backlog = payload.team.backlog
       state.estimationValues = payload.team.estimationValues

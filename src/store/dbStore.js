@@ -15,10 +15,10 @@ const defaultBacklog = [
 ]
 
 const defaultTeams = [
-  { name: 'Eagle', include: true },
-  { name: 'Dragon', include: true },
-  { name: 'Lion', include: true },
-  { name: 'Gryphen', include: true }
+  { name: 'Eagle', include: true, logo: 'eagle.png' },
+  { name: 'Dragon', include: true, logo: 'dragon.png' },
+  { name: 'Lion', include: true, logo: 'lion.png' },
+  { name: 'Gryphen', include: true, logo: 'gryphen.png' }
 ]
 
 const defaultTeamMembers = [
