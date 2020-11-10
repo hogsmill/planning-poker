@@ -131,8 +131,9 @@ export default {
   }
   .selected-card {
     min-height: 76px;
-    border: 1px solid;
+    border: 1px solid #888;
     margin-bottom: 24px;
+    box-shadow: 2px 2px 3px #444;
   }
   #team-logo {
     height: 65px;
@@ -178,12 +179,14 @@ export default {
         height: 144px;
         width: 103px;
         border: 6px solid #888;
+        box-shadow: 2px 2px 3px #444;
 
         &.back {
           background-image: url("../assets/img/card-back.jpg");
           background-size: contain;
           background-repeat: no-repeat;
           background-position: center;
+          background-color: #888;
         }
         .tbd {
           color: #ddd;
