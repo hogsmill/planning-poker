@@ -54,7 +54,7 @@
           <tr v-for="(value, index) in estimateTeam.estimationValues[estimateTeam.estimationType]" :key="index">
             <td><input type="checkbox" :checked="value.include" @click="includeValue(value)"></td>
             <td>
-            <div v-if="value.icon" :style="{ 'background-image': logo(value.icon) }" />
+            <div v-if="value.icon" class="estimate-type-icon" :style="{ 'background-image': logo(value.icon) }" />
               {{ value.name }}
             </td>
             <td>
@@ -146,5 +146,12 @@ export default {
 <style lang="scss">
   .estimate-team-selected {
     display: inline;
+  }
+  .estimate-type-icon {
+    width: 24px;
+    height: 24px;
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
   }
 </style>
