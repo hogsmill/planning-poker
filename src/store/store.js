@@ -19,7 +19,7 @@ export const store = new Vuex.Store({
     teamMembers: [],
     backlog: [],
     revealed: false,
-    estimationType: 'fibonacci',
+    estimationType: '',
     estimationValues: {},
     editing: {
       showTeams: false,
@@ -89,7 +89,7 @@ export const store = new Vuex.Store({
       return Object.keys(state.estimationValues)
     },
     getEstimationValues: (state) => {
-      return state.estimationValues[state.estimationType]
+      return state.estimationType ? state.estimationValues[state.estimationType] : []
     },
     getConnections: (state) => {
       return state.connections
@@ -147,9 +147,11 @@ export const store = new Vuex.Store({
       state.estimationType = payload.estimationType
     },
     loadTeam: (state, payload) => {
+      console.log(payload.team.backlog)
       state.thisTeam = payload.team
       state.teamMembers = payload.team.members
       state.backlog = payload.team.backlog
+      state.estimationType = payload.team.estimationType
       state.estimationValues = payload.team.estimationValues
     },
     reveal: (state, payload) => {

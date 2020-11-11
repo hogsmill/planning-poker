@@ -2,8 +2,9 @@
 const { v4: uuidv4 } = require('uuid');
 
 const defaultEstimationValues = {
-  't-shirt': ['XS', 'S', 'M', 'L', 'XL'],
   'fibonacci': ['1', '2', '3', '5', '8', '13'],
+  't-shirt': ['XS', 'S', 'M', 'L', 'XL'],
+  'fruit': ['grape', 'cherry', 'apple', 'kiwi', 'watermelon', 'pineapple'],
   'custom': []
 }
 
@@ -15,10 +16,10 @@ const defaultBacklog = [
 ]
 
 const defaultTeams = [
-  { name: 'Eagle', include: true, logo: 'eagle.png' },
-  { name: 'Dragon', include: true, logo: 'dragon.png' },
-  { name: 'Lion', include: true, logo: 'lion.png' },
-  { name: 'Gryphen', include: true, logo: 'gryphen.png' }
+  { name: 'Eagle', include: true, logo: 'agile_sims_eagle.png' },
+  { name: 'Dragon', include: true, logo: 'agile_sims_dragon.png' },
+  { name: 'Lion', include: true, logo: 'agile_sims_lion.png' },
+  { name: 'Gryphen', include: true, logo: 'agile_sims_gryphen.png' }
 ]
 
 const defaultTeamMembers = [
@@ -226,6 +227,41 @@ function _loadBacklog(err, client, db, io, data, debugOn) {
   })
 }
 
+function _setOrganisation(err, client, db, io, data, debugOn) {
+
+  if (debugOn) { console.log('setOrganisation', data) }
+
+  db.collection('planningPokerOrganisations').findOne({organisation: data.organisation}, function(err, res) {
+    if (err) throw err
+    if (!res) {
+      data.teams = data.demo ? defaultTeams : []
+      data.estimationValues = defaultEstimationValues
+      if (data.demo) {
+        for (let i = 0; i < data.teams.length; i++) {
+          data.teams[i].members = defaultTeamMembers
+          data.teams[i].estimationType = Object.keys(defaultEstimationValues)[0]
+          data.teams[i].estimationValues = defaultEstimationValues
+          data.teams[i].backlog = defaultBacklog
+          data.teams[i].include = true
+        }
+      }
+      const created = new Date().toISOString()
+      db.collection('planningPokerOrganisations').insertOne({organisation: data.organisation, created: created, teams: data.teams, estimationTypes: data.estimationValues, demo: data.demo}, function(err, res) {
+        if (err) throw err
+        io.emit('loadOrganisation', data)
+        client.close()
+      })
+    } else {
+      data.teams = res.teams
+      db.collection('planningPokerOrganisations').updateOne({'_id': res._id}, {$set: {demo: data.demo}}, function(err, res) {
+        if (err) throw err
+        io.emit('loadOrganisation', data)
+        client.close()
+      })
+    }
+  })
+}
+
 module.exports = {
 
   // Organisation
@@ -234,33 +270,13 @@ module.exports = {
 
     if (debugOn) { console.log('setOrganisation', data) }
 
-    db.collection('planningPokerOrganisations').findOne({organisation: data.organisation}, function(err, res) {
-      if (err) throw err
-      if (!res) {
-        data.teams = data.demo ? defaultTeams : []
-        data.estimationValues = defaultEstimationValues
-        if (data.demo) {
-          for (let i = 0; i < data.teams.length; i++) {
-            data.teams[i].members = defaultTeamMembers
-            data.teams[i].estimationValues = defaultEstimationValues
-            data.teams[i].backlog = defaultBacklog
-            data.teams[i].include = true
-          }
-        }
-        db.collection('planningPokerOrganisations').insertOne({organisation: data.organisation, teams: data.teams, estimationTypes: data.estimationValues, demo: data.demo}, function(err, res) {
-          if (err) throw err
-          io.emit('loadOrganisation', data)
-          client.close()
-        })
-      } else {
-        data.teams = res.teams
-        db.collection('planningPokerOrganisations').updateOne({'_id': res._id}, {$set: {demo: data.demo}}, function(err, res) {
-          if (err) throw err
-          io.emit('loadOrganisation', data)
-          client.close()
-        })
-      }
-    })
+    if (data.startOver) {
+      db.collection('planningPokerOrganisations').deleteOne({organisation: data.organisation}, function(err, res) {
+        _setOrganisation(err, client, db, io, data, debugOn)
+      })
+    } else {
+      _setOrganisation(err, client, db, io, data, debugOn)
+    }
   },
 
   // Game
@@ -373,7 +389,11 @@ module.exports = {
               }
               backlog.push(team.backlog[j])
             }
-            team.backlog = backlog
+            team.backlog = backlog.sort(function(a, b) {
+              a = a.estimate ? parseInt(a.estimate) : 0
+              b = b.estimate ? parseInt(b.estimate) : 0
+              return a - b
+            })
             data.team = team
           }
           teams.push(team)
