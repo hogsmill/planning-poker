@@ -42,7 +42,7 @@
                     <td class="center">
                       Include?
                     </td>
-                    <td colspan="2"></td>
+                    <td colspan="2" />
                   </tr>
                   <tr v-for="(teamMember, mindex) in team.members" :key="mindex">
                     <td><input type="checkbox" :checked="teamMember.include" @click="includeTeamMember(team, teamMember)"></td>

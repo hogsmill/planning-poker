@@ -1,5 +1,5 @@
 
-const { v4: uuidv4 } = require('uuid');
+const { v4: uuidv4 } = require('uuid')
 
 const defaultEstimationValues = {
   'fibonacci': [
@@ -324,7 +324,8 @@ module.exports = {
     db.collection('planningPokerOrganisations').findOne({organisation: data.organisation}, function(err, res) {
       if (err) throw err
       if (res) {
-        let teams = [], selectedTeam
+        const teams = []
+        let selectedTeam
         for (let i = 0; i < res.teams.length; i++) {
           const team = res.teams[i]
           if (team.name == data.teamName) {
@@ -626,7 +627,6 @@ module.exports = {
           if (err) throw err
           io.emit('loadOrganisation', data)
           io.emit('updateEstimateTeam', data)
-
           client.close()
        })
       }
@@ -637,22 +637,26 @@ module.exports = {
 
     if (debugOn) { console.log('addEstimationType', data) }
 
-    if (data.allTeams) {
-      addEstimationTypeToOrganisation(err, client, db, io, data, debugOn)
-    }
-    db.collection('planningPoker').findOne({teamName: data.teamName}, function(err, res) {
+    db.collection('planningPokerOrganisations').findOne({organisation: data.organisation}, function(err, res) {
       if (err) throw err
       if (res) {
-        const estimationValues = res.estimationValues
-        estimationValues[data.estimationType] = []
-        res.estimationValues = estimationValues
-        const team = res
-        db.collection('planningPoker').updateOne({'_id': res._id}, {$set: {estimationTypes: res.estimationTypes}}, function(err, res) {
+        const teams = []
+        for (let i = 0; i < res.teams.length; i++) {
+          const team = res.teams[i]
+          if (team.name == data.teamName || data.allTeams) {
+            team.estimationValues[data.estimationType] = []
+            data.estimateTeam = team
+          }
+          teams.push(team)
+        }
+        data.teams = teams
+        db.collection('planningPokerOrganisations').updateOne({'_id': res._id}, {$set: {teams: teams}}, function(err, res) {
           if (err) throw err
-          io.emit('loadTeam', team)
+          io.emit('loadOrganisation', data)
+          io.emit('updateEstimateTeam', data)
           client.close()
        })
-     }
+      }
     })
   },
 
@@ -660,19 +664,31 @@ module.exports = {
 
     if (debugOn) { console.log('addEstimationValue', data) }
 
-    db.collection('planningPoker').findOne({teamName: data.teamName}, function(err, res) {
+    db.collection('planningPokerOrganisations').findOne({organisation: data.organisation}, function(err, res) {
       if (err) throw err
       if (res) {
-        const estimationValues = res.estimationValues[data.estimationType]
-        estimationValues.push(data.value)
-        res.estimationValues[data.estimationType] = estimationValues
-        const team = res
-        db.collection('planningPoker').updateOne({'_id': res._id}, {$set: {estimationValues: res.estimationValues}}, function(err, res) {
+        const teams = []
+        for (let i = 0; i < res.teams.length; i++) {
+          const team = res.teams[i]
+          if (team.name == data.teamName || data.allTeams) {
+            const order = team.estimationValues[data.estimationType].length + 1
+            team.estimationValues[data.estimationType].push({
+              name: data.value,
+              order: order,
+              include: true
+            })
+            data.estimateTeam = team
+          }
+          teams.push(team)
+        }
+        data.teams = teams
+        db.collection('planningPokerOrganisations').updateOne({'_id': res._id}, {$set: {teams: teams}}, function(err, res) {
           if (err) throw err
-          io.emit('loadTeam', team)
+          io.emit('loadOrganisation', data)
+          io.emit('updateEstimateTeam', data)
           client.close()
        })
-     }
+      }
     })
   },
 
@@ -680,23 +696,36 @@ module.exports = {
 
     if (debugOn) { console.log('deleteEstimationValue', data) }
 
-    db.collection('planningPoker').findOne({teamName: data.teamName}, function(err, res) {
+    db.collection('planningPokerOrganisations').findOne({organisation: data.organisation}, function(err, res) {
       if (err) throw err
       if (res) {
-        const estimationValues = []
-        for (let i = 0; i < res.estimationValues[data.estimationType].length; i++) {
-          if (res.estimationValues[data.estimationType][i] != data.value) {
-            estimationValues.push(res.estimationValues[data.estimationType][i])
+        const teams = []
+        let i, j, k
+        for (i = 0; i < res.teams.length; i++) {
+          const team = res.teams[i]
+          if (team.name == data.teamName || data.allTeams) {
+            const estimationTypes = [], estTypes = team.estimationValues[data.estimationType]
+            for (j = 0; j < estTypes.length; j++) {
+              if (estTypes[j].name != data.value) {
+                estimationTypes.push(estTypes[j])
+              }
+            }
+            for (j = 0, k = 1; j < estimationTypes.length; j++, k++) {
+              estimationTypes[j].order = k
+            }
+            team.estimationValues[data.estimationType] = estimationTypes
+            data.estimateTeam = team
           }
+          teams.push(team)
         }
-        res.estimationValues[data.estimationType] = estimationValues
-        const team = res
-        db.collection('planningPoker').updateOne({'_id': res._id}, {$set: {estimationValues: res.estimationValues}}, function(err, res) {
+        data.teams = teams
+        db.collection('planningPokerOrganisations').updateOne({'_id': res._id}, {$set: {teams: teams}}, function(err, res) {
           if (err) throw err
-          io.emit('loadTeam', team)
+          io.emit('loadOrganisation', data)
+          io.emit('updateEstimateTeam', data)
           client.close()
        })
-     }
+      }
     })
   }
 

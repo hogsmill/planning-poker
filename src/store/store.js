@@ -95,7 +95,6 @@ export const store = new Vuex.Store({
       } else {
         values = []
       }
-      console.log(values, state)
       return values
     },
     getConnections: (state) => {
@@ -120,7 +119,6 @@ export const store = new Vuex.Store({
       return state.editing.backlogTeam
     },
     getEstimateTeam: (state) => {
-      console.log(state.editing.estimateTeam)
       return state.editing.estimateTeam
     }
   },

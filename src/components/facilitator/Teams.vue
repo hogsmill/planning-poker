@@ -24,11 +24,11 @@
             <td class="center">
               Include?
             </td>
-            <td colspan="2"></td>
+            <td colspan="2" />
           </tr>
           <tr v-for="(team, index) in teams" :key="index">
             <td>
-              <input type="checkbox" :checked="team.include" @click="includeTeam(team)" />
+              <input type="checkbox" :checked="team.include" @click="includeTeam(team)">
             </td>
             <td>{{ team.name }}</td>
             <td>

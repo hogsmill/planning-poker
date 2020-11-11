@@ -39,7 +39,7 @@
         <div><b>{{ teamMember.name }}</b></div>
         <div v-if="teamMember.uid == myName.uid || revealed" class="poker-card rounded">
           <div v-if="estimating" class="poker-card-value">
-            <select :id="'estimate-value-' + myName.uid" @change="saveEstimate()">
+            <select class="estimate-dropdown" :id="'estimate-value-' + myName.uid" @change="saveEstimate()">
               <option value="" />
               <option v-for="(value, ind) in estimationValues" :key="ind" :value="value.name">
                 {{ value.name }}
@@ -154,6 +154,9 @@ export default {
   .estimation-type {
     text-align: right;
     height: 30px;
+  }
+  .estimate-dropdown option {
+    padding-left: 30px;
   }
   .final-estimate {
     div {

@@ -7,7 +7,7 @@
         <span v-if="!showEstimates" @click="setShowEstimates(true)" title="expand" class="toggle">&#9660;</span>
       </td>
     </tr>
-    <Team v-if="showEstimates" :scope="'estimate'"/>
+    <Team v-if="showEstimates" :scope="'estimate'" />
     <tr v-if="showEstimates">
       <td>
         Estimate Using
@@ -22,7 +22,9 @@
                     {{ estType }}
                   </option>
                 </select>
-                <div class="estimate-team-selected" v-if="estimateTeam"> for {{ estimateTeam.name }} </div>
+                <div class="estimate-team-selected" v-if="estimateTeam">
+                  for {{ estimateTeam.name }}
+                </div>
               </td>
             </tr>
             <tr>
@@ -33,7 +35,7 @@
                 <button class="btn btn-sm btn-secondary smaller-font" @click="addEstimationType()">
                   Add New
                 </button>
-                <input type="checkbox" id="new-estimation-type-team-only"> This team only?
+                <input type="checkbox" id="new-estimation-type-all-teams" checked="true"> Apply to all teams?
               </td>
             </tr>
           </table>
@@ -46,15 +48,15 @@
       </td>
       <td>
         <table v-if="estimateTeam" class="inner-table">
-        <tr>
-          <td class="center">
-            Include?
-          </td>
-          <td colspan="2"></td>
-          <tr v-for="(value, index) in estimateTeam.estimationValues[estimateTeam.estimationType]" :key="index">
+          <tr>
+            <td class="center">
+              Include?
+            </td>
+            <td colspan="2" />
+          </tr><tr v-for="(value, index) in estimateTeam.estimationValues[estimateTeam.estimationType]" :key="index">
             <td><input type="checkbox" :checked="value.include" @click="includeValue(value)"></td>
             <td>
-            <div v-if="value.icon" class="estimate-type-icon" :style="{ 'background-image': logo(value.icon) }" />
+              <div v-if="value.icon" class="estimate-type-icon" :style="{ 'background-image': logo(value.icon) }" />
               {{ value.name }}
             </td>
             <td>
@@ -69,7 +71,7 @@
               <button class="btn btn-sm btn-secondary smaller-font" @click="addEstimationValue()">
                 Add Value
               </button>
-              <input type="checkbox" id="new-estimation-value-team-only"> This team only?
+              <input type="checkbox" id="add-estimation-value-all-teams"> Apply to all teams?
             </td>
           </tr>
         </table>
@@ -128,16 +130,18 @@ export default {
     },
     addEstimationType() {
       const estimationType = document.getElementById('new-estimation-type').value
-      const thisTeamOnly = document.getElementById('new-estimation-type-team-only').checked
-      this.socket.emit('addEstimationType', {organisation: this.organisation, teamName: this.estimateTeam.name, estimationType: estimationType, thisTeamOnly: thisTeamOnly})
+      const allTeams = document.getElementById('new-estimation-type-all-teams').checked
+      this.socket.emit('addEstimationType', {organisation: this.organisation, teamName: this.estimateTeam.name, estimationType: estimationType, allTeams: allTeams})
     },
     addEstimationValue() {
+      const estimationType = document.getElementById('set-estimation-type').value
       const estimationValue = document.getElementById('add-estimation-value').value
-      const thisTeamOnly = document.getElementById('add-estimation-value-team-only').checked
-      this.socket.emit('addEstimationValue', {organisation: this.organisation, teamName: this.estimateTeam.name, estimationType: this.estimationType, value: estimationValue, thisTeamOnly: thisTeamOnly})
+      const allTeams = document.getElementById('add-estimation-value-all-teams').checked
+      this.socket.emit('addEstimationValue', {organisation: this.organisation, teamName: this.estimateTeam.name, estimationType: estimationType, value: estimationValue, allTeams: allTeams})
     },
     deleteEstimationValue(value) {
-      this.socket.emit('deleteEstimationValue', {organisation: this.organisation, teamName: this.estimateTeam.name, estimationType: this.estimationType, value: value})
+      const estimationType = document.getElementById('set-estimation-type').value
+      this.socket.emit('deleteEstimationValue', {organisation: this.organisation, teamName: this.estimateTeam.name, estimationType: estimationType, value: value.name})
     }
   }
 }
@@ -153,5 +157,6 @@ export default {
     background-size: contain;
     background-repeat: no-repeat;
     background-position: center;
+    display: inline-block
   }
 </style>
