@@ -45,15 +45,16 @@
         Estimates Values for {{ estimationType }}
       </td>
       <td>
-        <table class="inner-table">
+        <table v-if="estimateTeam" class="inner-table">
         <tr>
           <td class="center">
             Include?
           </td>
           <td colspan="2"></td>
-          <tr v-for="(value, index) in estimationValues" :key="index">
+          <tr v-for="(value, index) in estimateTeam.estimationValues[estimateTeam.estimationType]" :key="index">
             <td><input type="checkbox" :checked="value.include" @click="includeValue(value)"></td>
             <td>
+            <div v-if="value.icon" :style="{ 'background-image': logo(value.icon) }" />
               {{ value.name }}
             </td>
             <td>
@@ -104,14 +105,15 @@ export default {
       return this.$store.getters.getEstimationType
     },
     estimationValues() {
-    console.log('facilitator')
-
       return this.$store.getters.getEstimationValues
     }
   },
   methods: {
     setShowEstimates(val) {
       this.$store.dispatch('setShowEstimates', val)
+    },
+    logo(icon) {
+      return 'url("../planning-poker/icons/' + icon + '")'
     },
     teamEstimationType() {
       const self = this

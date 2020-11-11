@@ -610,24 +610,23 @@ module.exports = {
     if (debugOn) { console.log('updateEstimationType', data) }
 
     db.collection('planningPokerOrganisations').findOne({organisation: data.organisation}, function(err, res) {
-      console.log('here 1')
-
       if (err) throw err
       if (res) {
-        console.log('here 2')
         const teams = []
         for (let i = 0; i < res.teams.length; i++) {
           const team = res.teams[i]
           if (team.name == data.teamName) {
             team.estimationType = data.estimationType
+            data.estimateTeam = team
           }
           teams.push(team)
         }
-        console.log(teams)
         data.teams = teams
         db.collection('planningPokerOrganisations').updateOne({'_id': res._id}, {$set: {teams: teams}}, function(err, res) {
           if (err) throw err
           io.emit('loadOrganisation', data)
+          io.emit('updateEstimateTeam', data)
+
           client.close()
        })
       }

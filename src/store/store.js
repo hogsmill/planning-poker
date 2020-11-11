@@ -89,7 +89,14 @@ export const store = new Vuex.Store({
       return Object.keys(state.estimationValues)
     },
     getEstimationValues: (state) => {
-      return state.estimationType ? state.estimationValues[state.estimationType] : []
+      let values
+      if (state.estimationValues && state.estimationType) {
+        values = state.estimationValues[state.estimationType]
+      } else {
+        values = []
+      }
+      console.log(values, state)
+      return values
     },
     getConnections: (state) => {
       return state.connections
@@ -113,6 +120,7 @@ export const store = new Vuex.Store({
       return state.editing.backlogTeam
     },
     getEstimateTeam: (state) => {
+      console.log(state.editing.estimateTeam)
       return state.editing.estimateTeam
     }
   },
@@ -145,6 +153,9 @@ export const store = new Vuex.Store({
     },
     updateEstimationType: (state, payload) => {
       state.estimationType = payload.estimationType
+    },
+    updateEstimateTeam: (state, payload) => {
+      state.editing.estimateTeam = payload.estimateTeam
     },
     loadTeam: (state, payload) => {
       state.thisTeam = payload.team
@@ -204,6 +215,9 @@ export const store = new Vuex.Store({
     },
     updateEstimationType: ({ commit }, payload) => {
       commit('updateEstimationType', payload)
+    },
+    updateEstimateTeam: ({ commit }, payload) => {
+      commit('updateEstimateTeam', payload)
     },
     loadTeam: ({ commit }, payload) => {
       commit('loadTeam', payload)

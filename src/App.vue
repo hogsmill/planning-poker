@@ -130,6 +130,12 @@ export default {
       }
     })
 
+    this.socket.on('updateEstimateTeam', (data) => {
+      if (this.organisation == data.organisation) {
+        this.$store.dispatch('updateEstimateTeam', data)
+      }
+    })
+
     this.socket.on('reveal', (data) => {
       if (this.teamName == data.teamName && this.organisation == data.organisation) {
         this.$store.dispatch('reveal', data)
