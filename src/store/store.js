@@ -147,7 +147,6 @@ export const store = new Vuex.Store({
       state.estimationType = payload.estimationType
     },
     loadTeam: (state, payload) => {
-      console.log(payload.team.backlog)
       state.thisTeam = payload.team
       state.teamMembers = payload.team.members
       state.backlog = payload.team.backlog
@@ -173,7 +172,9 @@ export const store = new Vuex.Store({
       state.editing.backlogTeam = payload
     },
     setEstimateTeam: (state, payload) => {
-      state.editing.estimateTeam = payload
+      state.editing.estimateTeam = state.teams.find(function(t) {
+        return t.name == payload
+      })
     },
     updateConnections: (state, payload) => {
       state.connections = payload

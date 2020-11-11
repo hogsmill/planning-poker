@@ -54,7 +54,7 @@ function doDb(fun, data) {
       case 'setOrganisation':
         dbStore.setOrganisation(err, client, db, io, data, debugOn)
         break
-      case 'loadGame':
+      case 'loadTeam':
         dbStore.loadTeam(err, client, db, io, data, debugOn)
         break
       case 'selectCard':
@@ -85,6 +85,9 @@ function doDb(fun, data) {
         break
       case 'deleteTeamMember':
         dbStore.deleteTeamMember(err, client, db, io, data, debugOn)
+        break
+      case 'updateEstimationType':
+        dbStore.updateEstimationType(err, client, db, io, data, debugOn)
         break
       case 'addEstimationType':
         dbStore.addEstimationType(err, client, db, io, data, debugOn)
@@ -134,9 +137,9 @@ io.on('connection', (socket) => {
   // Game
   socket.on('setOrganisation', (data) => { doDb('setOrganisation', data) })
 
-  socket.on('loadTeam', (data) => { doDb('loadGame', data) })
+  socket.on('loadTeam', (data) => { doDb('loadTeam', data) })
 
-  socket.on('updateEstimationType', (data) => { emit('updateEstimationType', data) })
+  socket.on('updateEstimationType', (data) => { doDb('updateEstimationType', data) })
 
   socket.on('selectCard', (data) => { doDb('selectCard', data) })
 

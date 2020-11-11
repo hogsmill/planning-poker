@@ -20,6 +20,9 @@
           </button>
         </div>
         <div>
+          <input type="checkbox" id="start-over"> Start over?
+        </div>
+        <div>
           <input type="checkbox" id="demo-mode" :checked="demo"> Demo mode?
         </div>
         <p>
@@ -57,9 +60,10 @@ export default {
     saveOrganisation() {
       const organisation = document.getElementById('organisation').value
       const demo = document.getElementById('demo-mode').checked
+      const startOver = document.getElementById('start-over').checked
       localStorage.setItem('organisation-pp', organisation)
       this.$store.dispatch('loadOrganisation', {organisation: organisation, demo: demo})
-      this.socket.emit('setOrganisation', {organisation: organisation, demo: demo})
+      this.socket.emit('setOrganisation', {organisation: organisation, startOver: startOver, demo: demo})
       this.hide()
     }
   }

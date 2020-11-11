@@ -7,7 +7,7 @@
         <span v-if="!showBacklog" @click="setShowBacklog(true)" title="expand" class="toggle">&#9660;</span>
       </td>
     </tr>
-    <Team v-if="showBacklog" :scope="'backlog'"/>
+    <Team v-if="showBacklog" />
     <tr v-if="showBacklog">
       <td>
         Load from file<br>

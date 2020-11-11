@@ -2,9 +2,29 @@
 const { v4: uuidv4 } = require('uuid');
 
 const defaultEstimationValues = {
-  'fibonacci': ['1', '2', '3', '5', '8', '13'],
-  't-shirt': ['XS', 'S', 'M', 'L', 'XL'],
-  'fruit': ['grape', 'cherry', 'apple', 'kiwi', 'watermelon', 'pineapple'],
+  'fibonacci': [
+    { order: 1, name: '1', include: true },
+    { order: 2, name: '2', include: true },
+    { order: 3, name: '3', include: true },
+    { order: 4, name: '5', include: true },
+    { order: 5, name: '8', include: true },
+    { order: 6, name: '13', include: true }
+  ],
+  't-shirt': [
+    { order: 1, name: 'XS', include: true },
+    { order: 2, name: 'S', include: true },
+    { order: 3, name: 'M', include: true },
+    { order: 4, name: 'L', include: true },
+    { order: 5, name: 'XL', include: true },
+  ],
+  'fruit': [
+    { order: 1, name: 'grape', include: true, icon: 'fruit_grape.jpg' },
+    { order: 2, name: 'cherry', include: true, icon: 'fruit_cherry.jpg' },
+    { order: 3, name: 'apple', include: true, icon: 'fruit_apple.jpg' },
+    { order: 4, name: 'kiwi', include: true, icon: 'fruit_kiwi.jpg' },
+    { order: 5, name: 'watermelon', include: true, icon: 'fruit_watermelon.jpg' },
+    { order: 6, name: 'pineapple', include: true, icon: 'fruit_pineapple.jpg' }
+  ],
   'custom': []
 }
 
@@ -390,9 +410,9 @@ module.exports = {
               backlog.push(team.backlog[j])
             }
             team.backlog = backlog.sort(function(a, b) {
-              a = a.estimate ? parseInt(a.estimate) : 0
-              b = b.estimate ? parseInt(b.estimate) : 0
-              return a - b
+              a = a.estimate ? a.estimate : { order: 0 }
+              b = b.estimate ? b.estimate : { order: 0 }
+              return a.order - b.order
             })
             data.team = team
           }
@@ -461,7 +481,6 @@ module.exports = {
           const team = res.teams[i]
           if (team.name == data.teamName) {
             const members = []
-            console.log(team.members, data.teamMember)
             for (let j = 0; j < team.members.length; j++) {
               if (team.members[j].uid == data.teamMember.uid) {
                 team.members[j].include = data.include
@@ -583,6 +602,35 @@ module.exports = {
           client.close()
        })
      }
+    })
+  },
+
+  updateEstimationType:  function(err, client, db, io, data, debugOn) {
+
+    if (debugOn) { console.log('updateEstimationType', data) }
+
+    db.collection('planningPokerOrganisations').findOne({organisation: data.organisation}, function(err, res) {
+      console.log('here 1')
+
+      if (err) throw err
+      if (res) {
+        console.log('here 2')
+        const teams = []
+        for (let i = 0; i < res.teams.length; i++) {
+          const team = res.teams[i]
+          if (team.name == data.teamName) {
+            team.estimationType = data.estimationType
+          }
+          teams.push(team)
+        }
+        console.log(teams)
+        data.teams = teams
+        db.collection('planningPokerOrganisations').updateOne({'_id': res._id}, {$set: {teams: teams}}, function(err, res) {
+          if (err) throw err
+          io.emit('loadOrganisation', data)
+          client.close()
+       })
+      }
     })
   },
 

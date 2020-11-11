@@ -10,10 +10,10 @@
         </tr>
       </thead>
       <tbody>
-        <tr v-for="(card, index) in backlog" :key="index" @click="selectCard(card.uid)">
+        <tr v-for="(card, index) in backlog" :key="index" :class="{ 'not-estimated': !card.estimate }" @click="selectCard(card.uid)">
           <td>{{ card.id }}</td>
           <td>{{ card.title }}</td>
-          <td><span v-if="card.estimate"><b>{{ card.estimate }}</b></span></td>
+          <td><span v-if="card.estimate"><b>{{ card.estimate.name }}</b></span></td>
         </tr>
       </tbody>
     </table>
@@ -48,5 +48,7 @@ export default {
 </script>
 
 <style lang="scss">
-
+  .not-estimated {
+    background-color: #eee;
+  }
 </style>

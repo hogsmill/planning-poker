@@ -4,7 +4,7 @@
       Team
     </td>
     <td>
-      <select :id="scope + '-team'" @change="setBacklogTeam()">
+      <select id="backlog-team'" @change="setBacklogTeam()">
         <option value="">
           -- Select --
         </option>
@@ -18,9 +18,6 @@
 
 <script>
 export default {
-  props: [
-    'scope'
-  ],
   computed: {
     teams() {
       return this.$store.getters.getTeams
