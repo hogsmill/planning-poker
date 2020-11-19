@@ -124,6 +124,12 @@ export default {
       }
     })
 
+    this.socket.on('loadTeams', (data) => {
+      if (this.organisation == data.organisation) {
+        this.$store.dispatch('loadTeams', data)
+      }
+    })
+
     this.socket.on('updateEstimationType', (data) => {
       if (this.teamName == data.teamName && this.organisation == data.organisation) {
         this.$store.dispatch('updateEstimationType', data)

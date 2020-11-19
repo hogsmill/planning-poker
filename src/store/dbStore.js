@@ -451,9 +451,10 @@ module.exports = {
           }
           teams.push(team)
         }
+        data.teams = teams
         db.collection('planningPokerOrganisations').updateOne({'_id': res._id}, {$set: {teams: teams}}, function(err, res) {
           if (err) throw err
-          io.emit('loadTeam', data)
+          io.emit('loadTeams', data)
           client.close()
         })
       }
