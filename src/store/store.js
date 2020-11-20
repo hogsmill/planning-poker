@@ -26,7 +26,7 @@ export const store = new Vuex.Store({
       showTeamMembers: false,
       showEstimates: false,
       showBacklog: false,
-      backlogTeam: '',
+      backlogTeam: {},
       estimateTeam: ''
     }
   },
@@ -181,7 +181,9 @@ export const store = new Vuex.Store({
       state.editing.showBacklog = payload
     },
     setBacklogTeam: (state, payload) => {
-      state.editing.backlogTeam = payload
+      state.editing.backlogTeam = state.teams.find(function(t) {
+        return t.name == payload
+      })
     },
     setEstimateTeam: (state, payload) => {
       state.editing.estimateTeam = state.teams.find(function(t) {

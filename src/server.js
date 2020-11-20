@@ -57,6 +57,9 @@ function doDb(fun, data) {
       case 'loadTeam':
         dbStore.loadTeam(err, client, db, io, data, debugOn)
         break
+      case 'updateBacklog':
+        dbStore.updateBacklog(err, client, db, io, data, debugOn)
+        break
       case 'selectCard':
         dbStore.selectCard(err, client, db, io, data, debugOn)
         break
@@ -97,6 +100,9 @@ function doDb(fun, data) {
         break
       case 'deleteEstimationValue':
         dbStore.deleteEstimationValue(err, client, db, io, data, debugOn)
+        break
+      case 'setRelativeSizing':
+        dbStore.setRelativeSizing(err, client, db, io, data, debugOn)
         break
       case 'loadBacklog':
         dbStore.loadBacklog(err, client, db, io, data, debugOn)
@@ -168,9 +174,13 @@ io.on('connection', (socket) => {
 
   socket.on('deleteEstimationValue', (data) => { doDb('deleteEstimationValue', data) })
 
+  socket.on('setRelativeSizing', (data) => { doDb('setRelativeSizing', data) })
+
   socket.on('loadBacklog', (data) => { doDb('loadBacklog', data) })
 
   socket.on('saveBacklog', (data) => { doDb('saveBacklog', data) })
+
+  socket.on('updateBacklog', (data) => { doDb('updateBacklog', data) })
 
   socket.on('addBacklogCard', (data) => { doDb('addBacklogCard', data) })
 

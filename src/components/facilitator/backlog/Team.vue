@@ -4,11 +4,11 @@
       Team
     </td>
     <td>
-      <select id="backlog-team'" @change="setBacklogTeam()">
+      <select id="backlog-team" @change="setBacklogTeam()">
         <option value="">
           -- Select --
         </option>
-        <option v-for="(team, index) in teams" :key="index" :value="team.name" :selected="team.name == backlogTeam">
+        <option v-for="(team, index) in teams" :key="index" :value="team.name" :selected="team.name == backlogTeam.name">
           {{ team.name }}
         </option>
       </select>

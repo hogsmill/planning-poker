@@ -36,10 +36,10 @@ const defaultBacklog = [
 ]
 
 const defaultTeams = [
-  { name: 'Eagle', include: true, logo: 'agile_sims_eagle.png' },
-  { name: 'Dragon', include: true, logo: 'agile_sims_dragon.png' },
-  { name: 'Lion', include: true, logo: 'agile_sims_lion.png' },
-  { name: 'Gryphen', include: true, logo: 'agile_sims_gryphen.png' }
+  { name: 'Eagle', include: true, relativeSizing: true, logo: 'agile_sims_eagle.png' },
+  { name: 'Dragon', include: true, relativeSizing: true, logo: 'agile_sims_dragon.png' },
+  { name: 'Lion', include: true, relativeSizing: true, logo: 'agile_sims_lion.png' },
+  { name: 'Gryphen', include: true, relativeSizing: true, logo: 'agile_sims_gryphen.png' }
 ]
 
 const defaultTeamMembers = [
@@ -117,6 +117,7 @@ function _addTeam(err, client, db, io, data, debugOn) {
       if (res.demo) {
         team.backlog = defaultBacklog
         team.members = defaultTeamMembers
+        team.relativeSizing = true,
         team.include = true
       }
       const teams = res.teams
@@ -317,6 +318,31 @@ module.exports = {
     })
   },
 
+  updateBacklog:  function(err, client, db, io, data, debugOn) {
+
+    if (debugOn) { console.log('updateBacklog', data) }
+
+    db.collection('planningPokerOrganisations').findOne({organisation: data.organisation}, function(err, res) {
+      if (err) throw err
+      if (res) {
+        const teams = []
+        for (let i = 0; i < res.teams.length; i++) {
+          const team = res.teams[i]
+          if (team.name == data.teamName) {
+            team.backlog = data.backlog
+            data.team = team
+          }
+          teams.push(team)
+        }
+        db.collection('planningPokerOrganisations').updateOne({'_id': res._id}, {$set: {teams: teams}}, function(err, res) {
+          if (err) throw err
+          io.emit('loadTeam', data)
+          client.close()
+        })
+      }
+    })
+  },
+
   selectCard:  function(err, client, db, io, data, debugOn) {
 
     if (debugOn) { console.log('selectCard', data) }
@@ -506,6 +532,30 @@ module.exports = {
   deleteTeamMember:  function(err, client, db, io, data, debugOn) {
 
     _deleteTeamMember(err, client, db, io, data, debugOn)
+  },
+
+  setRelativeSizing: function(err, client, db, io, data, debugOn) {
+
+    if (debugOn) { console.log('setRelativeSizing', data) }
+
+    db.collection('planningPokerOrganisations').findOne({organisation: data.organisation}, function(err, res) {
+      if (err) throw err
+      if (res) {
+        const teams = []
+        for (let i = 0; i < res.teams.length; i++) {
+          if (res.teams[i].name == data.teamName) {
+            res.teams[i].relativeSizing = data.relativeSizing
+          }
+          teams.push(res.teams[i])
+        }
+        data.teams = teams
+        db.collection('planningPokerOrganisations').updateOne({'_id': res._id}, {$set: {teams: teams}}, function(err, res) {
+          if (err) throw err
+          io.emit('loadTeams', data)
+          client.close()
+        })
+      }
+    })
   },
 
   loadBacklog:  function(err, client, db, io, data, debugOn) {

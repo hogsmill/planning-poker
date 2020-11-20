@@ -9,6 +9,10 @@
     </tr>
     <Team v-if="showBacklog" />
     <tr v-if="showBacklog">
+      <td>Relative sizing?</td>
+      <td><input id="relative-sizing" type="checkbox" :disabled="!backlogTeam.name" :checked="backlogTeam.relativeSizing" @change="toggleRelativeSizing()"></td>
+    </tr>
+    <tr v-if="showBacklog">
       <td>
         Load from file<br>
         <i>(Must be CSV, with columns Id, Title, <br>Description, [Estimate])</i> - estimate optional
@@ -26,7 +30,7 @@
           </tr>
           <tr>
             <td>
-              <input id="backlog-file" type="file" :disabled="!backlogTeam" @change="loadBacklog()">
+              <input id="backlog-file" type="file" :disabled="!backlogTeam.name" @change="loadBacklog()">
             </td>
           </tr>
         </table>
@@ -50,7 +54,7 @@
           </tr>
           <tr>
             <td colspan="2">
-              <button class="btn btn-sm btn-secondary smaller-font" :disabled="!backlogTeam" @click="addCard()">
+              <button class="btn btn-sm btn-secondary smaller-font" :disabled="!backlogTeam.name" @click="addCard()">
                 Add Card
               </button>
             </td>
@@ -78,7 +82,7 @@
           </tr>
           <tr>
             <td>
-              <button class="btn btn-sm btn-secondary smaller-font" :disabled="!backlogTeam" @click="saveBacklog()">
+              <button class="btn btn-sm btn-secondary smaller-font" :disabled="!backlogTeam.name" @click="saveBacklog()">
                 Save
               </button>
             </td>
@@ -123,11 +127,15 @@ export default {
     setShowBacklog(val) {
       this.$store.dispatch('setShowBacklog', val)
     },
+    toggleRelativeSizing() {
+      const sizing = document.getElementById('relative-sizing').checked
+      this.socket.emit('setRelativeSizing', {organisation: this.organisation, teamName: this.backlogTeam.name, relativeSizing: sizing})
+    },
     loadBacklog() {
       const file = document.getElementById('backlog-file').files[0]
       const separator = document.getElementById('backlog-load-file-separator').value
       const replace = document.getElementById('backlog-file-replace').checked
-      fileFuns.loadBacklog(file, separator, this.organisation, this.backlogTeam, replace, this.socket)
+      fileFuns.loadBacklog(file, separator, this.organisation, this.backlogTeam.name, replace, this.socket)
     },
     addCard() {
       const card = {
@@ -137,12 +145,12 @@ export default {
         title: document.getElementById('card-title').value,
         description: document.getElementById('card-description').value
       }
-      this.socket.emit('addBacklogCard', {organisation: this.organisation, teamName: this.backlogTeam, card: card})
+      this.socket.emit('addBacklogCard', {organisation: this.organisation, teamName: this.backlogTeam.name, card: card})
     },
     saveBacklog() {
       const saveFile = document.getElementById('backlog-save-file').value
       const separator = document.getElementById('backlog-save-file-separator').value
-      this.socket.emit('saveBacklog', {organisation: this.organisation, teamName: this.backlogTeam, file: saveFile, separator: separator})
+      this.socket.emit('saveBacklog', {organisation: this.organisation, teamName: this.backlogTeam.name, file: saveFile, separator: separator})
     }
   }
 }

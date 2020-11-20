@@ -1,7 +1,7 @@
 <template>
   <div>
     <div v-for="(team, index) in teams" :key="index">
-      <table v-if="team.name == backlogTeam">
+      <table v-if="team.name == backlogTeam.name">
         <tr v-for="(card, cindex) in team.backlog" :key="cindex">
           <td>{{ card.id }}: {{ card.title }}</td>
           <button class="btn btn-sm btn-secondary smaller-font" @click="deleteCard(card)">
@@ -32,7 +32,7 @@ export default {
   methods: {
     deleteCard(card) {
       if (confirm('Delete card ' + card.id + ': ' + card.title)) {
-        this.socket.emit('deleteBacklogCard', {organisation: this.organisation, teamName: this.backlogTeam, card: card})
+        this.socket.emit('deleteBacklogCard', {organisation: this.organisation, teamName: this.backlogTeam.name, card: card})
       }
     }
   }
