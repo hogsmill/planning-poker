@@ -142,6 +142,12 @@ export default {
       }
     })
 
+    this.socket.on('updateTimer', (data) => {
+      if (this.teamName == data.teamName && this.organisation == data.organisation) {
+        this.$store.dispatch('updateTimer', data)
+      }
+    })
+
     this.socket.on('reveal', (data) => {
       if (this.teamName == data.teamName && this.organisation == data.organisation) {
         this.$store.dispatch('reveal', data)

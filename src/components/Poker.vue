@@ -12,7 +12,8 @@
       </p>
     </div>
     <div v-if="selectedCard" class="final-estimate">
-      <div>
+      <Timer v-if="thisTeam.useTimer" :socket="socket" />
+      <div class="agreed-estimate">
         <span>Agreed Estimate: </span>
         <select id="agreed-estimate-value">
           <option value="" />
@@ -65,10 +66,15 @@
 </template>
 
 <script>
+import Timer from './poker/Timer.vue'
+
 export default {
   props: [
     'socket'
   ],
+  components: {
+    Timer
+  },
   data() {
     return {
       estimating: false
@@ -157,6 +163,16 @@ export default {
   }
   .estimate-dropdown option {
     padding-left: 30px;
+  }
+  .agreed-estimate {
+    padding-bottom: 20px;
+    span, select {
+      font-size: x-large;
+    }
+    button {
+      position: relative;
+      top: -4px;
+    }
   }
   .final-estimate {
     div {

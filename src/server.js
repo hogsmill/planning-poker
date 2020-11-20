@@ -63,6 +63,9 @@ function doDb(fun, data) {
       case 'selectCard':
         dbStore.selectCard(err, client, db, io, data, debugOn)
         break
+      case 'startTimer':
+        dbStore.startTimer(err, client, db, io, data, debugOn)
+        break
       case 'updateEstimateValue':
         dbStore.updateEstimateValue(err, client, db, io, data, debugOn)
         break
@@ -75,7 +78,13 @@ function doDb(fun, data) {
         dbStore.addTeam(err, client, db, io, data, debugOn)
         break
       case 'includeTeam':
-        dbStore.includeTeam(err, client, db, io, data, debugOn)
+        dbStore.setTeamParameter(err, client, db, io, data, debugOn, 'include')
+        break
+      case 'setUseTimer':
+        dbStore.setTeamParameter(err, client, db, io, data, debugOn, 'useTimer')
+        break
+      case 'setTimerTime':
+        dbStore.setTeamParameter(err, client, db, io, data, debugOn, 'timerTime')
         break
       case 'deleteTeam':
         dbStore.deleteTeam(err, client, db, io, data, debugOn)
@@ -151,6 +160,8 @@ io.on('connection', (socket) => {
 
   socket.on('updateEstimateValue', (data) => { doDb('updateEstimateValue', data) })
 
+  socket.on('startTimer', (data) => { doDb('startTimer', data) })
+
   socket.on('reveal', (data) => { emit('reveal', data) })
 
   socket.on('updateAgreedEstimate', (data) => { doDb('updateAgreedEstimate', data) })
@@ -159,6 +170,10 @@ io.on('connection', (socket) => {
   socket.on('addTeam', (data) => { doDb('addTeam', data) })
 
   socket.on('includeTeam', (data) => { doDb('includeTeam', data) })
+
+  socket.on('setUseTimer', (data) => { doDb('setUseTimer', data) })
+
+  socket.on('setTimerTime', (data) => { doDb('setTimerTime', data) })
 
   socket.on('deleteTeam', (data) => { doDb('deleteTeam', data) })
 

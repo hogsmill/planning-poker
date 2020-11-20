@@ -18,6 +18,7 @@ export const store = new Vuex.Store({
     teams: [],
     teamMembers: [],
     backlog: [],
+    time: 0,
     revealed: false,
     estimationType: '',
     estimationValues: {},
@@ -81,6 +82,9 @@ export const store = new Vuex.Store({
     },
     getEstimationType: (state) => {
       return state.estimationType
+    },
+    getTime: (state) => {
+      return state.time
     },
     getRevealed: (state) => {
       return state.revealed
@@ -165,6 +169,9 @@ export const store = new Vuex.Store({
       state.estimationType = payload.team.estimationType
       state.estimationValues = payload.team.estimationValues
     },
+    updateTimer: (state, payload) => {
+      state.time = payload.time
+    },
     reveal: (state, payload) => {
       state.revealed = payload.reveal
     },
@@ -227,6 +234,9 @@ export const store = new Vuex.Store({
     },
     loadTeam: ({ commit }, payload) => {
       commit('loadTeam', payload)
+    },
+    updateTimer: ({ commit }, payload) => {
+      commit('updateTimer', payload)
     },
     reveal: ({ commit }, payload) => {
       commit('reveal', payload)

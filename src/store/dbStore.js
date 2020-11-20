@@ -36,10 +36,10 @@ const defaultBacklog = [
 ]
 
 const defaultTeams = [
-  { name: 'Eagle', include: true, relativeSizing: true, logo: 'agile_sims_eagle.png' },
-  { name: 'Dragon', include: true, relativeSizing: true, logo: 'agile_sims_dragon.png' },
-  { name: 'Lion', include: true, relativeSizing: true, logo: 'agile_sims_lion.png' },
-  { name: 'Gryphen', include: true, relativeSizing: true, logo: 'agile_sims_gryphen.png' }
+  { name: 'Eagle', include: true, useTimer: true, timerTime: 30, relativeSizing: true, logo: 'agile_sims_eagle.png' },
+  { name: 'Dragon', include: true, useTimer: true, timerTime: 30, relativeSizing: true, logo: 'agile_sims_dragon.png' },
+  { name: 'Lion', include: true, useTimer: true, timerTime: 30, relativeSizing: true, logo: 'agile_sims_lion.png' },
+  { name: 'Gryphen', include: true, useTimer: true, timerTime: 30, relativeSizing: true, logo: 'agile_sims_gryphen.png' }
 ]
 
 const defaultTeamMembers = [
@@ -283,6 +283,17 @@ function _setOrganisation(err, client, db, io, data, debugOn) {
   })
 }
 
+function updateTimer(io, t, data) {
+  data.time = t
+  io.emit('updateTimer', data)
+  t = t - 1
+  if (t >= 0) {
+    setTimeout(function() {
+      updateTimer(io, t, data)
+    }, 1000)
+  }
+}
+
 module.exports = {
 
   // Organisation
@@ -384,6 +395,24 @@ module.exports = {
     })
   },
 
+  startTimer:  function(err, client, db, io, data, debugOn) {
+
+    if (debugOn) { console.log('startTimer', data) }
+
+    db.collection('planningPokerOrganisations').findOne({organisation: data.organisation}, function(err, res) {
+      if (err) throw err
+      if (res) {
+        for (let i = 0; i < res.teams.length; i++) {
+          if (res.teams[i].name == data.teamName) {
+            let t = res.teams[i].timerTime
+            updateTimer(io, t, data)
+          }
+        }
+      }
+      client.close()
+    })
+  },
+
   updateEstimateValue:  function(err, client, db, io, data, debugOn) {
 
     if (debugOn) { console.log('updateEstimateValue', data) }
@@ -461,9 +490,9 @@ module.exports = {
     _addTeam(err, client, db, io, data, debugOn)
   },
 
-  includeTeam: function(err, client, db, io, data, debugOn) {
+  setTeamParameter: function(err, client, db, io, data, debugOn, field) {
 
-    if (debugOn) { console.log('includeTeam', data) }
+    if (debugOn) { console.log('setTeamParameter', field, data) }
 
     db.collection('planningPokerOrganisations').findOne({organisation: data.organisation}, function(err, res) {
       if (err) throw err
@@ -472,8 +501,7 @@ module.exports = {
         for (let i = 0; i < res.teams.length; i++) {
           const team = res.teams[i]
           if (team.name == data.teamName) {
-            team.include = data.include
-            data.team = team
+            team[field] = data[field]
           }
           teams.push(team)
         }
