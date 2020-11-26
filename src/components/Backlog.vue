@@ -114,6 +114,7 @@ export default {
   .backlog-item {
     border: 1px solid;
     margin: 12px auto;
+    box-shadow: 2px 2px 3px #444;
 
     td {
       padding: 6px;
