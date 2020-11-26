@@ -1,7 +1,9 @@
 <template>
   <div>
     <div class="timer-holder rounded" :class="{ 'imminent' : imminent() }">
-      <div class="timer">{{ displayTimer() }}</div>
+      <div class="timer">
+        {{ displayTimer() }}
+      </div>
       <button v-if="time == 0" class="btn btn-sm btn-secondary smaller-font" @click="startTimer()">
         Start Timer
       </button>
@@ -56,6 +58,7 @@ export default {
     padding: 12px;
     width: 180px;
     border: 1px solid;
+    box-shadow: 2px 2px 3px #444;
 
     &.imminent {
       background-color: red;

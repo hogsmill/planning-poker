@@ -28,11 +28,11 @@
         </div>
       </div>
       <div class="mt-4" v-if="step == 2">
-        <h4>Welcome to the Coin Game</h4>
+        <h4>Welcome to Planning Poker</h4>
         <div>
           <p>
-            Add host as a URL parameter to see the facilitation tab where you can set units,
-            upload and save items, define teams and team members, and more
+            Add <b>host</b> as a URL parameter to see the facilitation tab where you can set units,
+            upload and save items, define teams and team members, and more, i.e.
           </p>
           <p>
             <a href="http://agilesimulations.co.uk/planning-poker?host">http://agilesimulations.co.uk/planning-poker?host</a>
@@ -40,76 +40,34 @@
         </div>
       </div>
       <div class="mt-4" v-if="step == 3">
-        <h4>Round 1: Batch Delivery</h4>
+        <h4>Game Play</h4>
         <p>
-          In this round, all coins must be played by a role before being passed
-          on <em>en masse</em>. This simulates a batch, or waterfall approach.
-          The round stops after {{ gameState.timeLimit.click }} seconds, and it is
-          extremely unlikely that any value will reach the customer in this time.
+          To start, define your organisation by clicking on <b>Set My Organisation</b>.
+        </p>
+        <p>
+          Click <b>Demo Mode?</b> to pre-load a set of teams and a backlog so you can
+          play the game to get a feel for it.
+        </p>
+        <p>
+          You can click the <b>Organisation: </b> button at any time to re-initialise the demo.
         </p>
       </div>
       <div class="mt-4" v-if="step == 4">
-        <h4>Round 2: Kanban Delivery</h4>
-        <p>
-          In this round, coins are passed on as soon as they are clicked. This
-          is to simulate more of a Kanban or flow way of working
-        </p>
-        <p>
-          There is no time limit on this round, but note the time it takes to
-          deliver all the coins to the customer
-        </p>
-      </div>
-      <div class="mt-4" v-if="step == 5">
-        <h4>Round 3: Value Delivery</h4>
-        <p>
-          This round is also kanban (coins passed on immediately), but the timer
-          stops <em>after {{ gameState.valueTimeLimit.click }} seconds!</em>. Coins are click highest-value first,
-          however, and the amount of value delivered is recorded.
-        </p>
-        <p>
-          Typically, despite having only one sixth of the time of round 1, most
-          of the value - usually 80% to 85% - will be delivered. This will also
-          typically be in 50% or less of the time of round 2, so most of the
-          value is delivered in much less time.
-        </p>
-        <p>This is the light bulb moment...</p>
-      </div>
-      <div class="mt-4" v-if="step == 6">
-        <h4>Game Play</h4>
-        <p>
-          Click the 'Play' buttons to play each round of the game as you would
-          round a table; everybody's browser will update as the coins are
-          clicked, so the next role can click coins as soon as they are
-          available to be played
-        </p>
-        <p>
-          The game can also be run in demo mode; if you're presenting to
-          management or C-Suite, or doing an online presentation (<em>not currently available</em>)
-        </p>
-      </div>
-      <div class="mt-4" v-if="step == 7">
-        <h4>Game Play</h4>
-        <p>
-          Click on the role in the header of this table to add the real names of
-          people playing the game, so you can see who's moving coins, and chivvy
-          them along accordingly...
-        </p>
-      </div>
-      <div class="mt-4" v-if="step == 8">
         <h4>Play The Game</h4>
         <p>
-          To play the game, all players need to set the same <b>Game Name</b>.
+          To play the game, all players need to enter the same organisation, their name, and
+          the same <b>Team Name</b>.
         </p>
         <p>
           The current state of the game will then be updated in real time
-          whenever a coin is clicked so you can play the game as interactively as
+          whenever anybody in the game changes anything; just as
           if you were doing it round a table!
         </p>
         <p>
           Enjoy!
         </p>
       </div>
-      <div class="buttons" v-if="step < 8">
+      <div class="buttons" v-if="step < 4">
         <button class="btn btn-info" @click="incrementStep">
           Next
         </button>
@@ -117,7 +75,7 @@
           Skip
         </button>
       </div>
-      <div class="buttons" v-if="step == 8">
+      <div class="buttons" v-if="step == 4">
         <button class="btn btn-info" @click="hide()">
           Play Game
         </button>
@@ -135,13 +93,9 @@ export default {
       step: 1,
       default: { width: 600, height: 260 },
       positions: {
-        2: { height: 290 },
-        3: { target: 'batch-button', width: 400, height: 240 },
-        4: { target: 'kanban-button', width: 400, height: 255 },
-        5: { target: 'value-delivery-button', width: 400, height: 380 },
-        6: { width: 400, height: 300 },
-        7: { target: 'results-table-body', width: 600, height: 180 },
-        8: { width: 600, height: 280 }
+        2: {  },
+        3: {  },
+        4: {  },
       }
     }
   },

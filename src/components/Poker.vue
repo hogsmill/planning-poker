@@ -69,12 +69,12 @@
 import Timer from './poker/Timer.vue'
 
 export default {
-  props: [
-    'socket'
-  ],
   components: {
     Timer
   },
+  props: [
+    'socket'
+  ],
   data() {
     return {
       estimating: false

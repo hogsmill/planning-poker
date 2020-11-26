@@ -404,7 +404,7 @@ module.exports = {
       if (res) {
         for (let i = 0; i < res.teams.length; i++) {
           if (res.teams[i].name == data.teamName) {
-            let t = res.teams[i].timerTime
+            const t = res.teams[i].timerTime
             updateTimer(io, t, data)
           }
         }

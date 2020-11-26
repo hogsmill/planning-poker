@@ -31,23 +31,39 @@
             <td colspan="2" />
           </tr>
           <tr v-for="(team, index) in teams" class="teams" :key="index">
-          <td>
-            <b>{{ team.name }}</b>
-          </td>
+            <td>
+              <b>{{ team.name }}</b>
+            </td>
             <td class="center">
               <input type="checkbox" :checked="team.include" @click="includeTeam(team)">
             </td>
             <td>
               <input type="checkbox" :checked="team.useTimer" @click="toggleTimer(team)">
               <select :id="'timer-time-' + sanitized(team.name)" class="timer-seconds" :value="team.timerTime" @change="setTimerTime(team)" :disabled="!team.useTimer">
-                <option value="10">10s</option>
-                <option value="15">15s</option>
-                <option value="20">20s</option>
-                <option value="30">30s</option>
-                <option value="45">45s</option>
-                <option value="60">60s</option>
-                <option value="90">1:30</option>
-                <option value="120">2:00</option>
+                <option value="10">
+                  10s
+                </option>
+                <option value="15">
+                  15s
+                </option>
+                <option value="20">
+                  20s
+                </option>
+                <option value="30">
+                  30s
+                </option>
+                <option value="45">
+                  45s
+                </option>
+                <option value="60">
+                  60s
+                </option>
+                <option value="90">
+                  1:30
+                </option>
+                <option value="120">
+                  2:00
+                </option>
               </select>
             </td>
             <td>
