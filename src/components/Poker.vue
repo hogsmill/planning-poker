@@ -145,7 +145,7 @@ export default {
     min-height: 76px;
     border: 1px solid #888;
     margin-bottom: 24px;
-    box-shadow: 2px 2px 3px #444;
+    box-shadow: 2px 2px 3px #aaa;
   }
   #team-logo {
     height: 65px;
@@ -204,7 +204,7 @@ export default {
         height: 144px;
         width: 103px;
         border: 6px solid #888;
-        box-shadow: 2px 2px 3px #444;
+        box-shadow: 2px 2px 3px #aaa;
 
         &.back {
           background-image: url("../assets/img/card-back.jpg");

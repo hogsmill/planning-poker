@@ -1,15 +1,19 @@
 <template>
   <div>
     <div class="timer-holder rounded" :class="{ 'imminent' : imminent() }">
-      <div class="timer">
-        {{ displayTimer() }}
-      </div>
-      <button v-if="time == 0" class="btn btn-sm btn-secondary smaller-font" @click="startTimer()">
-        Start Timer
-      </button>
-      <button v-if="time > 0" class="btn btn-sm btn-secondary smaller-font" :disable="time > 0" @click="stopTimer()">
-        Stop Timer
-      </button>
+      <table>
+        <tr>
+          <td>
+            <div class="timer">
+            {{ displayTimer() }}
+            </div>
+          </td>
+          <td>
+            <i v-if="time == 0" class="fas fa-play-circle" @click="startTimer()" />
+            <i v-if="time > 0" class="fas fa-stop-circle" @click="stopTimer()" />
+          </td>
+        </tr>
+      </table>
     </div>
   </div>
 </template>
@@ -55,17 +59,22 @@ export default {
 <style lang="scss">
   .timer-holder {
     margin: 0 auto 12px auto;
-    padding: 12px;
-    width: 180px;
+    width: 250px;
     border: 1px solid;
-    box-shadow: 2px 2px 3px #444;
+    box-shadow: 2px 2px 3px #aaa;
+
+    .fas {
+      font-size: xxx-large;
+      text-shadow: 2px 2px 2px #aaa;
+    }
 
     &.imminent {
       background-color: red;
       color: #fff;
     }
 
-    .timer{
+    .timer {
+      width: 140px;
       font-size: 48px;
       font-weight: bold;
     }
