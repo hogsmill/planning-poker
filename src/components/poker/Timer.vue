@@ -58,14 +58,20 @@ export default {
 
 <style lang="scss">
   .timer-holder {
+    color: #444;
+    background-color: #fff;
     margin: 0 auto 12px auto;
     width: 250px;
-    border: 1px solid;
     box-shadow: 2px 2px 3px #aaa;
 
     .fas {
       font-size: xxx-large;
       text-shadow: 2px 2px 2px #aaa;
+
+      &:hover {
+        cursor: pointer;
+        color: #666;
+      }
     }
 
     &.imminent {

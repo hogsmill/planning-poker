@@ -112,7 +112,8 @@ export default {
 
 <style lang="scss">
   .backlog-item {
-    border: 1px solid;
+    background-color: #fff;
+    color: #222;
     margin: 12px auto;
     box-shadow: 2px 2px 3px #aaa;
     width: 75%;

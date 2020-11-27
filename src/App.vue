@@ -193,6 +193,8 @@ export default {
     text-align: center;
   }
   .poker-table {
+    background-color: #35654d;
+    color: #fff;
     margin: 0 auto;
     width: 100%;
     .backlog {

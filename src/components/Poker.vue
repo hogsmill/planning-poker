@@ -142,8 +142,10 @@ export default {
     padding: 12px;
   }
   .selected-card {
+    padding-top: 12px;
+    color: #444;
+    background-color: #fff;
     min-height: 76px;
-    border: 1px solid #888;
     margin-bottom: 24px;
     box-shadow: 2px 2px 3px #aaa;
   }
@@ -165,7 +167,7 @@ export default {
     padding-left: 30px;
   }
   .agreed-estimate {
-    padding-bottom: 20px;
+    padding: 12px;
     span, select {
       font-size: x-large;
     }
@@ -200,6 +202,7 @@ export default {
       }
 
       .poker-card {
+        background-color: #fff;
         margin: 0 auto;
         height: 144px;
         width: 103px;
@@ -214,13 +217,17 @@ export default {
           background-color: #888;
         }
         .tbd {
-          color: #ddd;
+          color: #aaa;
         }
         .poker-card-value {
           font-size: 40px;
           margin-top: 24px;
           font-weight: bold;
-          color: #green;
+          color: #444;
+
+          &:hover {
+            cursor: pointer;
+          }
         }
         .poker-card-voted {
           width: 45px;
