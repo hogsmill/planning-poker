@@ -54,10 +54,10 @@
         </div>
         <div v-if="teamMember.uid != myName.uid && !revealed" class="poker-card back rounded">
           <div v-if="teamMember.voted" class="poker-card-voted rounded-circle voted">
-            &#10004;
+            <i class="fas fa-check-circle" />
           </div>
           <div v-if="!teamMember.voted" class="poker-card-voted rounded-circle not-voted">
-            &#10008;
+            <i class="fas fa-times-circle" />
           </div>
         </div>
       </div>
@@ -207,7 +207,7 @@ export default {
         box-shadow: 2px 2px 3px #aaa;
 
         &.back {
-          background-image: url("../assets/img/card-back.jpg");
+          background-image: url("../assets/img/card-back.png");
           background-size: contain;
           background-repeat: no-repeat;
           background-position: center;
@@ -223,8 +223,8 @@ export default {
           color: #green;
         }
         .poker-card-voted {
-          width: 48px;
-          height: 48px;
+          width: 45px;
+          height: 45px;
           background-color: #fff;
           border: 2px solid #888;
           margin: 36px auto 0 auto;
