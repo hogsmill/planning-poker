@@ -475,7 +475,7 @@ module.exports = {
             team.backlog = backlog.sort(function(a, b) {
               a = a.estimate ? a.estimate : { order: 0 }
               b = b.estimate ? b.estimate : { order: 0 }
-              return a.order - b.order
+              return b.order - a.order
             })
             data.team = team
           }
