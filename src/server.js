@@ -83,6 +83,9 @@ function doDb(fun, data) {
       case 'setUseTimer':
         dbStore.setTeamParameter(err, client, db, io, data, debugOn, 'useTimer')
         break
+      case 'setTimerAutoReveal':
+        dbStore.setTeamParameter(err, client, db, io, data, debugOn, 'timerAutoReveal')
+        break
       case 'setTimerTime':
         dbStore.setTeamParameter(err, client, db, io, data, debugOn, 'timerTime')
         break
@@ -172,6 +175,8 @@ io.on('connection', (socket) => {
   socket.on('includeTeam', (data) => { doDb('includeTeam', data) })
 
   socket.on('setUseTimer', (data) => { doDb('setUseTimer', data) })
+
+  socket.on('setTimerAutoReveal', (data) => { doDb('setTimerAutoReveal', data) })
 
   socket.on('setTimerTime', (data) => { doDb('setTimerTime', data) })
 

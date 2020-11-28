@@ -18,19 +18,19 @@ const defaultEstimationValues = {
     { order: 5, name: 'XL', include: true }
   ],
   'relative': [
-    { order: 1, name: 'XS', include: true, icon: 'xs.png' },
-    { order: 2, name: 'S', include: true, icon: 's.png' },
-    { order: 3, name: 'M', include: true, icon: 'm.png' },
-    { order: 4, name: 'L', include: true, icon: 'l.png' },
-    { order: 5, name: 'XL', include: true, icon: 'xl.png' }
+    { order: 1, name: 'XS', include: true, icon: 'agile_sims_relative_xs.png' },
+    { order: 2, name: 'S', include: true, icon: 'agile_sims_relative_s.png' },
+    { order: 3, name: 'M', include: true, icon: 'agile_sims_relative_m.png' },
+    { order: 4, name: 'L', include: true, icon: 'agile_sims_relative_l.png' },
+    { order: 5, name: 'XL', include: true, icon: 'agile_sims_relative_xl.png' }
   ],
   'fruit': [
-    { order: 1, name: 'grape', include: true, icon: 'fruit_grape.jpg' },
-    { order: 2, name: 'cherry', include: true, icon: 'fruit_cherry.jpg' },
-    { order: 3, name: 'apple', include: true, icon: 'fruit_apple.jpg' },
-    { order: 4, name: 'kiwi', include: true, icon: 'fruit_kiwi.jpg' },
-    { order: 5, name: 'watermelon', include: true, icon: 'fruit_watermelon.jpg' },
-    { order: 6, name: 'pineapple', include: true, icon: 'fruit_pineapple.jpg' }
+    { order: 1, name: 'grape', include: true, icon: 'agile_sims_fruit_grape.jpg' },
+    { order: 2, name: 'cherry', include: true, icon: 'agile_sims_fruit_cherry.jpg' },
+    { order: 3, name: 'apple', include: true, icon: 'agile_sims_fruit_apple.jpg' },
+    { order: 4, name: 'kiwi', include: true, icon: 'agile_sims_fruit_kiwi.jpg' },
+    { order: 5, name: 'watermelon', include: true, icon: 'agile_sims_fruit_watermelon.jpg' },
+    { order: 6, name: 'pineapple', include: true, icon: 'agile_sims_fruit_pineapple.jpg' }
   ],
   'custom': []
 }
@@ -43,10 +43,10 @@ const defaultBacklog = [
 ]
 
 const defaultTeams = [
-  { name: 'Eagle', include: true, useTimer: true, timerTime: 30, relativeSizing: true, logo: 'agile_sims_eagle.png' },
-  { name: 'Dragon', include: true, useTimer: true, timerTime: 30, relativeSizing: true, logo: 'agile_sims_dragon.png' },
-  { name: 'Lion', include: true, useTimer: true, timerTime: 30, relativeSizing: true, logo: 'agile_sims_lion.png' },
-  { name: 'Gryphen', include: true, useTimer: true, timerTime: 30, relativeSizing: true, logo: 'agile_sims_gryphen.png' }
+  { name: 'Eagle', include: true, useTimer: true, timerAutoReveal: false, timerTime: 30, relativeSizing: true, logo: 'agile_sims_icon_eagle.png' },
+  { name: 'Lion', include: true, useTimer: true, timerAutoReveal: false, timerTime: 30, relativeSizing: true, logo: 'agile_sims_icon_lion.png' },
+  { name: 'Dragon', include: true, useTimer: true, timerAutoReveal: false, timerTime: 30, relativeSizing: true, logo: 'agile_sims_icon_dragon.png' },
+  { name: 'Gryphen', include: true, useTimer: true, timerAutoReveal: false, timerTime: 30, relativeSizing: true, logo: 'agile_sims_icon_gryphen.png' }
 ]
 
 const defaultTeamMembers = [

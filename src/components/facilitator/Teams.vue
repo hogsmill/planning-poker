@@ -28,6 +28,9 @@
             <td>
               Timer?
             </td>
+            <td>
+              Auto-Reveal?
+            </td>
             <td colspan="2" />
           </tr>
           <tr v-for="(team, index) in teams" class="teams" :key="index">
@@ -65,6 +68,9 @@
                   2:00
                 </option>
               </select>
+            </td>
+            <td>
+              <input type="checkbox" :checked="team.timerAutoReveal" @click="toggleTimerAutoReveal(team)">
             </td>
             <td>
               <button class="btn btn-sm btn-secondary smaller-font" @click="deleteTeam(team)">
@@ -112,6 +118,10 @@ export default {
     toggleTimer(team) {
       const useTimer = !team.useTimer
       this.socket.emit('setUseTimer', {organisation: this.organisation, teamName: team.name, useTimer: useTimer})
+    },
+    toggleTimerAutoReveal(team) {
+      const timerAutoReveal = !team.timerAutoReveal
+      this.socket.emit('setTimerAutoReveal', {organisation: this.organisation, teamName: team.name, timerAutoReveal: timerAutoReveal})
     },
     setTimerTime(team) {
       const timerTime = document.getElementById('timer-time-' + this.sanitized(team.name)).value
