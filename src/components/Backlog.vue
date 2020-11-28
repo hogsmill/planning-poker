@@ -32,7 +32,8 @@
               {{ card.title }}
             </td>
             <td class="backlog-estimate">
-              <span v-if="card.estimate"><b>{{ card.estimate.name }}</b></span>
+              <div v-if="card.estimate && card.estimate.icon" class="estimate-icon" :style="{ 'background-image': icon(card.estimate) }" />
+              <span v-if="card.estimate && !card.estimate.icon"><b>{{ card.estimate.name }}</b></span>
             </td>
           </tr>
         </table>
@@ -49,7 +50,8 @@
               {{ card.title }}
             </td>
             <td class="backlog-estimate">
-              <span v-if="card.estimate"><b>{{ card.estimate.name }}</b></span>
+              <div v-if="card.estimate && card.estimate.icon" class="estimate-icon" :style="{ 'background-image': icon(card.estimate) }" />
+              <span v-if="card.estimate && !card.estimate.icon"><b>{{ card.estimate.name }}</b></span>
             </td>
           </tr>
         </table>
@@ -85,6 +87,9 @@ export default {
   methods: {
     items(n) {
       return n == 1 ? '1 item' : n + ' items'
+    },
+    icon(estimate) {
+      return 'url("../planning-poker/icons/' + estimate.icon + '")'
     },
     selectCard(uid) {
       this.socket.emit('selectCard', {organisation: this.organisation, teamName: this.teamName, uid: uid})
@@ -143,6 +148,14 @@ export default {
     .backlog-estimate {
       width: 10%;
     }
+  }
+
+  .estimate-icon {
+    width: 35px;
+    height: 35px;
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
   }
 
   .not-estimated {
