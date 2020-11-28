@@ -15,7 +15,14 @@ const defaultEstimationValues = {
     { order: 2, name: 'S', include: true },
     { order: 3, name: 'M', include: true },
     { order: 4, name: 'L', include: true },
-    { order: 5, name: 'XL', include: true },
+    { order: 5, name: 'XL', include: true }
+  ],
+  'relative': [
+    { order: 1, name: 'XS', include: true, icon: 'xs.png' },
+    { order: 2, name: 'S', include: true, icon: 's.png' },
+    { order: 3, name: 'M', include: true, icon: 'm.png' },
+    { order: 4, name: 'L', include: true, icon: 'l.png' },
+    { order: 5, name: 'XL', include: true, icon: 'xl.png' }
   ],
   'fruit': [
     { order: 1, name: 'grape', include: true, icon: 'fruit_grape.jpg' },
