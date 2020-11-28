@@ -224,13 +224,12 @@ export default {
           color: #aaa;
         }
         .estimate-icon {
-          width: 70px;
-          height: 70px;
-          margin: auto auto;
+          width: 50px;
+          height: 50px;
+          margin: 40px auto;
           background-size: contain;
           background-repeat: no-repeat;
           background-position: center;
-          background-color: red;
         }
         .poker-card-value {
           font-size: 40px;
