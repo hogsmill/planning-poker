@@ -290,14 +290,17 @@ function _setOrganisation(err, client, db, io, data, debugOn) {
   })
 }
 
-function updateTimer(io, t, data) {
+function updateTimer(io, t, data, autoReveal) {
   data.time = t
   io.emit('updateTimer', data)
   t = t - 1
   if (t >= 0) {
     setTimeout(function() {
-      updateTimer(io, t, data)
+      updateTimer(io, t, data, autoReveal)
     }, 1000)
+  } else if (autoReveal) {
+    data.reveal = true
+    io.emit('reveal', data)
   }
 }
 
@@ -412,7 +415,7 @@ module.exports = {
         for (let i = 0; i < res.teams.length; i++) {
           if (res.teams[i].name == data.teamName) {
             const t = res.teams[i].timerTime
-            updateTimer(io, t, data)
+            updateTimer(io, t, data, res.teams[i].timerAutoReveal)
           }
         }
       }
