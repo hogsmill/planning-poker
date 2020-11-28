@@ -5,7 +5,7 @@
         <tr>
           <td>
             <div class="timer">
-            {{ displayTimer() }}
+              {{ displayTimer() }}
             </div>
           </td>
           <td>

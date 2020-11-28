@@ -3,8 +3,8 @@
     <tr>
       <td colspan="2">
         <h4>Backlog</h4>
-        <span v-if="showBacklog" @click="setShowBacklog(false)" title="collapse" class="toggle">&#9650;</span>
-        <span v-if="!showBacklog" @click="setShowBacklog(true)" title="expand" class="toggle">&#9660;</span>
+        <i v-if="showBacklog" @click="setShowBacklog(false)" title="collapse" class="fas fa-caret-up toggle" />
+        <i v-if="!showBacklog" @click="setShowBacklog(true)" title="expand" class="fas fa-caret-down toggle" />
       </td>
     </tr>
     <Team v-if="showBacklog" />

@@ -48,7 +48,8 @@
             </select>
           </div>
           <div v-if="!estimating" class="poker-card-value" @click="startEstimating()">
-            <span v-if="teamMember.estimate">{{ teamMember.estimate.name }}</span>
+            <div v-if="teamMember.estimate && teamMember.estimate.icon" class="estimate-icon" :style="{ 'background-image': icon(teamMember.estimate) }" />
+            <span v-if="teamMember.estimate && !teamMember.estimate.icon">{{ teamMember.estimate.name }}</span>
             <span v-if="!teamMember.estimate" class="tbd">TBD</span>
           </div>
         </div>
@@ -111,6 +112,9 @@ export default {
       if (this.thisTeam && this.thisTeam.logo) {
         return 'url("../planning-poker/icons/' + this.thisTeam.logo + '")'
       }
+    },
+    icon(estimate) {
+      return 'url("../planning-poker/icons/' + estimate.icon + '")'
     },
     startEstimating() {
       this.estimating = true
@@ -218,6 +222,15 @@ export default {
         }
         .tbd {
           color: #aaa;
+        }
+        .estimate-icon {
+          width: 70px;
+          height: 70px;
+          margin: auto auto;
+          background-size: contain;
+          background-repeat: no-repeat;
+          background-position: center;
+          background-color: red;
         }
         .poker-card-value {
           font-size: 40px;

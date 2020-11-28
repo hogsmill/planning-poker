@@ -56,6 +56,9 @@ export default {
     }
     .toggle {
       color: #aaa;
+      font-size: xx-large;
+      position: absolute;
+      right: 6px;
     }
 
     .left {
@@ -66,11 +69,6 @@ export default {
       width: 50%;
       display: inline-block;
       text-align: left;
-    }
-
-    span {
-      position: absolute;
-      right: 6px;
     }
 
     td {
@@ -95,7 +93,7 @@ export default {
         }
       }
     }
-    
+
     input {
       min-width: 120px;
       height: 24px;
