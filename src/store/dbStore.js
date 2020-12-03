@@ -43,10 +43,10 @@ const defaultBacklog = [
 ]
 
 const defaultTeams = [
-  { name: 'Eagle', include: true, useTimer: true, timerAutoReveal: false, timerTime: 30, relativeSizing: true, logo: 'agile_sims_icon_eagle.png' },
-  { name: 'Lion', include: true, useTimer: true, timerAutoReveal: false, timerTime: 30, relativeSizing: true, logo: 'agile_sims_icon_lion.png' },
-  { name: 'Dragon', include: true, useTimer: true, timerAutoReveal: false, timerTime: 30, relativeSizing: true, logo: 'agile_sims_icon_dragon.png' },
-  { name: 'Gryphen', include: true, useTimer: true, timerAutoReveal: false, timerTime: 30, relativeSizing: true, logo: 'agile_sims_icon_gryphen.png' }
+  { name: 'Eagle', include: true, useTimer: true, timerAutoReveal: false, timerTime: 30, relativeSizing: true, gameView: 'poker', logo: 'agile_sims_icon_eagle.png' },
+  { name: 'Lion', include: true, useTimer: true, timerAutoReveal: false, timerTime: 30, relativeSizing: true, gameView: 'poker', logo: 'agile_sims_icon_lion.png' },
+  { name: 'Dragon', include: true, useTimer: true, timerAutoReveal: false, timerTime: 30, relativeSizing: true, gameView: 'poker', logo: 'agile_sims_icon_dragon.png' },
+  { name: 'Gryphen', include: true, useTimer: true, timerAutoReveal: false, timerTime: 30, relativeSizing: true, gameView: 'poker', logo: 'agile_sims_icon_gryphen.png' }
 ]
 
 const defaultTeamMembers = [
@@ -271,6 +271,7 @@ function _setOrganisation(err, client, db, io, data, debugOn) {
           data.teams[i].estimationValues = defaultEstimationValues
           data.teams[i].backlog = defaultBacklog
           data.teams[i].include = true
+          data.teams[i].gameView = 'poker'
         }
       }
       const created = new Date().toISOString()
@@ -335,6 +336,31 @@ module.exports = {
         })
         io.emit('loadTeam', data)
         client.close()
+      }
+    })
+  },
+
+  setGameView:  function(err, client, db, io, data, debugOn) {
+
+    if (debugOn) { console.log('setGameView', data) }
+
+    db.collection('planningPokerOrganisations').findOne({organisation: data.organisation}, function(err, res) {
+      if (err) throw err
+      if (res) {
+        const teams = []
+        for (let i = 0; i < res.teams.length; i++) {
+          const team = res.teams[i]
+          if (team.name == data.teamName) {
+            team.gameView = data.view
+            data.team = team
+          }
+          teams.push(team)
+        }
+        db.collection('planningPokerOrganisations').updateOne({'_id': res._id}, {$set: {teams: teams}}, function(err, res) {
+          if (err) throw err
+          io.emit('loadTeam', data)
+          client.close()
+        })
       }
     })
   },

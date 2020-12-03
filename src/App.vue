@@ -14,8 +14,9 @@
         <Organisation :socket="socket" />
         <MyName v-if="organisation" :socket="socket" />
         <TeamName v-if="organisation" :socket="socket" />
+        <GameView v-if="organisation" :socket="socket" />
       </div>
-      <div v-if="organisation" class="container">
+      <div v-if="organisation && gameView == 'poker'" class="container">
         <div v-if="teamName">
           <table class="poker-table" border>
             <tr>
@@ -28,6 +29,9 @@
             </tr>
           </table>
         </div>
+      </div>
+      <div v-if="organisation && gameView == 'train'" class="container">
+        <Train v-if="organisation && gameView == 'train'" :socket="socket" />
       </div>
     </div>
   </div>
@@ -45,8 +49,10 @@ import FacilitatorView from './components/FacilitatorView.vue'
 import Organisation from './components/Organisation.vue'
 import MyName from './components/MyName.vue'
 import TeamName from './components/TeamName.vue'
+import GameView from './components/GameView.vue'
 import Backlog from './components/Backlog.vue'
 import Poker from './components/Poker.vue'
+import Train from './components/Train.vue'
 
 export default {
   name: 'App',
@@ -58,8 +64,10 @@ export default {
     Organisation,
     MyName,
     TeamName,
+    GameView,
     Backlog,
-    Poker
+    Poker,
+    Train
   },
   computed: {
     isHost() {
@@ -79,6 +87,9 @@ export default {
     },
     teamName() {
       return this.$store.getters.getTeamName
+    },
+    gameView() {
+      return this.$store.getters.getGameView
     }
   },
   created() {
@@ -113,6 +124,7 @@ export default {
     }
 
     this.socket.on('loadTeam', (data) => {
+      console.log('loadTeam', data)
       if (this.teamName == data.teamName && this.organisation == data.organisation) {
         this.$store.dispatch('loadTeam', data)
       }
@@ -189,7 +201,7 @@ export default {
     margin: 6px
   }
   .game-params {
-    height: 40px;
+    height: 60px;
     text-align: center;
   }
   .poker-table {

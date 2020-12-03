@@ -47,6 +47,9 @@ export const store = new Vuex.Store({
     getShowTab: (state) => {
       return state.showTab
     },
+    getGameView: (state) => {
+      return state.thisTeam.gameView
+    },
     getMyName: (state) => {
       return state.myName
     },

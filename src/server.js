@@ -57,6 +57,9 @@ function doDb(fun, data) {
       case 'loadTeam':
         dbStore.loadTeam(err, client, db, io, data, debugOn)
         break
+      case 'setGameView':
+        dbStore.setGameView(err, client, db, io, data, debugOn)
+        break
       case 'updateBacklog':
         dbStore.updateBacklog(err, client, db, io, data, debugOn)
         break
@@ -156,6 +159,8 @@ io.on('connection', (socket) => {
   socket.on('setOrganisation', (data) => { doDb('setOrganisation', data) })
 
   socket.on('loadTeam', (data) => { doDb('loadTeam', data) })
+
+  socket.on('setGameView', (data) => { doDb('setGameView', data) })
 
   socket.on('updateEstimationType', (data) => { doDb('updateEstimationType', data) })
 
