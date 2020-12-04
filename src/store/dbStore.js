@@ -36,10 +36,10 @@ const defaultEstimationValues = {
 }
 
 const defaultBacklog = [
-  { id: 1, uid: '1', title: 'Build an API', description: 'Build the API by updating the domain model to allow feature x to connect'},
-  { id: 2, uid: '2', title: 'Do the UI', description: 'Update the GUI to allow product selection. Date comes from the API'},
-  { id: 3, uid: '3', title: 'Build the login', description: 'Store user details in database'},
-  { id: 4, uid: '4', title: 'Add Logging', description: 'Update logging system to log new feature'}
+  { id: 1, uid: '1', title: 'Build an API', selected: false, description: 'Build the API by updating the domain model to allow feature x to connect'},
+  { id: 2, uid: '2', title: 'Do the UI', selected: false, description: 'Update the GUI to allow product selection. Date comes from the API'},
+  { id: 3, uid: '3', title: 'Build the login', selected: false, description: 'Store user details in database'},
+  { id: 4, uid: '4', title: 'Add Logging', selected: false, description: 'Update logging system to log new feature'}
 ]
 
 const defaultTeams = [
@@ -418,6 +418,31 @@ module.exports = {
             }
             team.members = members
             team.backlog = backlog
+            data.team = team
+          }
+          teams.push(team)
+        }
+        db.collection('planningPokerOrganisations').updateOne({'_id': res._id}, {$set: {teams: teams}}, function(err, res) {
+          if (err) throw err
+          io.emit('loadTeam', data)
+          client.close()
+        })
+      }
+    })
+  },
+
+  updateCommittedCards:  function(err, client, db, io, data, debugOn) {
+
+    if (debugOn) { console.log('updateCommittedCards', data) }
+
+    db.collection('planningPokerOrganisations').findOne({organisation: data.organisation}, function(err, res) {
+      if (err) throw err
+      if (res) {
+        const teams = []
+        for (let i = 0; i < res.teams.length; i++) {
+          const team = res.teams[i]
+          if (team.name == data.teamName) {
+            team.backlog = data.backlog
             data.team = team
           }
           teams.push(team)

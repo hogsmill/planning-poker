@@ -65,11 +65,21 @@ export default {
       return estimationType == 'fibonacci'
     },
     selectedTotal() {
-      let total = 0
-      for (let i = 0; i < this.trainPosition; i++) {
+      let total = 0, i
+      const cards = []
+      for (i = 0; i < this.trainPosition; i++) {
+        const card = this.backlog[i]
+        card.selected = true
+        cards.push(card)
         const estimate = this.backlog[i].estimate ? parseInt(this.backlog[i].estimate.name) : 0
         total = total + estimate
       }
+      for (let j = i; j < this.backlog.length; j++) {
+        const card = this.backlog[j]
+        card.selected = false
+        cards.push(card)
+      }
+      this.socket.emit('updateCommittedCards', {organisation: this.organisation, teamName: this.teamName, backlog: cards})
       return total
     },
     left() {

@@ -66,6 +66,9 @@ function doDb(fun, data) {
       case 'selectCard':
         dbStore.selectCard(err, client, db, io, data, debugOn)
         break
+      case 'updateCommittedCards':
+        dbStore.updateCommittedCards(err, client, db, io, data, debugOn)
+        break
       case 'startTimer':
         dbStore.startTimer(err, client, db, io, data, debugOn)
         break
@@ -165,6 +168,8 @@ io.on('connection', (socket) => {
   socket.on('updateEstimationType', (data) => { doDb('updateEstimationType', data) })
 
   socket.on('selectCard', (data) => { doDb('selectCard', data) })
+
+  socket.on('updateCommittedCards', (data) => { doDb('updateCommittedCards', data) })
 
   socket.on('updateEstimateValue', (data) => { doDb('updateEstimateValue', data) })
 

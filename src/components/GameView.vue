@@ -1,6 +1,8 @@
 <template>
   <div class="game-view">
-    <div class="label">View:</div>
+    <div class="label">
+      View:
+    </div>
     <div class="view-button rounded" :class="{ 'selected' : gameView == 'poker'}">
       <div class="poker" @click="setGameView('poker')" />
     </div>
@@ -61,7 +63,7 @@ export default {
       }
 
       &.selected {
-        background-color: #ddd;
+        background-color: #f8f9fa;
       }
 
       div {
