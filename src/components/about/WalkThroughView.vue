@@ -42,7 +42,7 @@
       <div class="mt-4" v-if="step == 3">
         <h4>Game Play</h4>
         <p>
-          To start, define your organisation by clicking on <b>Set My Organisation</b>.
+          To start, define your <b>Organisation</b> by clicking on <b>Set My Organisation</b>.
         </p>
         <p>
           Click <b>Demo Mode?</b> to pre-load a set of teams and a backlog so you can
@@ -55,11 +55,16 @@
       <div class="mt-4" v-if="step == 4">
         <h4>Play The Game</h4>
         <p>
-          To play the game, all players need to enter the same organisation, their name, and
-          the same <b>Team Name</b>.
+          To play the game, all players need to enter the same <b>Organisation</b> and
+          <b>Team Name</b>, and their own mane.
         </p>
         <p>
-          The current state of the game will then be updated in real time
+          Click on a backlog card to get started. Each player can estimate privately, then
+          the facilitator, or one team member, can reveal the estimates once everyone has
+          estimated. An agreed estimate can then be entered.
+        </p>
+        <p>
+          The current state of the game will be updated in real time
           whenever anybody in the game changes anything; just as
           if you were doing it round a table!
         </p>
@@ -67,7 +72,28 @@
           Enjoy!
         </p>
       </div>
-      <div class="buttons" v-if="step < 4">
+      <div class="mt-4" v-if="step == 5">
+        <h4>Demo Mode</h4>
+        <p>
+          Demo mode allows you to explore the features of the app.
+        </p>
+        <p>
+          4 teams are pre-defined, and each one has a different default way to estimate:
+          <ul>
+            <li>Eagle - Fibonacci</li>
+            <li>Lion - T-Shirt</li>
+            <li>Dragon - Relative</li>
+            <li>Gryphen Fruit</li>
+          </ul>
+          New estimation types can be defined in the Facilitator
+          view if required.
+        </p>
+        <p>
+          Team members are also pre-defined in demo mode for simplicity. In rea mode,
+          team members are set up in the Facilitator view.
+        </p>
+      </div>
+      <div class="buttons" v-if="step < 5">
         <button class="btn btn-info" @click="incrementStep">
           Next
         </button>
@@ -75,7 +101,7 @@
           Skip
         </button>
       </div>
-      <div class="buttons" v-if="step == 4">
+      <div class="buttons" v-if="step == 5">
         <button class="btn btn-info" @click="hide()">
           Play Game
         </button>
@@ -95,7 +121,7 @@ export default {
       positions: {
         2: {  },
         3: {  },
-        4: {  },
+        4: { height: 350 },
       }
     }
   },
@@ -177,5 +203,8 @@ export default {
 #walk-through p {
   margin-left: 8px;
   margin-right: 8px;
+}
+li {
+  text-align: left;
 }
 </style>

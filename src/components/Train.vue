@@ -4,14 +4,17 @@
       Start the train!
     </button>
     <div v-if="isNumeric(estimationType)" class="commitment">
-      Planned: {{ committedTotal() }} <span v-if="velocity">(Capacity: {{ velocity }})</span>
+      Sprint backlog: {{ committedTotal() }} <span v-if="velocity">(Capacity: {{ velocity }})</span>
     </div>
     <div v-if="!isNumeric(estimationType)" class="commitment">
-      Planned: {{ committedLength() }} cards <span v-if="velocity">(Capacity: {{ velocity }} cards)</span>
+      Sprint backlog: {{ committedLength() }} cards <span v-if="velocity">(Capacity: {{ velocity }} cards)</span>
     </div>
     <div class="train-holder">
       <div v-if="!trainRunning" id="train-div">
-        tbd
+        <p>
+          Start the train, then move it left and right along the ordered<br>
+          backlog to define the cards that will form the next sprint backlog.
+        </p>
       </div>
       <div v-if="trainRunning" id="train-div" class="train-div">
         <span v-if="trainPosition > 0" class="left">
@@ -28,7 +31,6 @@
         <div class="arrows">
           <i v-if="index > 0" class="fas fa-arrow-left" @click="cardLeft(card)" />
           <i class="fas fa-info-circle" @click="selectCard(card)" />
-
           <i v-if="index < backlog.length - 1" class="fas fa-arrow-right" @click="cardRight(card)" />
         </div>
         <div class="id">
@@ -98,6 +100,9 @@ export default {
     estimationType() {
       return this.$store.getters.getEstimationType
     }
+  },
+  created() {
+    this.trainRunning = false
   },
   methods: {
     isNumeric(estimationType) {
@@ -211,7 +216,6 @@ export default {
 
     #train-div {
       position: absolute;
-      display: none;
     }
 
     .train-holder {
