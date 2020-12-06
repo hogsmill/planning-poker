@@ -26,6 +26,9 @@
               Include?
             </td>
             <td>
+              Capacity/Velocity (<i>if using SPs</i>)
+            </td>
+            <td>
               Timer?
             </td>
             <td>
@@ -39,6 +42,10 @@
             </td>
             <td class="center">
               <input type="checkbox" :checked="team.include" @click="includeTeam(team)">
+            </td>
+            <td class="center">
+              <input type="text" class="velocity" :id="'velocity-' + sanitized(team.name)" :value="team.velocity">
+              <i class="fas fa-save" @click="setVelocity(team)" />
             </td>
             <td>
               <input type="checkbox" :checked="team.useTimer" @click="toggleTimer(team)">
@@ -123,6 +130,11 @@ export default {
       const timerAutoReveal = !team.timerAutoReveal
       this.socket.emit('setTimerAutoReveal', {organisation: this.organisation, teamName: team.name, timerAutoReveal: timerAutoReveal})
     },
+    setVelocity(team) {
+      const velocity = document.getElementById('velocity-' + this.sanitized(team.name)).value
+      console.log(velocity)
+      this.socket.emit('setVelocity', {organisation: this.organisation, teamName: team.name, velocity: velocity})
+    },
     setTimerTime(team) {
       const timerTime = document.getElementById('timer-time-' + this.sanitized(team.name)).value
       this.socket.emit('setTimerTime', {organisation: this.organisation, teamName: team.name, timerTime: timerTime})
@@ -146,5 +158,20 @@ export default {
   }
   .facilitator-table .teams input[type=checkbox] {
     min-width: 30px;
+  }
+  .velocity {
+    width: 30px;
+  }
+  .fa-save {
+    color: #aaa;
+    font-size: x-large;
+    margin-left: 6px;
+    position: relative;
+    top: 3px;
+
+    &:hover {
+      cursor: pointer;
+      color: #444;
+    }
   }
 </style>

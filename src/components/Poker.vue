@@ -1,64 +1,66 @@
 <template>
   <div>
-    <div class="selected-card">
-      <h4 v-if="selectedCard">
-        {{ selectedCard.title }}
-      </h4>
-      <p v-if="selectedCard">
-        {{ selectedCard.description }}
-      </p>
-      <p v-if="!selectedCard">
-        <i>Click a backlog card to start</i>
-      </p>
+    <div v-if="!selectedCard" class="select-card">
+      Click a backlog card to start estimating
     </div>
-    <div v-if="selectedCard" class="final-estimate">
-      <Timer v-if="thisTeam.useTimer" :socket="socket" />
-      <div class="agreed-estimate">
-        <span>Agreed Estimate: </span>
-        <select id="agreed-estimate-value">
-          <option value="" />
-          <option v-for="(value, index) in estimationValues" :key="index" :value="value.name">
-            {{ value.name }}
-          </option>
-        </select>
-        <button class="btn btn-sm btn-secondary smaller-font" :disabled="!selectedCard" @click="saveAgreedEstimate()">
-          Submit
-        </button>
-        <div id="team-logo" :style="{ 'background-image': logo() }" />
+    <div v-if="selectedCard">
+      <div class="selected-card">
+        <h4>
+          {{ selectedCard.title }}
+        </h4>
+        <p v-if="selectedCard">
+          {{ selectedCard.description }}
+        </p>
       </div>
-      <div>
-        <button v-if="!revealed" class="btn btn-sm btn-secondary smaller-font reveal" @click="reveal(true)">
-          Reveal Estimates
-        </button>
-        <button v-if="revealed" class="btn btn-sm btn-secondary smaller-font reveal" @click="reveal(false)">
-          Hide Estimates
-        </button>
-      </div>
-    </div>
-    <div v-if="selectedCard" class="members">
-      <div v-for="(teamMember, index) in teamMembers" :key="index" class="member">
-        <div><b>{{ teamMember.name }}</b></div>
-        <div v-if="teamMember.uid == myName.uid || revealed" class="poker-card rounded">
-          <div v-if="estimating" class="poker-card-value">
-            <select class="estimate-dropdown" :id="'estimate-value-' + myName.uid" @change="saveEstimate()">
-              <option value="" />
-              <option v-for="(value, ind) in estimationValues" :key="ind" :value="value.name">
-                {{ value.name }}
-              </option>
-            </select>
-          </div>
-          <div v-if="!estimating" class="poker-card-value" @click="startEstimating()">
-            <div v-if="teamMember.estimate && teamMember.estimate.icon" class="estimate-icon" :style="{ 'background-image': icon(teamMember.estimate) }" />
-            <span v-if="teamMember.estimate && !teamMember.estimate.icon">{{ teamMember.estimate.name }}</span>
-            <span v-if="!teamMember.estimate" class="tbd">TBD</span>
-          </div>
+      <div class="final-estimate">
+        <Timer v-if="thisTeam.useTimer" :socket="socket" />
+        <div class="agreed-estimate">
+          <span>Agreed Estimate: </span>
+          <select id="agreed-estimate-value">
+            <option value="" />
+            <option v-for="(value, index) in estimationValues" :key="index" :value="value.name">
+              {{ value.name }}
+            </option>
+          </select>
+          <button class="btn btn-sm btn-secondary smaller-font" :disabled="!selectedCard" @click="saveAgreedEstimate()">
+            Submit
+          </button>
+          <div id="team-logo" :style="{ 'background-image': logo() }" />
         </div>
-        <div v-if="teamMember.uid != myName.uid && !revealed" class="poker-card back rounded">
-          <div v-if="teamMember.voted" class="poker-card-voted rounded-circle voted">
-            <i class="fas fa-check-circle" />
+        <div>
+          <button v-if="!revealed" class="btn btn-sm btn-secondary smaller-font reveal" @click="reveal(true)">
+            Reveal Estimates
+          </button>
+          <button v-if="revealed" class="btn btn-sm btn-secondary smaller-font reveal" @click="reveal(false)">
+            Hide Estimates
+          </button>
+        </div>
+      </div>
+      <div class="members">
+        <div v-for="(teamMember, index) in teamMembers" :key="index" class="member">
+          <div><b>{{ teamMember.name }}</b></div>
+          <div v-if="teamMember.uid == myName.uid || revealed" class="poker-card rounded">
+            <div v-if="estimating" class="poker-card-value">
+              <select class="estimate-dropdown" :id="'estimate-value-' + myName.uid" @change="saveEstimate()">
+                <option value="" />
+                <option v-for="(value, ind) in estimationValues" :key="ind" :value="value.name">
+                  {{ value.name }}
+                </option>
+              </select>
+            </div>
+            <div v-if="!estimating" class="poker-card-value" @click="startEstimating()">
+              <div v-if="teamMember.estimate && teamMember.estimate.icon" class="estimate-icon" :style="{ 'background-image': icon(teamMember.estimate) }" />
+              <span v-if="teamMember.estimate && !teamMember.estimate.icon">{{ teamMember.estimate.name }}</span>
+              <span v-if="!teamMember.estimate" class="tbd">TBD</span>
+            </div>
           </div>
-          <div v-if="!teamMember.voted" class="poker-card-voted rounded-circle not-voted">
-            <i class="fas fa-times-circle" />
+          <div v-if="teamMember.uid != myName.uid && !revealed" class="poker-card back rounded">
+            <div v-if="teamMember.voted" class="poker-card-voted rounded-circle voted">
+              <i class="fas fa-check-circle" />
+            </div>
+            <div v-if="!teamMember.voted" class="poker-card-voted rounded-circle not-voted">
+              <i class="fas fa-times-circle" />
+            </div>
           </div>
         </div>
       </div>
@@ -144,6 +146,11 @@ export default {
 <style lang="scss">
   td {
     padding: 12px;
+  }
+  .select-card {
+    margin: 120px 24px 0 24px;
+    font-size: xxx-large;
+
   }
   .selected-card {
     padding-top: 12px;

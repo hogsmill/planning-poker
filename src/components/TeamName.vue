@@ -21,7 +21,7 @@
               -- Select --
             </option>
             <option v-for="(team, index) in includedTeams" :key="index" :value="team.name" :selected="team.name == teamName">
-              {{ team.name }}
+              {{ teamOption(team) }}
             </option>
           </select>
           <button class="btn btn-sm btn-secondary smaller-font" @click="saveTeamName()">
@@ -39,6 +39,9 @@ export default {
     'socket'
   ],
   computed: {
+    demo() {
+      return this.$store.getters.getDemo
+    },
     teamName() {
       return this.$store.getters.getTeamName
     },
@@ -55,6 +58,9 @@ export default {
     },
     hide() {
       this.$modal.hide('set-team-name')
+    },
+    teamOption(team) {
+      return this.demo ? team.name + ' (' + team.estimationType + ')' : team.name
     },
     saveTeamName() {
       const teamName = document.getElementById('team-name').value

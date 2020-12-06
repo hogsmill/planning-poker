@@ -95,6 +95,9 @@ function doDb(fun, data) {
       case 'setTimerTime':
         dbStore.setTeamParameter(err, client, db, io, data, debugOn, 'timerTime')
         break
+      case 'setVelocity':
+        dbStore.setTeamParameter(err, client, db, io, data, debugOn, 'velocity')
+        break
       case 'deleteTeam':
         dbStore.deleteTeam(err, client, db, io, data, debugOn)
         break
@@ -183,6 +186,8 @@ io.on('connection', (socket) => {
   socket.on('addTeam', (data) => { doDb('addTeam', data) })
 
   socket.on('includeTeam', (data) => { doDb('includeTeam', data) })
+
+  socket.on('setVelocity', (data) => { doDb('setVelocity', data) })
 
   socket.on('setUseTimer', (data) => { doDb('setUseTimer', data) })
 

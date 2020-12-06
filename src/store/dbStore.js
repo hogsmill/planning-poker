@@ -36,17 +36,17 @@ const defaultEstimationValues = {
 }
 
 const defaultBacklog = [
-  { id: 1, uid: '1', title: 'Build an API', selected: false, description: 'Build the API by updating the domain model to allow feature x to connect'},
-  { id: 2, uid: '2', title: 'Do the UI', selected: false, description: 'Update the GUI to allow product selection. Date comes from the API'},
-  { id: 3, uid: '3', title: 'Build the login', selected: false, description: 'Store user details in database'},
-  { id: 4, uid: '4', title: 'Add Logging', selected: false, description: 'Update logging system to log new feature'}
+  { id: 1, uid: '1', order: 1, title: 'Build an API', selected: false, committed: false, description: 'Build the API by updating the domain model to allow feature x to connect'},
+  { id: 2, uid: '2', order: 2, title: 'Do the UI', selected: false, committed: false, description: 'Update the GUI to allow product selection. Date comes from the API'},
+  { id: 3, uid: '3', order: 3, title: 'Build the login', selected: false, committed: false, description: 'Store user details in database'},
+  { id: 4, uid: '4', order: 4, title: 'Add Logging', selected: false, committed: false, description: 'Update logging system to log new feature'}
 ]
 
 const defaultTeams = [
-  { name: 'Eagle', include: true, useTimer: true, timerAutoReveal: false, timerTime: 30, relativeSizing: true, gameView: 'poker', logo: 'agile_sims_icon_eagle.png' },
-  { name: 'Lion', include: true, useTimer: true, timerAutoReveal: false, timerTime: 30, relativeSizing: true, gameView: 'poker', logo: 'agile_sims_icon_lion.png' },
-  { name: 'Dragon', include: true, useTimer: true, timerAutoReveal: false, timerTime: 30, relativeSizing: true, gameView: 'poker', logo: 'agile_sims_icon_dragon.png' },
-  { name: 'Gryphen', include: true, useTimer: true, timerAutoReveal: false, timerTime: 30, relativeSizing: true, gameView: 'poker', logo: 'agile_sims_icon_gryphen.png' }
+  { name: 'Eagle', estimationType: 'fibonacci', include: true, velocity: 20, useTimer: true, timerAutoReveal: false, timerTime: 30, relativeSizing: true, gameView: 'poker', logo: 'agile_sims_icon_eagle.png' },
+  { name: 'Lion', estimationType: 't-shirt', include: true, velocity: 20, useTimer: true, timerAutoReveal: false, timerTime: 30, relativeSizing: true, gameView: 'poker', logo: 'agile_sims_icon_lion.png' },
+  { name: 'Dragon', estimationType: 'relative', include: true, velocity: 20, useTimer: true, timerAutoReveal: false, timerTime: 30, relativeSizing: true, gameView: 'poker', logo: 'agile_sims_icon_dragon.png' },
+  { name: 'Gryphen', estimationType: 'fruit', include: true, velocity: 20, useTimer: true, timerAutoReveal: false, timerTime: 30, relativeSizing: true, gameView: 'poker', logo: 'agile_sims_icon_gryphen.png' }
 ]
 
 const defaultTeamMembers = [
@@ -237,6 +237,8 @@ function _loadBacklog(err, client, db, io, data, debugOn) {
           const backlog = data.replace ? [] : team.backlog
           for (let j = 0; j < data.backlog.length; j++) {
             data.backlog[j].uid = uuidv4()
+            data.backlog[i].selected = false
+            data.backlog[i].committed = false
             backlog.push(data.backlog[j])
           }
           team.backlog = backlog
@@ -267,7 +269,6 @@ function _setOrganisation(err, client, db, io, data, debugOn) {
       if (data.demo) {
         for (let i = 0; i < data.teams.length; i++) {
           data.teams[i].members = defaultTeamMembers
-          data.teams[i].estimationType = Object.keys(defaultEstimationValues)[0]
           data.teams[i].estimationValues = defaultEstimationValues
           data.teams[i].backlog = defaultBacklog
           data.teams[i].include = true
@@ -282,11 +283,16 @@ function _setOrganisation(err, client, db, io, data, debugOn) {
       })
     } else {
       data.teams = res.teams
-      db.collection('planningPokerOrganisations').updateOne({'_id': res._id}, {$set: {demo: data.demo}}, function(err, res) {
-        if (err) throw err
+      if (!data.demo) {
         io.emit('loadOrganisation', data)
         client.close()
-      })
+      } else {
+        db.collection('planningPokerOrganisations').updateOne({'_id': res._id}, {$set: {demo: data.demo}}, function(err, res) {
+          if (err) throw err
+          io.emit('loadOrganisation', data)
+          client.close()
+        })
+      }
     }
   })
 }
@@ -331,6 +337,8 @@ module.exports = {
     db.collection('planningPokerOrganisations').findOne({organisation: data.organisation}, function(err, res) {
       if (err) throw err
       if (res) {
+        console.log(data, res.demo)
+        data.demo = res.demo
         data.team = res.teams.find(function(t) {
           return t.name == data.teamName
         })
@@ -356,6 +364,7 @@ module.exports = {
           }
           teams.push(team)
         }
+        data.demo = res.demo
         db.collection('planningPokerOrganisations').updateOne({'_id': res._id}, {$set: {teams: teams}}, function(err, res) {
           if (err) throw err
           io.emit('loadTeam', data)
@@ -381,6 +390,7 @@ module.exports = {
           }
           teams.push(team)
         }
+        data.demo = res.demo
         db.collection('planningPokerOrganisations').updateOne({'_id': res._id}, {$set: {teams: teams}}, function(err, res) {
           if (err) throw err
           io.emit('loadTeam', data)
@@ -422,6 +432,7 @@ module.exports = {
           }
           teams.push(team)
         }
+        data.demo = res.demo
         db.collection('planningPokerOrganisations').updateOne({'_id': res._id}, {$set: {teams: teams}}, function(err, res) {
           if (err) throw err
           io.emit('loadTeam', data)
@@ -447,6 +458,7 @@ module.exports = {
           }
           teams.push(team)
         }
+        data.demo = res.demo
         db.collection('planningPokerOrganisations').updateOne({'_id': res._id}, {$set: {teams: teams}}, function(err, res) {
           if (err) throw err
           io.emit('loadTeam', data)
@@ -499,6 +511,7 @@ module.exports = {
           }
           teams.push(team)
         }
+        data.demo = res.demo
         db.collection('planningPokerOrganisations').updateOne({'_id': res._id}, {$set: {teams: teams}}, function(err, res) {
           if (err) throw err
           io.emit('loadTeam', data)
@@ -535,6 +548,7 @@ module.exports = {
           }
           teams.push(team)
         }
+        data.demo = res.demo
         db.collection('planningPokerOrganisations').updateOne({'_id': res._id}, {$set: {teams: teams}}, function(err, res) {
           if (err) throw err
           io.emit('loadTeam', data)
@@ -609,6 +623,7 @@ module.exports = {
           }
           teams.push(team)
         }
+        data.demo = res.demo
         db.collection('planningPokerOrganisations').updateOne({'_id': res._id}, {$set: {teams: teams}}, function(err, res) {
           if (err) throw err
           io.emit('loadTeam', data)

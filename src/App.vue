@@ -12,9 +12,9 @@
     <div v-if="showTab == 'game'">
       <div class="game-params">
         <Organisation :socket="socket" />
-        <MyName v-if="organisation" :socket="socket" />
         <TeamName v-if="organisation" :socket="socket" />
-        <GameView v-if="organisation" :socket="socket" />
+        <MyName v-if="organisation && teamName" :socket="socket" />
+        <GameView v-if="organisation && teamName && myName" :socket="socket" />
       </div>
       <div v-if="organisation && gameView == 'poker'" class="container">
         <div v-if="teamName">
@@ -87,6 +87,9 @@ export default {
     },
     teamName() {
       return this.$store.getters.getTeamName
+    },
+    myName() {
+      return this.$store.getters.getMyName
     },
     gameView() {
       return this.$store.getters.getGameView

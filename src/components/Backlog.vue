@@ -2,9 +2,9 @@
   <div>
     <h4>Backlog <br>({{ items(backlog.length) }})</h4>
     <p v-if="thisTeam.relativeSizing">
-      Drag and drop to relative size items
+      Orderd by estimate (<i>largest at the top</i>)
     </p>
-    <draggable v-if="thisTeam.relativeSizing" @start="drag=true" @end="end(backlog)">
+    <div v-if="thisTeam.relativeSizing">
       <div v-for="card in backlog" :key="card.id" class="rounded backlog-item" :class="{ 'not-estimated': !card.estimate }" @click="selectCard(card.uid)">
         <table>
           <tr class="backlog-item-header">
@@ -38,7 +38,7 @@
           </tr>
         </table>
       </div>
-    </draggable>
+    </div>
     <div v-if="!thisTeam.relativeSizing">
       <div v-for="(card, index) in backlog" :key="index" class="rounded backlog-item" :class="{ 'not-estimated': !card.estimate }" @click="selectCard(card.uid)">
         <table>
@@ -61,12 +61,8 @@
 </template>
 
 <script>
-import draggable from 'vuedraggable'
 
 export default {
-  components: {
-    draggable
-  },
   props: [
     'socket'
   ],
@@ -93,23 +89,6 @@ export default {
     },
     selectCard(uid) {
       this.socket.emit('selectCard', {organisation: this.organisation, teamName: this.teamName, uid: uid})
-    },
-    end() {
-      // TODO: Massive hack to get this working! :-(
-      const newBacklog = []
-      let r = 1
-      const ranks = document.getElementsByClassName('backlog-id')
-      for (let i = 0; i < ranks.length; i++) {
-        const rank = ranks[i].getAttribute('value')
-        for (let j = 0; j < this.backlog.length; j++) {
-          if (this.backlog[j].id == rank) {
-            this.backlog[j].rank = r
-            r = r + 1
-            newBacklog.push(this.backlog[j])
-          }
-        }
-      }
-      this.socket.emit('updateBacklog', {organisation: this.organisation, teamName: this.teamName, backlog: newBacklog})
     }
   }
 }

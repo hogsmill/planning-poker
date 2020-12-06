@@ -17,6 +17,7 @@ export const store = new Vuex.Store({
     organisation: '',
     teams: [],
     teamMembers: [],
+    gameView: 'poker',
     backlog: [],
     time: 0,
     revealed: false,
@@ -108,7 +109,24 @@ export const store = new Vuex.Store({
       return state.connections
     },
     getBacklog: (state) => {
-      return state.backlog
+      let backlog = state.backlog
+      if (state.gameView == 'train') {
+        backlog = backlog.sort(function(a, b) {
+          const orderA = parseInt(a.order)
+          const orderB = parseInt(b.order)
+          return orderA - orderB
+        })
+      } else {
+        backlog = backlog.sort(function(a, b) {
+          const orderA = a.estimate ? parseInt(a.estimate.order) : 0
+          const orderB = a.estimate ? parseInt(a.estimate.order) : 0
+          return orderB - orderA
+        })
+      }
+      return backlog
+    },
+    getVelocity: (state) => {
+      return state.thisTeam.velocity
     },
     getShowTeams: (state) => {
       return state.editing.showTeams
@@ -166,8 +184,10 @@ export const store = new Vuex.Store({
       state.editing.estimateTeam = payload.estimateTeam
     },
     loadTeam: (state, payload) => {
+      state.demo = payload.demo
       state.thisTeam = payload.team
       state.teamMembers = payload.team.members
+      state.gameView = payload.team.gameView
       state.backlog = payload.team.backlog
       state.estimationType = payload.team.estimationType
       state.estimationValues = payload.team.estimationValues

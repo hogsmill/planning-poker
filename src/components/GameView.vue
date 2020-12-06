@@ -30,7 +30,6 @@ export default {
   },
   methods: {
     setGameView(view) {
-      console.log(view)
       this.socket.emit('setGameView', {organisation: this.organisation, teamName: this.teamName, view: view})
     }
   }
@@ -63,7 +62,15 @@ export default {
       }
 
       &.selected {
-        background-color: #f8f9fa;
+        background-color: #35654d;
+
+        .poker {
+          background-image: url("../assets/img/poker-white.png");
+        }
+
+        .train {
+          background-image: url("../assets/img/train-white.png");
+        }
       }
 
       div {
@@ -72,14 +79,14 @@ export default {
         margin: auto auto;
 
         &.poker {
-          background-image: url("../assets/img/poker.png");
+          background-image: url("../assets/img/poker-black.png");
           background-size: contain;
           background-repeat: no-repeat;
           background-position: center;
         }
 
         &.train {
-          background-image: url("../assets/img/train.png");
+          background-image: url("../assets/img/train-black.png");
           background-size: contain;
           background-repeat: no-repeat;
           background-position: center;
