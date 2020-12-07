@@ -276,12 +276,16 @@ function _setOrganisation(err, client, db, io, data, debugOn) {
         }
       }
       const created = new Date().toISOString()
+      const lastaccess = new Date().toISOString()
       db.collection('planningPokerOrganisations').insertOne({organisation: data.organisation, created: created, teams: data.teams, estimationTypes: data.estimationValues, demo: data.demo}, function(err, res) {
         if (err) throw err
         io.emit('loadOrganisation', data)
         client.close()
       })
     } else {
+      db.collection('planningPokerOrganisations').updateOne({'_id': res._id}, {$set: {lastaccess: new Date().toISOString()}}, function(err, res) {
+        if (err) throw err
+      })
       data.teams = res.teams
       if (!data.demo) {
         io.emit('loadOrganisation', data)
