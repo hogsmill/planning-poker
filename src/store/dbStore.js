@@ -277,7 +277,7 @@ function _setOrganisation(err, client, db, io, data, debugOn) {
       }
       const created = new Date().toISOString()
       const lastaccess = new Date().toISOString()
-      db.collection('planningPokerOrganisations').insertOne({organisation: data.organisation, created: created, teams: data.teams, estimationTypes: data.estimationValues, demo: data.demo}, function(err, res) {
+      db.collection('planningPokerOrganisations').insertOne({organisation: data.organisation, created: created, lastaccess: data.lastaccess, teams: data.teams, estimationTypes: data.estimationValues, demo: data.demo}, function(err, res) {
         if (err) throw err
         io.emit('loadOrganisation', data)
         client.close()
