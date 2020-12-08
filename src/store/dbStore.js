@@ -289,7 +289,6 @@ function _setOrganisation(err, client, db, io, data, debugOn) {
       data.teams = res.teams
       if (!data.demo) {
         io.emit('loadOrganisation', data)
-        client.close()
       } else {
         db.collection('planningPokerOrganisations').updateOne({'_id': res._id}, {$set: {demo: data.demo}}, function(err, res) {
           if (err) throw err
@@ -341,7 +340,6 @@ module.exports = {
     db.collection('planningPokerOrganisations').findOne({organisation: data.organisation}, function(err, res) {
       if (err) throw err
       if (res) {
-        console.log(data, res.demo)
         data.demo = res.demo
         data.team = res.teams.find(function(t) {
           return t.name == data.teamName
