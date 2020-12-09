@@ -40,6 +40,10 @@
         <div v-for="(teamMember, index) in teamMembers" :key="index" class="member rounded" :class="{ highest: highest(teamMember),  lowest: lowest(teamMember) }">
           <div><b>{{ teamMember.name }}</b></div>
           <div v-if="teamMember.uid == myName.uid || revealed" class="poker-card rounded">
+            <div class="options">
+              <i class="coffee fas fa-mug-hot" @click="coffee(teamMember)" />
+              <i class="question far fa-question-circle" @click="question(teamMember)" />
+            </div>
             <div v-if="estimating" class="poker-card-value">
               <select class="estimate-dropdown" :id="'estimate-value-' + myName.uid" @change="saveEstimate()">
                 <option value="" />
@@ -55,12 +59,19 @@
             </div>
           </div>
           <div v-if="teamMember.uid != myName.uid && !revealed" class="poker-card back rounded">
-            <div v-if="teamMember.voted" class="poker-card-voted rounded-circle voted">
+            <div v-if="memberStatus(teamMember) == 'coffee'" class="poker-card-voted rounded-circle">
+              <i class="coffee-status fas fa-mug-hot" />
+            </div>
+            <div v-if="memberStatus(teamMember) == 'question'" class="poker-card-voted rounded-circle">
+              <i class="question-status far fa-question-circle" />
+            </div>
+            <div v-if="memberStatus(teamMember) == 'voted'" class="poker-card-voted rounded-circle voted">
               <i class="fas fa-check-circle" />
             </div>
-            <div v-if="!teamMember.voted" class="poker-card-voted rounded-circle not-voted">
+            <div v-if="memberStatus(teamMember) == 'not-voted'" class="poker-card-voted rounded-circle not-voted">
               <i class="fas fa-times-circle" />
             </div>
+            -->
           </div>
         </div>
       </div>
@@ -142,8 +153,27 @@ export default {
       }
       return this.revealed && member.estimate.order == lowest.order
     },
+    memberStatus(member) {
+      let status = ''
+      if (member.coffee) {
+        status = 'coffee'
+      } else if (member.question) {
+        status = 'question'
+      } else if (member.voted) {
+        status = 'voted'
+      } else {
+        status = 'not-voted'
+      }
+      return status
+    },
     startEstimating() {
       this.estimating = true
+    },
+    coffee(member) {
+      this.socket.emit('memberCoffee', {organisation: this.organisation, teamName: this.teamName, teamMember: this.myName, coffee: true})
+    },
+    question(member) {
+      this.socket.emit('memberQuestion', {organisation: this.organisation, teamName: this.teamName, teamMember: this.myName, question: true})
     },
     saveEstimate() {
       const estValue = document.getElementById('estimate-value-' + this.myName.uid).value
@@ -251,6 +281,27 @@ export default {
         width: 103px;
         border: 6px solid #888;
         box-shadow: 2px 2px 3px #aaa;
+        position: relative;
+
+        .coffee {
+          position: absolute;
+          left: 3px;
+          top: 3px;
+        }
+        .question {
+          position: absolute;
+          right: 3px;
+          top: 3px;
+        }
+
+        .options {
+          color: #888;
+
+          i:hover {
+            cursor: pointer;
+            color: #444;
+          }
+        }
 
         &.back {
           background-image: url("../assets/img/card-back.png");
@@ -287,6 +338,19 @@ export default {
           border: 2px solid #888;
           margin: 36px auto 0 auto;
           font-size: 30px;
+
+          .coffee-status {
+            color: #444;
+            position: relative;
+            top: -2px;
+            left: 2px;
+          }
+
+          .question-status {
+            color: #444;
+            top: -2px;
+            left: 2px;
+          }
 
           &.voted {
             color: green;

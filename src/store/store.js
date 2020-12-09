@@ -61,7 +61,6 @@ export const store = new Vuex.Store({
       return state.organisation
     },
     getThisTeam: (state) => {
-      console.log(state.thisTeam)
       return state.thisTeam
     },
     getTeams: (state) => {

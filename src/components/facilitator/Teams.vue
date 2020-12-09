@@ -168,7 +168,6 @@ export default {
     },
     setVelocity(team) {
       const velocity = document.getElementById('velocity-' + this.sanitized(team.name)).value
-      console.log(velocity)
       this.socket.emit('setVelocity', {organisation: this.organisation, teamName: team.name, velocity: velocity})
     },
     setEstimationTimerTime(team) {

@@ -78,6 +78,12 @@ function doDb(fun, data) {
       case 'updateEstimateValue':
         dbStore.updateEstimateValue(err, client, db, io, data, debugOn)
         break
+      case 'memberCoffee':
+        dbStore.setMemberValue(err, client, db, io, data, debugOn, 'coffee')
+        break
+      case 'memberQuestion':
+        dbStore.setMemberValue(err, client, db, io, data, debugOn, 'question')
+        break
       case 'updateAgreedEstimate':
         dbStore.updateAgreedEstimate(err, client, db, io, data, debugOn)
         break
@@ -182,6 +188,10 @@ io.on('connection', (socket) => {
   socket.on('selectCard', (data) => { doDb('selectCard', data) })
 
   socket.on('updateCommittedCards', (data) => { doDb('updateCommittedCards', data) })
+
+  socket.on('memberCoffee', (data) => { doDb('memberCoffee', data) })
+
+  socket.on('memberQuestion', (data) => { doDb('memberQuestion', data) })
 
   socket.on('updateEstimateValue', (data) => { doDb('updateEstimateValue', data) })
 

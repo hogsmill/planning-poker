@@ -43,7 +43,6 @@ export default {
   methods: {
     displayTimer() {
       let t = this.time
-      console.log(t, this.thisTeam)
       if (!t) {
         t = this.thisTeam.timerType == 'estimation' ? this.thisTeam.estimationTimerTime : this.thisTeam.discussionTimerTime
       }

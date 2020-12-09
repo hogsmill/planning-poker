@@ -127,7 +127,6 @@ export default {
     }
 
     this.socket.on('loadTeam', (data) => {
-      console.log('loadTeam', data)
       if (this.teamName == data.teamName && this.organisation == data.organisation) {
         this.$store.dispatch('loadTeam', data)
       }
