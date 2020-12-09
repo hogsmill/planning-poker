@@ -13,6 +13,12 @@
             <i v-if="time > 0" class="fas fa-stop-circle" @click="stopTimer()" />
           </td>
         </tr>
+        <tr v-if="thisTeam.useEstimationTimer && thisTeam.useDiscussionTimer">
+          <td>
+            <input type="radio" name="timerType" :checked="thisTeam.timerType == 'estimation'" @click="setTimerType('estimation')"> Estimation
+            <input type="radio" name="timerType" :checked="thisTeam.timerType == 'discussion'" @click="setTimerType('discussion')"> Discussion
+          </td>
+        </tr>
       </table>
     </div>
   </div>
@@ -36,7 +42,11 @@ export default {
   },
   methods: {
     displayTimer() {
-      const t = this.time ? this.time : this.thisTeam.timerTime
+      let t = this.time
+      console.log(t, this.thisTeam)
+      if (!t) {
+        t = this.thisTeam.timerType == 'estimation' ? this.thisTeam.estimationTimerTime : this.thisTeam.discussionTimerTime
+      }
       let m = parseInt(t / 60)
       let s = t - (m * 60)
       m = m < 10 ? '0' + m : m
@@ -45,6 +55,9 @@ export default {
     },
     imminent() {
       return this.time > 0 && this.time < 10
+    },
+    setTimerType(timerType) {
+      this.socket.emit('setTimerType', {organisation: this.organisation, teamName: this.thisTeam.name, timerType: timerType})
     },
     startTimer() {
       this.socket.emit('startTimer', {organisation: this.organisation, teamName: this.thisTeam.name})

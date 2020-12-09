@@ -69,6 +69,9 @@ function doDb(fun, data) {
       case 'updateCommittedCards':
         dbStore.updateCommittedCards(err, client, db, io, data, debugOn)
         break
+      case 'setTimerType':
+        dbStore.setTimerType(err, client, db, io, data, debugOn)
+        break
       case 'startTimer':
         dbStore.startTimer(err, client, db, io, data, debugOn)
         break
@@ -86,14 +89,20 @@ function doDb(fun, data) {
       case 'includeTeam':
         dbStore.setTeamParameter(err, client, db, io, data, debugOn, 'include')
         break
-      case 'setUseTimer':
-        dbStore.setTeamParameter(err, client, db, io, data, debugOn, 'useTimer')
+      case 'setUseEstimationTimer':
+        dbStore.setTeamParameter(err, client, db, io, data, debugOn, 'useEstimationTimer')
+        break
+      case 'setUseDiscussionTimer':
+        dbStore.setTeamParameter(err, client, db, io, data, debugOn, 'useDiscussionTimer')
         break
       case 'setTimerAutoReveal':
         dbStore.setTeamParameter(err, client, db, io, data, debugOn, 'timerAutoReveal')
         break
-      case 'setTimerTime':
-        dbStore.setTeamParameter(err, client, db, io, data, debugOn, 'timerTime')
+      case 'setEstimationTimerTime':
+        dbStore.setTeamParameter(err, client, db, io, data, debugOn, 'estimationTimerTime')
+        break
+      case 'setDiscussionTimerTime':
+        dbStore.setTeamParameter(err, client, db, io, data, debugOn, 'discussionTimerTime')
         break
       case 'setVelocity':
         dbStore.setTeamParameter(err, client, db, io, data, debugOn, 'velocity')
@@ -176,6 +185,8 @@ io.on('connection', (socket) => {
 
   socket.on('updateEstimateValue', (data) => { doDb('updateEstimateValue', data) })
 
+  socket.on('setTimerType', (data) => { doDb('setTimerType', data) })
+
   socket.on('startTimer', (data) => { doDb('startTimer', data) })
 
   socket.on('reveal', (data) => { emit('reveal', data) })
@@ -189,11 +200,15 @@ io.on('connection', (socket) => {
 
   socket.on('setVelocity', (data) => { doDb('setVelocity', data) })
 
-  socket.on('setUseTimer', (data) => { doDb('setUseTimer', data) })
+  socket.on('setUseEstimationTimer', (data) => { doDb('setUseEstimationTimer', data) })
+
+  socket.on('setUseDiscussionTimer', (data) => { doDb('setUseDiscussionTimer', data) })
 
   socket.on('setTimerAutoReveal', (data) => { doDb('setTimerAutoReveal', data) })
 
-  socket.on('setTimerTime', (data) => { doDb('setTimerTime', data) })
+  socket.on('setEstimationTimerTime', (data) => { doDb('setEstimationTimerTime', data) })
+
+  socket.on('setDiscussionTimerTime', (data) => { doDb('setDiscussionTimerTime', data) })
 
   socket.on('deleteTeam', (data) => { doDb('deleteTeam', data) })
 

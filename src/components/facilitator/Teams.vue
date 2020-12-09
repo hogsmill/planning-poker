@@ -26,13 +26,16 @@
               Include?
             </td>
             <td>
-              Capacity/Velocity (<i>if using SPs</i>)
+              Capacity/Velocity<br>(<i>if using SPs</i>)
             </td>
             <td>
-              Timer?
+              Estimation Timer?
             </td>
             <td>
               Auto-Reveal?
+            </td>
+            <td>
+              Discussion Timer?
             </td>
             <td colspan="2" />
           </tr>
@@ -44,12 +47,12 @@
               <input type="checkbox" :checked="team.include" @click="includeTeam(team)">
             </td>
             <td class="center">
-              <input type="text" class="velocity" :id="'velocity-' + sanitized(team.name)" :value="team.velocity">
+              <input type="number" class="velocity" :id="'velocity-' + sanitized(team.name)" :value="team.velocity">
               <i class="fas fa-save" @click="setVelocity(team)" />
             </td>
             <td>
-              <input type="checkbox" :checked="team.useTimer" @click="toggleTimer(team)">
-              <select :id="'timer-time-' + sanitized(team.name)" class="timer-seconds" :value="team.timerTime" @change="setTimerTime(team)" :disabled="!team.useTimer">
+              <input type="checkbox" :checked="team.useEstimationTimer" @click="toggleEstimationTimer(team)">
+              <select :id="'estimation-timer-time-' + sanitized(team.name)" class="timer-seconds" :value="team.estimationTimerTime" @change="setEstimationTimerTime(team)" :disabled="!team.useEstimationTimer">
                 <option value="10">
                   10s
                 </option>
@@ -76,8 +79,34 @@
                 </option>
               </select>
             </td>
-            <td>
+            <td class="center">
               <input type="checkbox" :checked="team.timerAutoReveal" @click="toggleTimerAutoReveal(team)">
+            </td>
+            <td>
+              <input type="checkbox" :checked="team.useDiscussionTimer" @click="toggleDiscussionTimer(team)">
+              <select :id="'discussion-timer-time-' + sanitized(team.name)" class="timer-seconds" :value="team.discussionTimerTime" @change="setDiscussionTimerTime(team)" :disabled="!team.useDiscussionTimer">
+                <option value="30">
+                  30s
+                </option>
+                <option value="60">
+                  60s
+                </option>
+                <option value="90">
+                  1:30
+                </option>
+                <option value="120">
+                  2:00
+                </option>
+                <option value="180">
+                  3:00
+                </option>
+                <option value="300">
+                  5:00
+                </option>
+                <option value="600">
+                  10:00
+                </option>
+            </select>
             </td>
             <td>
               <button class="btn btn-sm btn-secondary smaller-font" @click="deleteTeam(team)">
@@ -118,13 +147,20 @@ export default {
       const teamName = document.getElementById('add-team-name').value
       this.socket.emit('addTeam', {organisation: this.organisation, teamName: teamName})
     },
+    deleteTeam(team) {
+      this.socket.emit('deleteTeam', {organisation: this.organisation, teamName: team.name})
+    },
     includeTeam(team) {
       const include = !team.include
       this.socket.emit('includeTeam', {organisation: this.organisation, teamName: team.name, include: include})
     },
-    toggleTimer(team) {
-      const useTimer = !team.useTimer
-      this.socket.emit('setUseTimer', {organisation: this.organisation, teamName: team.name, useTimer: useTimer})
+    toggleDiscussionTimer(team) {
+      const useTimer = !team.useDiscussionTimer
+      this.socket.emit('setUseDiscussionTimer', {organisation: this.organisation, teamName: team.name, useDiscussionTimer: useTimer})
+    },
+    toggleEstimationTimer(team) {
+      const useTimer = !team.useEstimationTimer
+      this.socket.emit('setUseEstimationTimer', {organisation: this.organisation, teamName: team.name, useEstimationTimer: useTimer})
     },
     toggleTimerAutoReveal(team) {
       const timerAutoReveal = !team.timerAutoReveal
@@ -135,12 +171,13 @@ export default {
       console.log(velocity)
       this.socket.emit('setVelocity', {organisation: this.organisation, teamName: team.name, velocity: velocity})
     },
-    setTimerTime(team) {
-      const timerTime = document.getElementById('timer-time-' + this.sanitized(team.name)).value
-      this.socket.emit('setTimerTime', {organisation: this.organisation, teamName: team.name, timerTime: timerTime})
+    setEstimationTimerTime(team) {
+      const timerTime = document.getElementById('estimation-timer-time-' + this.sanitized(team.name)).value
+      this.socket.emit('setEstimationTimerTime', {organisation: this.organisation, teamName: team.name, estimationTimerTime: timerTime})
     },
-    deleteTeam(team) {
-      this.socket.emit('deleteTeam', {organisation: this.organisation, teamName: team.name})
+    setDiscussionTimerTime(team) {
+      const timerTime = document.getElementById('discussion-timer-time-' + this.sanitized(team.name)).value
+      this.socket.emit('setDiscussionTimerTime', {organisation: this.organisation, teamName: team.name, discussionTimerTime: timerTime})
     }
   }
 }
@@ -155,12 +192,6 @@ export default {
   }
   .facilitator-table .header td,  .facilitator-table td.center, {
     text-align: center;
-  }
-  .facilitator-table .teams input[type=checkbox] {
-    min-width: 30px;
-  }
-  .velocity {
-    width: 30px;
   }
   .fa-save {
     color: #aaa;

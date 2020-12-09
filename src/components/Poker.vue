@@ -13,7 +13,7 @@
         </p>
       </div>
       <div class="final-estimate">
-        <Timer v-if="thisTeam.useTimer" :socket="socket" />
+        <Timer v-if="thisTeam.useDiscussionTimer || thisTeam.useEstimationTimer" :socket="socket" />
         <div class="agreed-estimate">
           <span>Agreed Estimate: </span>
           <select id="agreed-estimate-value">
@@ -37,7 +37,7 @@
         </div>
       </div>
       <div class="members">
-        <div v-for="(teamMember, index) in teamMembers" :key="index" class="member">
+        <div v-for="(teamMember, index) in teamMembers" :key="index" class="member rounded">
           <div><b>{{ teamMember.name }}</b></div>
           <div v-if="teamMember.uid == myName.uid || revealed" class="poker-card rounded">
             <div v-if="estimating" class="poker-card-value">

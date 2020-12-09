@@ -43,10 +43,10 @@ const defaultBacklog = [
 ]
 
 const defaultTeams = [
-  { name: 'Eagle', estimationType: 'fibonacci', include: true, velocity: 20, useTimer: true, timerAutoReveal: false, timerTime: 30, relativeSizing: true, gameView: 'poker', logo: 'agile_sims_icon_eagle.png' },
-  { name: 'Lion', estimationType: 't-shirt', include: true, velocity: 20, useTimer: true, timerAutoReveal: false, timerTime: 30, relativeSizing: true, gameView: 'poker', logo: 'agile_sims_icon_lion.png' },
-  { name: 'Dragon', estimationType: 'relative', include: true, velocity: 20, useTimer: true, timerAutoReveal: false, timerTime: 30, relativeSizing: true, gameView: 'poker', logo: 'agile_sims_icon_dragon.png' },
-  { name: 'Gryphen', estimationType: 'fruit', include: true, velocity: 20, useTimer: true, timerAutoReveal: false, timerTime: 30, relativeSizing: true, gameView: 'poker', logo: 'agile_sims_icon_gryphen.png' }
+  { name: 'Eagle', estimationType: 'fibonacci', include: true, velocity: 20, timerType: 'estimation', useEstimationTimer: true, timerAutoReveal: false, estimationTimerTime: 30, useDiscussionTimer: true, discussionTimerTime: 120, relativeSizing: true, gameView: 'poker', logo: 'agile_sims_icon_eagle.png' },
+  { name: 'Lion', estimationType: 't-shirt', include: true, velocity: 20, timerType: 'estimation', timerType: '', useEstimationTimer: true, timerAutoReveal: false, estimationTimerTime: 30, useDiscussionTimer: true, discussionTimerTime: 120, relativeSizing: true, gameView: 'poker', logo: 'agile_sims_icon_lion.png' },
+  { name: 'Dragon', estimationType: 'relative', include: true, velocity: 20, timerType: 'estimation', useEstimationTimer: true, timerAutoReveal: false, estimationTimerTime: 30, useDiscussionTimer: true, discussionTimerTime: 120, relativeSizing: true, gameView: 'poker', logo: 'agile_sims_icon_dragon.png' },
+  { name: 'Gryphen', estimationType: 'fruit', include: true, velocity: 20, timerType: 'estimation', useEstimationTimer: true, timerAutoReveal: false, estimationTimerTime: 30, useDiscussionTimer: true, discussionTimerTime: 120, relativeSizing: true, gameView: 'poker', logo: 'agile_sims_icon_gryphen.png' }
 ]
 
 const defaultTeamMembers = [
@@ -470,6 +470,32 @@ module.exports = {
     })
   },
 
+  setTimerType:  function(err, client, db, io, data, debugOn) {
+
+    if (debugOn) { console.log('setTimerType', data) }
+
+    db.collection('planningPokerOrganisations').findOne({organisation: data.organisation}, function(err, res) {
+      if (err) throw err
+      if (res) {
+        const teams = []
+        for (let i = 0; i < res.teams.length; i++) {
+          const team = res.teams[i]
+          if (team.name == data.teamName) {
+            team.timerType = data.timerType
+            data.team = team
+          }
+          teams.push(team)
+        }
+        data.demo = res.demo
+        db.collection('planningPokerOrganisations').updateOne({'_id': res._id}, {$set: {teams: teams}}, function(err, res) {
+          if (err) throw err
+          io.emit('loadTeam', data)
+          client.close()
+        })
+      }
+    })
+  },
+
   startTimer:  function(err, client, db, io, data, debugOn) {
 
     if (debugOn) { console.log('startTimer', data) }
@@ -479,7 +505,8 @@ module.exports = {
       if (res) {
         for (let i = 0; i < res.teams.length; i++) {
           if (res.teams[i].name == data.teamName) {
-            const t = res.teams[i].timerTime
+            const team = res.teams[i]
+            const t = team.timerType == 'estimation' ? team.estimationTimerTime : team.discussionTimerTime
             updateTimer(io, t, data, res.teams[i].timerAutoReveal)
           }
         }
@@ -579,6 +606,14 @@ module.exports = {
           const team = res.teams[i]
           if (team.name == data.teamName) {
             team[field] = data[field]
+          }
+          if (field == 'useEstimationTimer' || field == 'useDiscussionTimer') {
+            if (team.useEstimationTimer && !team.useDiscussionTimer) {
+              team.timerType = 'estimation'
+            }
+            if (!team.useEstimationTimer && team.useDiscussionTimer) {
+              team.timerType = 'discussion'
+            }
           }
           teams.push(team)
         }

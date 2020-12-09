@@ -94,13 +94,22 @@ export default {
       }
     }
 
-    input {
+    input[type=text] {
       min-width: 120px;
       height: 24px;
       padding: 2px;
       margin: 0 auto;
     }
-
+    input[type=number] {
+      min-width: 60px;
+      height: 24px;
+      padding: 2px;
+      margin: 0 auto;
+      text-align: right;
+    }
+    input[type=checkbox] {
+      min-width: 30px;
+    }
     select {
       min-width: 120px;
     }
