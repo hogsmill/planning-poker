@@ -37,7 +37,7 @@
         </div>
       </div>
       <div class="members">
-        <div v-for="(teamMember, index) in teamMembers" :key="index" class="member rounded">
+        <div v-for="(teamMember, index) in teamMembers" :key="index" class="member rounded" :class="{ highest: highest(teamMember),  lowest: lowest(teamMember) }">
           <div><b>{{ teamMember.name }}</b></div>
           <div v-if="teamMember.uid == myName.uid || revealed" class="poker-card rounded">
             <div v-if="estimating" class="poker-card-value">
@@ -117,6 +117,30 @@ export default {
     },
     icon(estimate) {
       return 'url("../planning-poker/icons/' + estimate.icon + '")'
+    },
+    highest(member) {
+      let highest = null
+      for (let i = 0; i < this.thisTeam.members.length; i++) {
+        const mem = this.thisTeam.members[i]
+        if (mem.voted) {
+          if (!highest || mem.estimate.order >= highest.order) {
+            highest = mem.estimate
+          }
+        }
+      }
+      return this.revealed && member.estimate.order == highest.order
+    },
+    lowest(member) {
+      let lowest = null
+      for (let i = 0; i < this.thisTeam.members.length; i++) {
+        const mem = this.thisTeam.members[i]
+        if (mem.voted) {
+          if (!lowest || mem.estimate.order <= lowest.order) {
+            lowest = mem.estimate
+          }
+        }
+      }
+      return this.revealed && member.estimate.order == lowest.order
     },
     startEstimating() {
       this.estimating = true
@@ -207,6 +231,14 @@ export default {
       height: 200px;
       float: left;
       margin: 2px;
+
+      &.highest {
+        background-color: red;
+      }
+
+      &.lowest {
+        background-color: green;
+      }
 
       select {
         font-size: 20px;
