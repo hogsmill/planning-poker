@@ -27,6 +27,9 @@
           </button>
           <div id="team-logo" :style="{ 'background-image': logo() }" />
         </div>
+        <div v-if="revealed">
+          Lowest: {{ lowest() }}, Median: {{ median() }}, Highest {{ highest() }}
+        </div>
         <div>
           <button v-if="!revealed" class="btn btn-sm btn-secondary smaller-font reveal" @click="reveal(true)">
             Reveal Estimates
@@ -37,7 +40,7 @@
         </div>
       </div>
       <div class="members">
-        <div v-for="(teamMember, index) in teamMembers" :key="index" class="member rounded" :class="{ highest: highest(teamMember),  lowest: lowest(teamMember) }">
+        <div v-for="(teamMember, index) in teamMembers" :key="index" class="member rounded" :class="{ highest: isHighest(teamMember), lowest: isLowest(teamMember) }">
           <div><b>{{ teamMember.name }}</b></div>
           <div v-if="teamMember.uid == myName.uid || revealed" class="poker-card rounded">
             <div class="options">
@@ -129,29 +132,33 @@ export default {
     icon(estimate) {
       return 'url("../planning-poker/icons/' + estimate.icon + '")'
     },
-    highest(member) {
+    isHighest(member) {
       let highest = null
-      for (let i = 0; i < this.thisTeam.members.length; i++) {
-        const mem = this.thisTeam.members[i]
-        if (mem.voted) {
-          if (!highest || mem.estimate.order >= highest.order) {
-            highest = mem.estimate
+      if (this.revealed && member.voted) {
+        for (let i = 0; i < this.thisTeam.members.length; i++) {
+          const mem = this.thisTeam.members[i]
+          if (mem.voted) {
+            if (!highest || mem.estimate.order >= highest.order) {
+              highest = mem.estimate
+            }
           }
         }
       }
-      return this.revealed && member.estimate.order == highest.order
+      return highest && member.estimate.order == highest.order
     },
-    lowest(member) {
+    isLowest(member) {
       let lowest = null
-      for (let i = 0; i < this.thisTeam.members.length; i++) {
-        const mem = this.thisTeam.members[i]
-        if (mem.voted) {
-          if (!lowest || mem.estimate.order <= lowest.order) {
-            lowest = mem.estimate
+      if (this.revealed && member.voted) {
+        for (let i = 0; i < this.thisTeam.members.length; i++) {
+          const mem = this.thisTeam.members[i]
+          if (mem.voted) {
+            if (!lowest || mem.estimate.order <= lowest.order) {
+              lowest = mem.estimate
+            }
           }
         }
       }
-      return this.revealed && member.estimate.order == lowest.order
+      return lowest && member.estimate.order == lowest.order
     },
     memberStatus(member) {
       let status = ''
@@ -174,6 +181,43 @@ export default {
     },
     question(member) {
       this.socket.emit('memberQuestion', {organisation: this.organisation, teamName: this.teamName, teamMember: this.myName, question: true})
+    },
+    lowest() {
+      let lowest = null
+      for (let i = 0; i < this.thisTeam.members.length; i++) {
+        const mem = this.thisTeam.members[i]
+        if (mem.voted) {
+          if (!lowest || mem.estimate.order <= lowest.order) {
+            lowest = mem.estimate
+          }
+        }
+      }
+      return lowest ? lowest.name : ''
+    },
+    highest() {
+      let highest = null
+      for (let i = 0; i < this.thisTeam.members.length; i++) {
+        const mem = this.thisTeam.members[i]
+        if (mem.voted) {
+          if (!highest || mem.estimate.order >= highest.order) {
+            highest = mem.estimate
+          }
+        }
+      }
+      return highest ? highest.name : ''
+    },
+    median() {
+      let voted = []
+      for (let i = 0; i < this.thisTeam.members.length; i++) {
+        if (this.thisTeam.members[i].voted) {
+          voted.push(this.thisTeam.members[i].estimate)
+        }
+      }
+      voted = voted.sort(function(a, b) {
+        return a.order - b.order
+      })
+      const l = parseInt(voted.length / 2)
+      return voted[l].name
     },
     saveEstimate() {
       const estValue = document.getElementById('estimate-value-' + this.myName.uid).value
@@ -348,8 +392,6 @@ export default {
 
           .question-status {
             color: #444;
-            top: -2px;
-            left: 2px;
           }
 
           &.voted {
