@@ -14,7 +14,7 @@
       Actual Play
     </h4>
     <p class="left">
-      TBD
+      Click on "Explain this for me..." for an explanation of how to play.
     </p>
   </div>
 </template>

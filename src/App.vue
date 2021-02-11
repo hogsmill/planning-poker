@@ -1,7 +1,6 @@
 <template>
   <div id="app" class="mb-4">
     <Header />
-    <WalkThroughView />
     <h1>
       Planning Poker
     </h1>
@@ -20,8 +19,10 @@
     <div v-if="showTab == 'game'">
       <div class="game-params">
         <SetGame :socket="socket" />
+        <WalkThroughView v-if="!organisation.id" />
         <GameView v-if="organisation.id && team.id && member.id" :socket="socket" />
       </div>
+      <div v-if="!organisation.id" class="poker-train" />
       <div v-if="organisation.id && gameView == 'poker'" class="container">
         <div v-if="team.name">
           <table class="poker-table" border>
@@ -189,6 +190,15 @@ export default {
   .game-params {
     height: 60px;
     text-align: center;
+  }
+  .poker-train {
+     width: 800px;
+     height: 400px;
+     margin: 0 auto;
+     background-image: url("./assets/img/poker-train.png");
+     background-size: contain;
+     background-repeat: no-repeat;
+     background-position: center;
   }
   .poker-table {
     background-color: #35654d;
