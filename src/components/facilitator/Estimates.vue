@@ -2,65 +2,83 @@
   <table class="facilitator-table">
     <tr>
       <td colspan="2">
-        <h4>Estimates (TBD)</h4>
+        <h4>Estimates</h4>
         <i v-if="showEstimates" @click="setShowEstimates(false)" title="collapse" class="fas fa-caret-up toggle" />
         <i v-if="!showEstimates" @click="setShowEstimates(true)" title="expand" class="fas fa-caret-down toggle" />
       </td>
     </tr>
-    <Team v-if="showEstimates" :scope="'estimate'" />
     <tr v-if="showEstimates">
       <td>
-        Estimate Using
+        Organisation
       </td>
       <td>
-        <div v-for="(team, index) in teams" :key="index">
-          <table v-if="team.name == estimateTeam.name" class="inner-table">
-            <tr>
-              <td colspan="2">
-                <select id="set-estimation-type" @change="setEstimationType()">
-                  <option v-for="(estType, eindex) in Object.keys(team.estimationValues)" :key="eindex" :selected="estType == team.estimationType">
-                    {{ estType }}
-                  </option>
-                </select>
-                <div class="estimate-team-selected" v-if="estimateTeam">
-                  for {{ estimateTeam.name }}
-                </div>
-              </td>
-            </tr>
-            <tr>
-              <td>
-                <input type="text" id="new-estimation-type">
-              </td>
-              <td>
-                <button class="btn btn-sm btn-secondary smaller-font" @click="addEstimationType()">
-                  Add New
-                </button>
-                <input type="checkbox" id="new-estimation-type-all-teams" checked="true"> Apply to all teams?
-              </td>
-            </tr>
-          </table>
-        </div>
+        <select id="organisation-select" @change="setSelectedOrganisationId(true)">
+          <option> -- Select -- </option>
+          <option v-for="(org, oindex) in organisations" :key="oindex" :value="org.id" :selected="org.id == selectedOrganisationId">
+            {{ org.name }}
+          </option>
+        </select>
       </td>
     </tr>
     <tr v-if="showEstimates">
       <td>
-        Estimates Values for {{ estimationType }}
+        Team
       </td>
       <td>
-        <table v-if="estimateTeam" class="inner-table">
+        <select id="team-select" @change="setSelectedTeamId()">
+          <option value="">
+            -- Select --
+          </option>
+          <option v-for="(team, tindex) in teams" :key="tindex" :value="team.id" :selected="team.id == selectedTeamId">
+            {{ team.name }}
+          </option>
+        </select>
+      </td>
+    </tr>
+    <tr v-if="showEstimates && selectedTeamId">
+      <td>
+        Estimate Using
+      </td>
+      <td>
+        <select id="set-estimation-type" @change="setEstimationType()">
+          <option v-for="(estType, eindex) in Object.keys(selectedTeam.estimationValues)" :key="eindex" :selected="estType == selectedTeam.estimationType">
+            {{ estType }}
+          </option>
+        </select>
+      </td>
+    </tr>
+    <tr v-if="showEstimates && selectedTeamId">
+      <td />
+      <td>
+        <input type="text" id="new-estimation-type">
+        <button class="btn btn-sm btn-secondary smaller-font" :disabled="selectedTeam.protected" @click="addEstimationType()">
+          Add New Estmation Type
+        </button>
+        <input type="checkbox" id="new-estimation-type-all-teams" :disabled="selectedTeam.protected" checked="true"> Apply to all teams?
+      </td>
+    </tr>
+    <tr v-if="showEstimates && selectedTeamId">
+      <td>
+        Estimates Values
+      </td>
+      <td>
+        <table v-if="selectedTeamId" class="inner-table">
           <tr>
             <td class="center">
               Include?
             </td>
             <td colspan="2" />
-          </tr><tr v-for="(value, index) in estimateTeam.estimationValues[estimateTeam.estimationType]" :key="index">
-            <td><input type="checkbox" :checked="value.include" @click="includeValue(value)"></td>
+          </tr>
+          <tr v-for="(value, index) in selectedTeam.estimationValues[selectedTeam.estimationType]" :key="index">
+            <td>
+              <input type="checkbox" :checked="value.include" :disabled="selectedTeam.protected" @click="includeValue(value)">
+            </td>
             <td>
               <div v-if="value.icon" class="estimate-type-icon" :style="{ 'background-image': logo(value.icon) }" />
               {{ value.name }}
             </td>
             <td>
-              <button class="btn btn-sm btn-secondary smaller-font" @click="deleteEstimationValue(value)">
+              <button class="btn btn-sm btn-secondary smaller-font" :disabled="selectedTeam.protected" @click="deleteEstimationValue(value)">
                 Delete
               </button>
             </td>
@@ -68,10 +86,10 @@
           <tr>
             <td colspan="3">
               <input id="add-estimation-value" type="text">
-              <button class="btn btn-sm btn-secondary smaller-font" @click="addEstimationValue()">
+              <button class="btn btn-sm btn-secondary smaller-font" :disabled="selectedTeam.protected" @click="addEstimationValue()">
                 Add Value
               </button>
-              <input type="checkbox" id="add-estimation-value-all-teams"> Apply to all teams?
+              <input type="checkbox" id="add-estimation-value-all-teams" :disabled="selectedTeam.protected"> Apply to all teams?
             </td>
           </tr>
         </table>
@@ -81,38 +99,63 @@
 </template>
 
 <script>
-import Team from './estimates/Team.vue'
-
 export default {
-  components: {
-    Team
-  },
   props: [
     'socket'
   ],
-  computed: {
-    showEstimates() {
-      return this.$store.getters.getShowEstimates
-    },
-    organisation() {
-      return this.$store.getters.getOrganisation
-    },
-    teams() {
-      return this.$store.getters.getTeams
-    },
-    estimateTeam() {
-      return this.$store.getters.getEstimateTeam
-    },
-    estimationType() {
-      return this.$store.getters.getEstimationType
-    },
-    estimationValues() {
-      return this.$store.getters.getEstimationValues
+  data() {
+    return {
+      showEstimates: false,
+      selectedOrganisationId: null,
+      teams: [],
+      selectedTeamId: null,
+      selectedTeam: {}
     }
+  },
+  computed: {
+    organisations() {
+      return this.$store.getters.getOrganisations
+    }
+  },
+  created() {
+    this.socket.on('loadOrganisations', (data) => {
+      if (this.showEstimates) {
+        this.setSelectedOrganisationId(false)
+        this.setSelectedTeamId()
+      }
+    })
+    this.socket.on('openEditPane', (data) => {
+      if (data != 'showEstimates') {
+        this.showEstimates = false
+      }
+    })
   },
   methods: {
     setShowEstimates(val) {
-      this.$store.dispatch('setShowEstimates', val)
+      this.showEstimates = val
+      if (val) {
+        this.socket.emit('openEditPane', 'showEstimates')
+      }
+    },
+    setSelectedOrganisationId(clear) {
+      if (clear) {
+        this.selectedTeamId = null
+        this.selectedTeam = {}
+      }
+      const orgId = document.getElementById('organisation-select').value
+      this.selectedOrganisationId = orgId
+      const organisation = this.organisations.find(function(o) {
+        return o.id == orgId
+      })
+      this.teams = organisation ? organisation.teams : []
+    },
+    setSelectedTeamId() {
+      const teamId = document.getElementById('team-select').value
+      this.selectedTeamId = teamId
+      const selectedTeam = this.teams.find(function(t) {
+        return t.id == teamId
+      })
+      this.selectedTeam = selectedTeam ? selectedTeam : {}
     },
     logo(icon) {
       return 'url("../planning-poker/icons/' + icon + '")'
@@ -120,28 +163,28 @@ export default {
     teamEstimationType() {
       const self = this
       const team = this.teams.find(function(t) {
-        return t.name == self.estimateTeam.name
+        return t.name == self.selectedTeam.name
       })
       return team ? team.estimationType : ''
     },
     setEstimationType() {
       const estimationType = document.getElementById('set-estimation-type').value
-      this.socket.emit('updateEstimationType', {organisation: this.organisation, teamName: this.estimateTeam.name, estimationType: estimationType})
+      this.socket.emit('updateEstimationType', {organisationId: this.selectedOrganisationId, teamId: this.selectedTeamId, estimationType: estimationType})
     },
     addEstimationType() {
       const estimationType = document.getElementById('new-estimation-type').value
       const allTeams = document.getElementById('new-estimation-type-all-teams').checked
-      this.socket.emit('addEstimationType', {organisation: this.organisation, teamName: this.estimateTeam.name, estimationType: estimationType, allTeams: allTeams})
+      this.socket.emit('addEstimationType', {organisationId: this.selectedOrganisationId, teamId: this.selectedTeamId, estimationType: estimationType, allTeams: allTeams})
     },
     addEstimationValue() {
       const estimationType = document.getElementById('set-estimation-type').value
       const estimationValue = document.getElementById('add-estimation-value').value
       const allTeams = document.getElementById('add-estimation-value-all-teams').checked
-      this.socket.emit('addEstimationValue', {organisation: this.organisation, teamName: this.estimateTeam.name, estimationType: estimationType, value: estimationValue, allTeams: allTeams})
+      this.socket.emit('addEstimationValue', {organisationId: this.selectedOrganisationId, teamId: this.selectedTeamId, estimationType: estimationType, value: estimationValue, allTeams: allTeams})
     },
     deleteEstimationValue(value) {
       const estimationType = document.getElementById('set-estimation-type').value
-      this.socket.emit('deleteEstimationValue', {organisation: this.organisation, teamName: this.estimateTeam.name, estimationType: estimationType, value: value.name})
+      this.socket.emit('deleteEstimationValue', {organisationId: this.selectedOrganisationId, teamId: this.selectedTeamId, estimationType: estimationType, value: value.name})
     }
   }
 }

@@ -21,8 +21,8 @@ export default {
     organisation() {
       return this.$store.getters.getOrganisation
     },
-    teamName() {
-      return this.$store.getters.getTeamName
+    team() {
+      return this.$store.getters.getTeam
     },
     gameView() {
       return this.$store.getters.getGameView
@@ -30,7 +30,7 @@ export default {
   },
   methods: {
     setGameView(view) {
-      this.socket.emit('setGameView', {organisation: this.organisation, teamName: this.teamName, view: view})
+      this.socket.emit('setGameView', {organisationId: this.organisation.id, teamId: this.team.id, view: view})
     }
   }
 }

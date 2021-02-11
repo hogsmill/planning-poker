@@ -10,27 +10,12 @@ export const store = new Vuex.Store({
     walkThrough: false,
     showTab: 'game',
     host: false,
-    demo: false,
-    myName: {},
-    teamName: '',
-    thisTeam: '',
-    organisation: '',
-    teams: [],
-    teamMembers: [],
-    gameView: 'poker',
-    backlog: [],
+    organisations: [],
+    organisation: {},
+    team: {},
+    member: {},
     time: 0,
     revealed: false,
-    estimationType: '',
-    estimationValues: {},
-    editing: {
-      showTeams: false,
-      showTeamMembers: false,
-      showEstimates: false,
-      showBacklog: false,
-      backlogTeam: {},
-      estimateTeam: ''
-    }
   },
   getters: {
     thisGame: (state) => {
@@ -42,64 +27,63 @@ export const store = new Vuex.Store({
     getHost: (state) => {
       return state.host
     },
-    getDemo: (state) => {
-      return state.demo
-    },
     getShowTab: (state) => {
       return state.showTab
     },
     getGameView: (state) => {
-      return state.thisTeam.gameView
+      return state.team.gameView
     },
-    getMyName: (state) => {
-      return state.myName
-    },
-    getTeamName: (state) => {
-      return state.teamName
+    getOrganisations: (state) => {
+      return state.organisations
     },
     getOrganisation: (state) => {
       return state.organisation
     },
-    getThisTeam: (state) => {
-      return state.thisTeam
+    getTeam: (state) => {
+      return state.team
+    },
+    getMember: (state) => {
+      return state.member
     },
     getTeams: (state) => {
-      return state.teams
+      return state.organisation.teams
     },
     getIncludedTeams: (state) => {
       const teams = []
-      for (let i = 0; i < state.teams.length; i++) {
-        if (state.teams[i].include) {
-          teams.push(state.teams[i])
+      if (state.organisation) {
+        for (let i = 0; i < state.organisation.teams.length; i++) {
+          if (state.organisation.teams[i].include) {
+            teams.push(state.organisation.teams[i])
+          }
         }
       }
       return teams
     },
     getTeamMembers: (state) => {
-      return state.teamMembers
+      return state.team.members
     },
     getSelectedCard: (state) => {
-      const card = state.backlog.find(function(c) {
+      const card = state.team.backlog.find(function(c) {
         return c.selected
       })
       return card ? card : false
     },
     getEstimationType: (state) => {
-      return state.estimationType
+      return state.team.estimationType
     },
     getTime: (state) => {
-      return state.time
+      return state.team.time
     },
     getRevealed: (state) => {
       return state.revealed
     },
     getEstimationTypes: (state) => {
-      return Object.keys(state.estimationValues)
+      return Object.keys(state.team.estimationValues)
     },
     getEstimationValues: (state) => {
       let values
-      if (state.estimationValues && state.estimationType) {
-        values = state.estimationValues[state.estimationType]
+      if (state.team.estimationValues && state.team.estimationType) {
+        values = state.team.estimationValues[state.team.estimationType]
       } else {
         values = []
       }
@@ -109,8 +93,8 @@ export const store = new Vuex.Store({
       return state.connections
     },
     getBacklog: (state) => {
-      let backlog = state.backlog
-      if (state.gameView == 'train') {
+      let backlog = state.team.backlog
+      if (state.team.gameView == 'train') {
         backlog = backlog.sort(function(a, b) {
           const orderA = parseInt(a.order)
           const orderB = parseInt(b.order)
@@ -126,7 +110,7 @@ export const store = new Vuex.Store({
       return backlog
     },
     getVelocity: (state) => {
-      return state.thisTeam.velocity
+      return state.team.velocity
     },
     getShowTeams: (state) => {
       return state.editing.showTeams
@@ -157,40 +141,36 @@ export const store = new Vuex.Store({
     updateShowTab: (state, payload) => {
       state.showTab = payload
     },
-    updateMyName: (state, payload) => {
-      state.myName = payload
-    },
-    updateTeamName: (state, payload) => {
-      state.teamName = payload
-    },
     updateOrganisation: (state, payload) => {
-      state.organisation = payload
+      state.organisation = state.organisations.find(function(o) {
+        return o.id == payload
+      })
+    },
+    updateTeam: (state, payload) => {
+      state.team = state.organisation.teams.find(function(t) {
+        return t.id == payload
+      })
+    },
+    updateMember: (state, payload) => {
+      state.member = state.team.members.find(function(m) {
+        return m.id == payload
+      })
+      console.log(state)
+    },
+    updateOrganisations: (state, payload) => {
+      state.organisations = payload
     },
     loadOrganisation: (state, payload) => {
-      state.organisation = payload.organisation
-      state.demo = payload.demo
-      if (payload.teams) {
-        state.teams = payload.teams
-      }
-      state.estimationValues = payload.estimationValues
+      state.organisation = payload
     },
-    loadTeams: (state, payload) => {
-      state.teams = payload.teams
+    loadTeam: (state, payload) => {
+      state.team = payload.team
     },
     updateEstimationType: (state, payload) => {
       state.estimationType = payload.estimationType
     },
     updateEstimateTeam: (state, payload) => {
       state.editing.estimateTeam = payload.estimateTeam
-    },
-    loadTeam: (state, payload) => {
-      state.demo = payload.demo
-      state.thisTeam = payload.team
-      state.teamMembers = payload.team.members
-      state.gameView = payload.team.gameView
-      state.backlog = payload.team.backlog
-      state.estimationType = payload.team.estimationType
-      state.estimationValues = payload.team.estimationValues
     },
     updateTimer: (state, payload) => {
       state.time = payload.time
@@ -234,14 +214,17 @@ export const store = new Vuex.Store({
     updateShowTab: ({ commit }, payload) => {
       commit('updateShowTab', payload)
     },
-    updateMyName: ({ commit }, payload) => {
-      commit('updateMyName', payload)
+    updateMember: ({ commit }, payload) => {
+      commit('updateMember', payload)
     },
-    updateTeamName: ({ commit }, payload) => {
-      commit('updateTeamName', payload)
+    updateTeam: ({ commit }, payload) => {
+      commit('updateTeam', payload)
     },
     updateOrganisation: ({ commit }, payload) => {
       commit('updateOrganisation', payload)
+    },
+    updateOrganisations: ({ commit }, payload) => {
+      commit('updateOrganisations', payload)
     },
     loadOrganisation: ({ commit }, payload) => {
       commit('loadOrganisation', payload)

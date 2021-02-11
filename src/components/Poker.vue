@@ -13,7 +13,7 @@
         </p>
       </div>
       <div class="final-estimate">
-        <Timer v-if="thisTeam.useDiscussionTimer || thisTeam.useEstimationTimer" :socket="socket" />
+        <Timer v-if="team.useDiscussionTimer || team.useEstimationTimer" :socket="socket" />
         <div class="agreed-estimate">
           <span>Agreed Estimate: </span>
           <select id="agreed-estimate-value">
@@ -40,15 +40,16 @@
         </div>
       </div>
       <div class="members">
-        <div v-for="(teamMember, index) in teamMembers" :key="index" class="member rounded" :class="{ highest: isHighest(teamMember), lowest: isLowest(teamMember) }">
+        <div v-for="(teamMember, index) in teamMembers" :key="index" class="member rounded"
+             :class="{ 'median': isMedian(teamMember), 'highest': isHighest(teamMember), 'lowest': isLowest(teamMember) }">
           <div><b>{{ teamMember.name }}</b></div>
-          <div v-if="teamMember.uid == myName.uid || revealed" class="poker-card rounded">
+          <div v-if="teamMember.id == member.id || revealed" class="poker-card rounded">
             <div class="options">
-              <i class="coffee fas fa-mug-hot" @click="coffee(teamMember)" />
-              <i class="question far fa-question-circle" @click="question(teamMember)" />
+              <i v-if="teamMember.id == member.id" class="coffee fas fa-mug-hot rounded" :class="{ 'selected' : memberStatus(teamMember) == 'coffee' }" @click="coffee(teamMember)" />
+              <i v-if="teamMember.id == member.id" class="question far fa-question-circle rounded" :class="{ 'selected' : memberStatus(teamMember) == 'question' }" @click="question(teamMember)" />
             </div>
             <div v-if="estimating" class="poker-card-value">
-              <select class="estimate-dropdown" :id="'estimate-value-' + myName.uid" @change="saveEstimate()">
+              <select v-if="teamMember.id == member.id" class="estimate-dropdown" :id="'estimate-value-' + member.id" @change="saveEstimate()">
                 <option value="" />
                 <option v-for="(value, ind) in estimationValues" :key="ind" :value="value.name">
                   {{ value.name }}
@@ -61,7 +62,7 @@
               <span v-if="!teamMember.estimate" class="tbd">TBD</span>
             </div>
           </div>
-          <div v-if="teamMember.uid != myName.uid && !revealed" class="poker-card back rounded">
+          <div v-if="teamMember.id != member.id && !revealed" class="poker-card back rounded">
             <div v-if="memberStatus(teamMember) == 'coffee'" class="poker-card-voted rounded-circle">
               <i class="coffee-status fas fa-mug-hot" />
             </div>
@@ -74,7 +75,6 @@
             <div v-if="memberStatus(teamMember) == 'not-voted'" class="poker-card-voted rounded-circle not-voted">
               <i class="fas fa-times-circle" />
             </div>
-            -->
           </div>
         </div>
       </div>
@@ -98,17 +98,14 @@ export default {
     }
   },
   computed: {
-    myName() {
-      return this.$store.getters.getMyName
-    },
-    teamName() {
-      return this.$store.getters.getTeamName
-    },
-    thisTeam() {
-      return this.$store.getters.getThisTeam
-    },
     organisation() {
       return this.$store.getters.getOrganisation
+    },
+    team() {
+      return this.$store.getters.getTeam
+    },
+    member() {
+      return this.$store.getters.getMember
     },
     selectedCard() {
       return this.$store.getters.getSelectedCard
@@ -125,40 +122,21 @@ export default {
   },
   methods: {
     logo() {
-      if (this.thisTeam && this.thisTeam.logo) {
-        return 'url("../planning-poker/icons/' + this.thisTeam.logo + '")'
+      if (this.team.id && this.team.logo) {
+        return 'url("../planning-poker/icons/' + this.team.logo + '")'
       }
     },
     icon(estimate) {
       return 'url("../planning-poker/icons/' + estimate.icon + '")'
     },
     isHighest(member) {
-      let highest = null
-      if (this.revealed && member.voted) {
-        for (let i = 0; i < this.thisTeam.members.length; i++) {
-          const mem = this.thisTeam.members[i]
-          if (mem.voted) {
-            if (!highest || mem.estimate.order >= highest.order) {
-              highest = mem.estimate
-            }
-          }
-        }
-      }
-      return highest && member.estimate.order == highest.order
+      return member.voted && member.estimate.name == this.team.highest
     },
     isLowest(member) {
-      let lowest = null
-      if (this.revealed && member.voted) {
-        for (let i = 0; i < this.thisTeam.members.length; i++) {
-          const mem = this.thisTeam.members[i]
-          if (mem.voted) {
-            if (!lowest || mem.estimate.order <= lowest.order) {
-              lowest = mem.estimate
-            }
-          }
-        }
-      }
-      return lowest && member.estimate.order == lowest.order
+      return  member.voted && member.estimate.name == this.team.lowest
+    },
+    isMedian(member) {
+      return  member.voted && member.estimate.name == this.team.median
     },
     memberStatus(member) {
       let status = ''
@@ -177,65 +155,37 @@ export default {
       this.estimating = true
     },
     coffee(member) {
-      this.socket.emit('memberCoffee', {organisation: this.organisation, teamName: this.teamName, teamMember: this.myName, coffee: true})
+      this.socket.emit('memberCoffee', {organisationId: this.organisation.id, teamId: this.team.id, memberId: this.member.id, coffee: true})
     },
     question(member) {
-      this.socket.emit('memberQuestion', {organisation: this.organisation, teamName: this.teamName, teamMember: this.myName, question: true})
+      this.socket.emit('memberQuestion', {organisationId: this.organisation.id, teamId: this.team.id, memberId: this.member.id, question: true})
     },
     lowest() {
-      let lowest = null
-      for (let i = 0; i < this.thisTeam.members.length; i++) {
-        const mem = this.thisTeam.members[i]
-        if (mem.voted) {
-          if (!lowest || mem.estimate.order <= lowest.order) {
-            lowest = mem.estimate
-          }
-        }
-      }
-      return lowest ? lowest.name : ''
+      return this.team.lowest
     },
     highest() {
-      let highest = null
-      for (let i = 0; i < this.thisTeam.members.length; i++) {
-        const mem = this.thisTeam.members[i]
-        if (mem.voted) {
-          if (!highest || mem.estimate.order >= highest.order) {
-            highest = mem.estimate
-          }
-        }
-      }
-      return highest ? highest.name : ''
+      return this.team.highest
     },
     median() {
-      let voted = []
-      for (let i = 0; i < this.thisTeam.members.length; i++) {
-        if (this.thisTeam.members[i].voted) {
-          voted.push(this.thisTeam.members[i].estimate)
-        }
-      }
-      voted = voted.sort(function(a, b) {
-        return a.order - b.order
-      })
-      const l = parseInt(voted.length / 2)
-      return voted[l].name
+      return this.team.median
     },
     saveEstimate() {
-      const estValue = document.getElementById('estimate-value-' + this.myName.uid).value
+      const estValue = document.getElementById('estimate-value-' + this.member.id).value
       const estimationValue = this.estimationValues.find(function(e) {
         return e.name == estValue
       })
-      this.socket.emit('updateEstimateValue', {organisation: this.organisation, teamName: this.teamName, teamMember: this.myName, value: estimationValue})
+      this.socket.emit('updateEstimateValue', {organisationId: this.organisation.id, teamId: this.team.id, memberId: this.member.id, value: estimationValue})
       this.estimating = false
     },
     reveal(value) {
-      this.socket.emit('reveal', {organisation: this.organisation, teamName: this.teamName, reveal: value})
+      this.socket.emit('reveal', {organisationId: this.organisation.id, teamId: this.team.id, reveal: value})
     },
     saveAgreedEstimate() {
       const estValue = document.getElementById('agreed-estimate-value').value
       const estimationValue = this.estimationValues.find(function(e) {
         return e.name == estValue
       })
-      this.socket.emit('updateAgreedEstimate', {organisation: this.organisation, teamName: this.teamName, selectedCard: this.selectedCard, value: estimationValue})
+      this.socket.emit('updateAgreedEstimate', {organisationId: this.organisation.id, teamId: this.team.id, selectedCard: this.selectedCard, value: estimationValue})
     }
   }
 }
@@ -314,6 +264,10 @@ export default {
         background-color: green;
       }
 
+      &.median {
+        background-color: orange;
+      }
+
       select {
         font-size: 20px;
       }
@@ -331,11 +285,23 @@ export default {
           position: absolute;
           left: 3px;
           top: 3px;
+          padding: 3px;
+
+          &.selected {
+            color: #fff;
+            background-color: green;
+          }
         }
         .question {
           position: absolute;
           right: 3px;
           top: 3px;
+          padding: 3px;
+
+          &.selected {
+            color: #fff;
+            background-color: green;
+          }
         }
 
         .options {

@@ -8,10 +8,23 @@
       </td>
     </tr>
     <tr v-if="showTeams">
+      <td>
+        Organisation
+      </td>
+      <td>
+        <select id="organisation-select" @change="setSelectedOrganisationId()">
+          <option> -- Select -- </option>
+          <option v-for="(org, oindex) in organisations" :key="oindex" :value="org.id" :selected="org.id == selectedOrganisationId">
+            {{ org.name }}
+          </option>
+        </select>
+      </td>
+    </tr>
+    <tr v-if="showTeams">
       <td>Add Team</td>
       <td>
-        <input type="text" id="add-team-name">
-        <button class="btn btn-sm btn-secondary smaller-font" @click="addTeam()">
+        <input type="text" id="new-team">
+        <button class="btn btn-sm btn-secondary smaller-font" @click="addTeam()" :disabled="!selectedOrganisationId || selectedOrganisationProtected">
           Add
         </button>
       </td>
@@ -106,10 +119,10 @@
                 <option value="600">
                   10:00
                 </option>
-            </select>
+              </select>
             </td>
             <td>
-              <button class="btn btn-sm btn-secondary smaller-font" @click="deleteTeam(team)">
+              <button class="btn btn-sm btn-secondary smaller-font" @click="deleteTeam(team)" :disabled="team.protected">
                 Delete
               </button>
             </td>
@@ -125,58 +138,80 @@ export default {
   props: [
     'socket'
   ],
-  computed: {
-    showTeams() {
-      return this.$store.getters.getShowTeams
-    },
-    teams() {
-      return this.$store.getters.getTeams
-    },
-    organisation() {
-      return this.$store.getters.getOrganisation
+  data() {
+    return {
+      showTeams: false,
+      selectedOrganisationId: null,
+      selectedOrganisationProtected: false,
+      teams: []
     }
+  },
+  computed: {
+    organisations() {
+      return this.$store.getters.getOrganisations
+    }
+  },
+  created() {
+    this.socket.on('loadOrganisations', (data) => {
+      if (this.showTeams) {
+        this.setSelectedOrganisationId()
+      }
+    })
+    this.socket.on('openEditPane', (data) => {
+      if (data != 'showTeams') {
+        this.showTeams = false
+      }
+    })
   },
   methods: {
     setShowTeams(val) {
-      this.$store.dispatch('setShowTeams', val)
+      this.showTeams = val
+      if (val) {
+        this.socket.emit('openEditPane', 'showTeams')
+      }
+    },
+    setSelectedOrganisationId() {
+      const orgId = document.getElementById('organisation-select').value
+      this.selectedOrganisationId = orgId
+      const organisation = this.organisations.find(function(o) {
+        return o.id == orgId
+      })
+      this.teams = organisation ? organisation.teams : []
+      this.selectedOrganisationProtected = organisation ? organisation.protected : false
     },
     sanitized(str) {
       return str.replace(/ /g, '').toLowerCase()
     },
     addTeam() {
-      const teamName = document.getElementById('add-team-name').value
-      this.socket.emit('addTeam', {organisation: this.organisation, teamName: teamName})
+      const team = document.getElementById('new-team').value
+      this.socket.emit('addTeam', {organisationId: this.selectedOrganisationId, name: team})
     },
     deleteTeam(team) {
-      this.socket.emit('deleteTeam', {organisation: this.organisation, teamName: team.name})
+      this.socket.emit('deleteTeam', {organisationId: this.selectedOrganisationId, id: team.id})
     },
     includeTeam(team) {
-      const include = !team.include
-      this.socket.emit('includeTeam', {organisation: this.organisation, teamName: team.name, include: include})
+      this.socket.emit('includeTeam', {organisationId: this.selectedOrganisationId, id: team.id})
     },
     toggleDiscussionTimer(team) {
-      const useTimer = !team.useDiscussionTimer
-      this.socket.emit('setUseDiscussionTimer', {organisation: this.organisation, teamName: team.name, useDiscussionTimer: useTimer})
+      this.socket.emit('setUseDiscussionTimer', {organisationId: this.selectedOrganisationId, id: team.id})
     },
     toggleEstimationTimer(team) {
-      const useTimer = !team.useEstimationTimer
-      this.socket.emit('setUseEstimationTimer', {organisation: this.organisation, teamName: team.name, useEstimationTimer: useTimer})
+      this.socket.emit('setUseEstimationTimer', {organisationId: this.selectedOrganisationId, id: team.id})
     },
     toggleTimerAutoReveal(team) {
-      const timerAutoReveal = !team.timerAutoReveal
-      this.socket.emit('setTimerAutoReveal', {organisation: this.organisation, teamName: team.name, timerAutoReveal: timerAutoReveal})
+      this.socket.emit('setTimerAutoReveal', {organisationId: this.selectedOrganisationId, id: team.id})
     },
     setVelocity(team) {
       const velocity = document.getElementById('velocity-' + this.sanitized(team.name)).value
-      this.socket.emit('setVelocity', {organisation: this.organisation, teamName: team.name, velocity: velocity})
+      this.socket.emit('setVelocity', {organisationId: this.selectedOrganisationId, id: team.id, value: velocity})
     },
     setEstimationTimerTime(team) {
       const timerTime = document.getElementById('estimation-timer-time-' + this.sanitized(team.name)).value
-      this.socket.emit('setEstimationTimerTime', {organisation: this.organisation, teamName: team.name, estimationTimerTime: timerTime})
+      this.socket.emit('setEstimationTimerTime', {organisationId: this.selectedOrganisationId, id: team.id, value: timerTime})
     },
     setDiscussionTimerTime(team) {
       const timerTime = document.getElementById('discussion-timer-time-' + this.sanitized(team.name)).value
-      this.socket.emit('setDiscussionTimerTime', {organisation: this.organisation, teamName: team.name, discussionTimerTime: timerTime})
+      this.socket.emit('setDiscussionTimerTime', {organisationId: this.selectedOrganisationId, id: team.id, value: timerTime})
     }
   }
 }

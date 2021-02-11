@@ -1,11 +1,13 @@
 
 const papa = require('papaparse')
+const { v4: uuidv4 } = require('uuid')
 
-function createBacklog(data, organisation, teamName, replace, socket) {
+function createBacklog(data, organisationId, teamId, replace, socket) {
   const backlog = []
   for (let i = 0; i < data.length; i++) {
     const card = {
-      id: data[i][0],
+      id: uuidv4(),
+      cardId: data[i][0],
       title: data[i][1],
       description: data[i][2],
       estimate: data[i][3] ? data[i][3] : '',
@@ -13,12 +15,12 @@ function createBacklog(data, organisation, teamName, replace, socket) {
     }
     backlog.push(card)
   }
-  socket.emit('loadBacklog', {organisation: organisation, teamName: teamName, backlog: backlog, replace: replace})
+  socket.emit('loadBacklog', {organisationId: organisationId, teamId: teamId, backlog: backlog, replace: replace})
 }
 
 const FileFuns = {
 
-  loadBacklog: function(file, separator, organisation, teamName, replace, socket) {
+  loadBacklog: function(file, separator, organisationId, teamId, replace, socket) {
 
     switch(separator) {
       case 'tab':
@@ -41,7 +43,7 @@ const FileFuns = {
       delimiter: separator,
       skipEmptyLines: true,
 	    complete: function(results) {
-		    createBacklog(results.data, organisation, teamName, replace, socket)
+		    createBacklog(results.data, organisationId, teamId, replace, socket)
 	    }
     })
   }

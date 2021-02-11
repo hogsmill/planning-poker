@@ -2,7 +2,15 @@
   <div id="app" class="mb-4">
     <Header />
     <WalkThroughView />
-    <h1>Planning Poker<span v-if="organisation">: {{ organisation }}</span> <span v-if="demo">(Demo)</span></h1>
+    <h1>
+      Planning Poker
+    </h1>
+    <h2>
+      <span v-if="organisation.id">({{ organisation.name }}</span>
+      <span v-if="team.id">, {{ team.name }}</span>
+      <span v-if="member.id">, {{ member.name }}</span>
+      <span v-if="organisation.id">)</span>
+    </h2>
     <div v-if="showTab == 'about'">
       <AboutView />
     </div>
@@ -11,13 +19,11 @@
     </div>
     <div v-if="showTab == 'game'">
       <div class="game-params">
-        <Organisation :socket="socket" />
-        <TeamName v-if="organisation" :socket="socket" />
-        <MyName v-if="organisation && teamName" :socket="socket" />
-        <GameView v-if="organisation && teamName && myName" :socket="socket" />
+        <SetGame :socket="socket" />
+        <GameView v-if="organisation.id && team.id && member.id" :socket="socket" />
       </div>
-      <div v-if="organisation && gameView == 'poker'" class="container">
-        <div v-if="teamName">
+      <div v-if="organisation.id && gameView == 'poker'" class="container">
+        <div v-if="team.name">
           <table class="poker-table" border>
             <tr>
               <td class="backlog">
@@ -46,9 +52,7 @@ import Header from './components/Header.vue'
 import WalkThroughView from './components/about/WalkThroughView.vue'
 import AboutView from './components/about/AboutView.vue'
 import FacilitatorView from './components/FacilitatorView.vue'
-import Organisation from './components/Organisation.vue'
-import MyName from './components/MyName.vue'
-import TeamName from './components/TeamName.vue'
+import SetGame from './components/SetGame.vue'
 import GameView from './components/GameView.vue'
 import Backlog from './components/Backlog.vue'
 import Poker from './components/Poker.vue'
@@ -61,9 +65,7 @@ export default {
     WalkThroughView,
     AboutView,
     FacilitatorView,
-    Organisation,
-    MyName,
-    TeamName,
+    SetGame,
     GameView,
     Backlog,
     Poker,
@@ -72,9 +74,6 @@ export default {
   computed: {
     isHost() {
       return this.$store.getters.getHost
-    },
-    demo() {
-      return this.$store.getters.getDemo
     },
     walkThrough() {
       return this.$store.getters.getWalkThrough
@@ -85,11 +84,11 @@ export default {
     organisation() {
       return this.$store.getters.getOrganisation
     },
-    teamName() {
-      return this.$store.getters.getTeamName
+    team() {
+      return this.$store.getters.getTeam
     },
-    myName() {
-      return this.$store.getters.getMyName
+    member() {
+      return this.$store.getters.getMember
     },
     gameView() {
       return this.$store.getters.getGameView
@@ -108,84 +107,69 @@ export default {
       this.$store.dispatch('updateHost', true)
     }
 
-    const org = localStorage.getItem('organisation-pp')
-    if (org) {
-      this.$store.dispatch('updateOrganisation', org)
-      this.socket.emit('setOrganisation', {organisation: org})
-    }
+    this.socket.emit('checkSystemWorkshops')
 
-    const teamName = localStorage.getItem('teamName-pp')
-    if (org && teamName) {
-      this.$store.dispatch('updateTeamName', teamName)
-      this.socket.emit('loadTeam', {organisation: org, teamName: teamName})
-    }
+    this.socket.on('loadOrganisations', (data) => {
+      this.$store.dispatch('updateOrganisations', data)
 
-    let myName = localStorage.getItem('myName-pp')
-    if (myName) {
-      myName = JSON.parse(myName)
-      this.$store.dispatch('updateMyName', myName)
-    }
+      const orgId = localStorage.getItem('organisation-pp')
+      if (orgId) {
+        this.$store.dispatch('updateOrganisation', orgId)
+        this.socket.emit('setOrganisation', {organisationId: orgId})
+      }
+
+      const teamId = localStorage.getItem('team-pp')
+      if (orgId && teamId) {
+        this.$store.dispatch('updateTeam', teamId)
+        this.socket.emit('loadTeam', {organisationId: orgId, teamId: teamId})
+      }
+
+      const memberId = localStorage.getItem('member-pp')
+      if (memberId) {
+        this.$store.dispatch('updateMember', memberId)
+      }
+    })
 
     this.socket.on('loadTeam', (data) => {
-      if (this.teamName == data.teamName && this.organisation == data.organisation) {
+      if (this.team.id == data.teamId && this.organisation.id == data.organisationId) {
+      console.log(data)
         this.$store.dispatch('loadTeam', data)
       }
     })
 
     this.socket.on('loadOrganisation', (data) => {
-      if (this.organisation == data.organisation) {
+      if (this.organisation.id == data.organisationId) {
         this.$store.dispatch('loadOrganisation', data)
       }
     })
 
     this.socket.on('loadTeams', (data) => {
-      if (this.organisation == data.organisation) {
+      if (this.organisation.id == data.organisationId) {
         this.$store.dispatch('loadTeams', data)
       }
     })
 
     this.socket.on('updateEstimationType', (data) => {
-      if (this.teamName == data.teamName && this.organisation == data.organisation) {
+      if (this.team.id == data.teamId && this.organisation.id == data.organisationId) {
         this.$store.dispatch('updateEstimationType', data)
       }
     })
 
     this.socket.on('updateEstimateTeam', (data) => {
-      if (this.organisation == data.organisation) {
+      if (this.organisation.id == data.organisationId) {
         this.$store.dispatch('updateEstimateTeam', data)
       }
     })
 
     this.socket.on('updateTimer', (data) => {
-      if (this.teamName == data.teamName && this.organisation == data.organisation) {
+      if (this.team.id == data.teamId && this.organisation.id == data.organisationId) {
         this.$store.dispatch('updateTimer', data)
       }
     })
 
     this.socket.on('reveal', (data) => {
-      if (this.teamName == data.teamName && this.organisation == data.organisation) {
+      if (this.team.id == data.teamId && this.organisation.id == data.organisationId) {
         this.$store.dispatch('reveal', data)
-      }
-    })
-
-    this.socket.on('backlogLoaded', (data) => {
-      if (this.organisation == data.organisation) {
-        alert('Backlog for ' + data.teamName + ' loaded. Backlog now has ' + data.backlogLength + ' items')
-        document.getElementById('backlog-file').value = ''
-      }
-    })
-
-    this.socket.on('backlogSaved', (data) => {
-      if (this.organisation == data.organisation) {
-        if (data.status) {
-          alert('File Saved')
-        } else if (data.errType == 'fileExists') {
-          if (confirm('File exists, overwrite?')) {
-            this.socket.emit('saveBacklog', {organisation: data.organisation, teamName: data.teamName, file: data.file, overwrite: true, separator: data.separator})
-          }
-        } else {
-          alert('Error saving file: ' +  data.err)
-        }
       }
     })
 

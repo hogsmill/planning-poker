@@ -7,12 +7,43 @@
         <i v-if="!showBacklog" @click="setShowBacklog(true)" title="expand" class="fas fa-caret-down toggle" />
       </td>
     </tr>
-    <Team v-if="showBacklog" />
     <tr v-if="showBacklog">
-      <td>Relative sizing?</td>
-      <td><input id="relative-sizing" type="checkbox" :disabled="!backlogTeam.name" :checked="backlogTeam.relativeSizing" @change="toggleRelativeSizing()"></td>
+      <td>
+        Organisation
+      </td>
+      <td>
+        <select id="organisation-select" @change="setSelectedOrganisationId(true)">
+          <option> -- Select -- </option>
+          <option v-for="(org, oindex) in organisations" :key="oindex" :value="org.id" :selected="org.id == selectedOrganisationId">
+            {{ org.name }}
+          </option>
+        </select>
+      </td>
     </tr>
     <tr v-if="showBacklog">
+      <td>
+        Team
+      </td>
+      <td>
+        <select id="team-select" @change="setSelectedTeamId()">
+          <option value="">
+            -- Select --
+          </option>
+          <option v-for="(team, tindex) in teams" :key="tindex" :value="team.id" :selected="team.id == selectedTeamId">
+            {{ team.name }}
+          </option>
+        </select>
+      </td>
+    </tr>
+    <tr v-if="showBacklog && selectedTeamId">
+      <td>
+        Relative sizing?
+      </td>
+      <td>
+        <input id="relative-sizing" type="checkbox" :checked="selectedTeam.relativeSizing" @change="toggleRelativeSizing()">
+      </td>
+    </tr>
+    <tr v-if="showBacklog && selectedTeamId">
       <td>
         Load from file<br>
         <i>(Must be CSV, with columns Id, Title, <br>Description, [Estimate])</i> - estimate optional
@@ -21,23 +52,30 @@
         <table class="inner-table">
           <Delimiter :scope="'load'" />
           <tr>
-            <td colspan>
-              <input id="backlog-file-replace" type="checkbox">
-            </td>
             <td>
+              <input id="backlog-file-replace" type="checkbox">
               Replace existing backlog?
             </td>
           </tr>
           <tr>
             <td>
-              <input id="backlog-file" type="file" :disabled="!backlogTeam.name" @change="loadBacklog()">
+              <input id="backlog-file" type="file">
+            </td>
+          </tr>
+          <tr>
+            <td>
+              <button class="btn btn-sm btn-secondary smaller-font" @click="loadBacklog()">
+                Load
+              </button>
             </td>
           </tr>
         </table>
       </td>
     </tr>
-    <tr v-if="showBacklog">
-      <td>Add item</td>
+    <tr v-if="showBacklog && selectedTeamId">
+      <td>
+        Add item
+      </td>
       <td>
         <table class="inner-table">
           <tr>
@@ -54,7 +92,7 @@
           </tr>
           <tr>
             <td colspan="2">
-              <button class="btn btn-sm btn-secondary smaller-font" :disabled="!backlogTeam.name" @click="addCard()">
+              <button class="btn btn-sm btn-secondary smaller-font" @click="addCard()">
                 Add Card
               </button>
             </td>
@@ -62,13 +100,26 @@
         </table>
       </td>
     </tr>
-    <tr v-if="showBacklog">
-      <td>Delete item</td>
+    <tr v-if="showBacklog && selectedTeamId">
       <td>
-        <TeamBacklog :socket="socket" />
+        Delete item
+      </td>
+      <td>
+        <table>
+          <tr v-for="(card, cindex) in selectedTeam.backlog" :key="cindex">
+            <td>
+              {{ card.cardId }}: {{ card.title }}
+            </td>
+            <td>
+              <button class="btn btn-sm btn-secondary smaller-font" @click="deleteCard(card)">
+                Delete Card
+              </button>
+            </td>
+          </tr>
+        </table>
       </td>
     </tr>
-    <tr v-if="showBacklog">
+    <tr v-if="showBacklog && selectedTeamId">
       <td>
         Save backlog to file
       </td>
@@ -82,7 +133,7 @@
           </tr>
           <tr>
             <td>
-              <button class="btn btn-sm btn-secondary smaller-font" :disabled="!backlogTeam.name" @click="saveBacklog()">
+              <button class="btn btn-sm btn-secondary smaller-font" @click="saveBacklog()">
                 Save
               </button>
             </td>
@@ -97,61 +148,122 @@
 import fileFuns from '../../lib/file.js'
 
 import Delimiter from './backlog/Delimiter.vue'
-import Team from './backlog/Team.vue'
-import TeamBacklog from './backlog/TeamBacklog.vue'
 
 export default {
   components: {
-    Team,
-    TeamBacklog,
     Delimiter
   },
   props: [
     'socket'
   ],
-  computed: {
-    showBacklog() {
-      return this.$store.getters.getShowBacklog
-    },
-    backlogTeam() {
-      return this.$store.getters.getBacklogTeam
-    },
-    teams() {
-      return this.$store.getters.getTeams
-    },
-    organisation() {
-      return this.$store.getters.getOrganisation
+  data() {
+    return {
+      showBacklog: false,
+      selectedOrganisationId: null,
+      teams: [],
+      selectedTeamId: null,
+      selectedTeam: {}
     }
+  },
+  computed: {
+    organisations() {
+      return this.$store.getters.getOrganisations
+    }
+  },
+  created() {
+    this.socket.on('loadOrganisations', (data) => {
+      if (this.showBacklog) {
+        this.setSelectedOrganisationId(false)
+        this.setSelectedTeamId()
+      }
+    })
+    this.socket.on('openEditPane', (data) => {
+      if (data != 'showBacklog') {
+        this.showBacklog = false
+      }
+    })
+    this.socket.on('backlogLoaded', (data) => {
+      if (this.selectedOrganisationId == data.organisationId) {
+        alert('Backlog for ' + data.teamName + ' loaded. Backlog now has ' + data.backlogLength + ' items')
+        document.getElementById('backlog-file').value = ''
+      }
+    })
+    this.socket.on('backlogSaved', (data) => {
+      if (this.selectedOrganisationId == data.organisationId) {
+        if (data.status) {
+          alert('File Saved')
+        } else if (data.errType == 'fileExists') {
+          if (confirm('File exists, overwrite?')) {
+            this.socket.emit('saveBacklog', {organisationId: data.organisationId, teamId: data.teamId, file: data.file, overwrite: true, separator: data.separator})
+          }
+        } else {
+          alert('Error saving file: ' +  data.err)
+        }
+      }
+    })
+
   },
   methods: {
     setShowBacklog(val) {
-      this.$store.dispatch('setShowBacklog', val)
+      this.showBacklog = val
+      if (val) {
+        this.socket.emit('openEditPane', 'showBacklog')
+      }
+    },
+    setSelectedOrganisationId(clear) {
+      if (clear) {
+        this.selectedTeamId = null
+        this.selectedTeam = {}
+      }
+      const orgId = document.getElementById('organisation-select').value
+      this.selectedOrganisationId = orgId
+      const organisation = this.organisations.find(function(o) {
+        return o.id == orgId
+      })
+      this.teams = organisation ? organisation.teams : []
+    },
+    setSelectedTeamId() {
+      const teamId = document.getElementById('team-select').value
+      this.selectedTeamId = teamId
+      const selectedTeam = this.teams.find(function(t) {
+        return t.id == teamId
+      })
+      this.selectedTeam = selectedTeam ? selectedTeam : {}
     },
     toggleRelativeSizing() {
       const sizing = document.getElementById('relative-sizing').checked
-      this.socket.emit('setRelativeSizing', {organisation: this.organisation, teamName: this.backlogTeam.name, relativeSizing: sizing})
+      this.socket.emit('setRelativeSizing', {organisationId: this.selectedOrganisationId, teamId: this.selectedTeamId, relativeSizing: sizing})
     },
     loadBacklog() {
       const file = document.getElementById('backlog-file').files[0]
       const separator = document.getElementById('backlog-load-file-separator').value
       const replace = document.getElementById('backlog-file-replace').checked
-      fileFuns.loadBacklog(file, separator, this.organisation, this.backlogTeam.name, replace, this.socket)
+      fileFuns.loadBacklog(file, separator, this.selectedOrganisationId, this.selectedTeamId, replace, this.socket)
     },
     addCard() {
       const card = {
-        id: document.getElementById('card-id').value,
-        selected: false,
-        estimate: 0,
+        cardId: document.getElementById('card-id').value,
         title: document.getElementById('card-title').value,
         description: document.getElementById('card-description').value
       }
-      this.socket.emit('addBacklogCard', {organisation: this.organisation, teamName: this.backlogTeam.name, card: card})
+      this.socket.emit('addBacklogCard', {organisationId: this.selectedOrganisationId, teamId: this.selectedTeamId, card: card})
+    },
+    deleteCard(card) {
+      if (confirm('Delete card ' + card.cardId + ': ' + card.title)) {
+        this.socket.emit('deleteBacklogCard', {organisationId: this.selectedOrganisationId, teamId: this.selectedTeamId, id: card.id})
+      }
     },
     saveBacklog() {
       const saveFile = document.getElementById('backlog-save-file').value
       const separator = document.getElementById('backlog-save-file-separator').value
-      this.socket.emit('saveBacklog', {organisation: this.organisation, teamName: this.backlogTeam.name, file: saveFile, separator: separator})
+      this.socket.emit('saveBacklog', {organisationId: this.selectedOrganisationId, teamId: this.selectedTeamId, file: saveFile, separator: separator})
     }
   }
 }
 </script>
+
+<style lang="scss">
+  input[type=file] {
+    width: 200px;
+  }
+</style>

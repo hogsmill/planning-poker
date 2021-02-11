@@ -1,11 +1,11 @@
 <template>
   <div>
     <h4>Backlog <br>({{ items(backlog.length) }})</h4>
-    <p v-if="thisTeam.relativeSizing">
+    <p v-if="team.relativeSizing">
       Orderd by estimate (<i>largest at the top</i>)
     </p>
-    <div v-if="thisTeam.relativeSizing">
-      <div v-for="card in backlog" :key="card.id" class="rounded backlog-item" :class="{ 'not-estimated': !card.estimate }" @click="selectCard(card.uid)">
+    <div v-if="team.relativeSizing">
+      <div v-for="card in backlog" :key="card.id" class="rounded backlog-item" :class="{ 'not-estimated': !card.estimate }" @click="selectCard(card.id)">
         <table>
           <tr class="backlog-item-header">
             <td class="backlog-rank">
@@ -23,10 +23,10 @@
           </tr>
           <tr>
             <td class="backlog-rank">
-              {{ card.rank ? card.rank : card.id }}
+              {{ card.rank }}
             </td>
-            <td class="backlog-id" :value="card.id">
-              {{ card.id }}
+            <td class="backlog-id">
+              {{ card.cardId }}
             </td>
             <td class="backlog-title">
               {{ card.title }}
@@ -39,8 +39,8 @@
         </table>
       </div>
     </div>
-    <div v-if="!thisTeam.relativeSizing">
-      <div v-for="(card, index) in backlog" :key="index" class="rounded backlog-item" :class="{ 'not-estimated': !card.estimate }" @click="selectCard(card.uid)">
+    <div v-if="!team.relativeSizing">
+      <div v-for="(card, index) in backlog" :key="index" class="rounded backlog-item" :class="{ 'not-estimated': !card.estimate }" @click="selectCard(card.id)">
         <table>
           <tr>
             <td class="backlog-id">
@@ -70,11 +70,8 @@ export default {
     organisation() {
       return this.$store.getters.getOrganisation
     },
-    teamName() {
-      return this.$store.getters.getTeamName
-    },
-    thisTeam() {
-      return this.$store.getters.getThisTeam
+    team() {
+      return this.$store.getters.getTeam
     },
     backlog() {
       return this.$store.getters.getBacklog
@@ -87,8 +84,8 @@ export default {
     icon(estimate) {
       return 'url("../planning-poker/icons/' + estimate.icon + '")'
     },
-    selectCard(uid) {
-      this.socket.emit('selectCard', {organisation: this.organisation, teamName: this.teamName, uid: uid})
+    selectCard(id) {
+      this.socket.emit('selectCard', {organisationId: this.organisation.id, teamId: this.team.id, id: id})
     }
   }
 }

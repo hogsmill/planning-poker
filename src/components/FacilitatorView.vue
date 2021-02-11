@@ -3,6 +3,7 @@
     <div class="connections">
       Current server connections: {{ connections.connections }} / {{ connections.maxConnections }}
     </div>
+    <Organisation :socket="socket" />
     <Teams :socket="socket" />
     <TeamMembers :socket="socket" />
     <Estimates :socket="socket" />
@@ -11,6 +12,7 @@
 </template>
 
 <script>
+import Organisation from './facilitator/Organisation.vue'
 import Teams from './facilitator/Teams.vue'
 import TeamMembers from './facilitator/TeamMembers.vue'
 import Estimates from './facilitator/Estimates.vue'
@@ -18,6 +20,7 @@ import Backlog from './facilitator/Backlog.vue'
 
 export default {
   components: {
+    Organisation,
     Teams,
     TeamMembers,
     Estimates,
@@ -93,7 +96,15 @@ export default {
         }
       }
     }
+    .fas {
+      color: #888;
+      font-size: x-large;
 
+      &.enabled:hover {
+        cursor: pointer;
+        color: #5a6268
+      }
+    }
     input[type=text] {
       min-width: 120px;
       height: 24px;

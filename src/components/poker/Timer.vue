@@ -13,10 +13,10 @@
             <i v-if="time > 0" class="fas fa-stop-circle" @click="stopTimer()" />
           </td>
         </tr>
-        <tr v-if="thisTeam.useEstimationTimer && thisTeam.useDiscussionTimer">
+        <tr v-if="team.useEstimationTimer && team.useDiscussionTimer">
           <td>
-            <input type="radio" name="timerType" :checked="thisTeam.timerType == 'estimation'" @click="setTimerType('estimation')"> Estimation
-            <input type="radio" name="timerType" :checked="thisTeam.timerType == 'discussion'" @click="setTimerType('discussion')"> Discussion
+            <input type="radio" name="timerType" :checked="team.timerType == 'estimation'" @click="setTimerType('estimation')"> Estimation
+            <input type="radio" name="timerType" :checked="team.timerType == 'discussion'" @click="setTimerType('discussion')"> Discussion
           </td>
         </tr>
       </table>
@@ -33,8 +33,8 @@ export default {
     organisation() {
       return this.$store.getters.getOrganisation
     },
-    thisTeam() {
-      return this.$store.getters.getThisTeam
+    team() {
+      return this.$store.getters.getTeam
     },
     time() {
       return this.$store.getters.getTime
@@ -44,7 +44,7 @@ export default {
     displayTimer() {
       let t = this.time
       if (!t) {
-        t = this.thisTeam.timerType == 'estimation' ? this.thisTeam.estimationTimerTime : this.thisTeam.discussionTimerTime
+        t = this.team.timerType == 'estimation' ? this.team.estimationTimerTime : this.team.discussionTimerTime
       }
       let m = parseInt(t / 60)
       let s = t - (m * 60)
@@ -56,13 +56,13 @@ export default {
       return this.time > 0 && this.time < 10
     },
     setTimerType(timerType) {
-      this.socket.emit('setTimerType', {organisation: this.organisation, teamName: this.thisTeam.name, timerType: timerType})
+      this.socket.emit('setTimerType', {organisationId: this.organisation.id, teamId: this.team.id, timerType: timerType})
     },
     startTimer() {
-      this.socket.emit('startTimer', {organisation: this.organisation, teamName: this.thisTeam.name})
+      this.socket.emit('startTimer', {organisationId: this.organisation.id, teamId: this.team.id, })
     },
     stopTimer() {
-      this.socket.emit('stopTimer', {organisation: this.organisation, teamName: this.thisTeam.name})
+      this.socket.emit('stopTimer', {organisationId: this.organisation.id, teamId: this.team.id, })
     }
   }
 }

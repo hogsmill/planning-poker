@@ -34,7 +34,7 @@
           <i v-if="index < backlog.length - 1" class="fas fa-arrow-right" @click="cardRight(card)" />
         </div>
         <div class="id">
-          Id: {{ card.id }} Order: {{ card.order }}
+          Id: {{ card.cardId }} Order: {{ card.order }}
         </div>
         <div class="title">
           {{ card.title }}
@@ -48,7 +48,7 @@
       <table>
         <tr>
           <td>Id:</td>
-          <td>{{ selectedCard.id }}</td>
+          <td>{{ selectedCard.cardId }}</td>
           <td><span v-if="selectedCard.estimate">Estimate:</span></td>
           <td><span v-if="selectedCard.estimate">{{ selectedCard.estimate.name }}</span></td>
         </tr>
@@ -85,11 +85,8 @@ export default {
     organisation() {
       return this.$store.getters.getOrganisation
     },
-    teamName() {
-      return this.$store.getters.getTeamName
-    },
-    thisTeam() {
-      return this.$store.getters.getThisTeam
+    team() {
+      return this.$store.getters.getTeam
     },
     backlog() {
       return this.$store.getters.getBacklog
@@ -134,7 +131,7 @@ export default {
         card.committed = i < this.trainPosition
         newBacklog.push(card)
       }
-      this.socket.emit('updateBacklog', {organisation: this.organisation, teamName: this.teamName, backlog: newBacklog})
+      this.socket.emit('updateBacklog', {organisationId: this.organisation.id, teamId: this.team.id, backlog: newBacklog})
     },
     cardLeft(card) {
       const backlog = []
@@ -143,7 +140,7 @@ export default {
         if (this.backlog[i].order == card.order - 1) {
           backlogCard.order = backlogCard.order + 1
         }
-        if (this.backlog[i].uid == card.uid) {
+        if (this.backlog[i].id == card.id) {
           backlogCard.order = backlogCard.order - 1
         }
         backlog.push(backlogCard)
@@ -160,7 +157,7 @@ export default {
         if (this.backlog[i].order == card.order + 1) {
           backlogCard.order = backlogCard.order - 1
         }
-        if (this.backlog[i].uid == card.uid) {
+        if (this.backlog[i].id == card.id) {
           backlogCard.order = backlogCard.order + 1
         }
         backlog.push(backlogCard)

@@ -1,62 +1,30 @@
 
+const stats = require('./lib/stats.js')
+const demo = require('./lib/demo.js')
+const estimation = require('./lib/estimation.js')
+const backlogFuns = require('./lib/backlog.js')
+
 const { v4: uuidv4 } = require('uuid')
 
-const defaultEstimationValues = {
-  'fibonacci': [
-    { order: 1, name: '1', include: true },
-    { order: 2, name: '2', include: true },
-    { order: 3, name: '3', include: true },
-    { order: 4, name: '5', include: true },
-    { order: 5, name: '8', include: true },
-    { order: 6, name: '13', include: true }
-  ],
-  't-shirt': [
-    { order: 1, name: 'XS', include: true },
-    { order: 2, name: 'S', include: true },
-    { order: 3, name: 'M', include: true },
-    { order: 4, name: 'L', include: true },
-    { order: 5, name: 'XL', include: true }
-  ],
-  'relative': [
-    { order: 1, name: 'XS', include: true, icon: 'agile_sims_relative_xs.png' },
-    { order: 2, name: 'S', include: true, icon: 'agile_sims_relative_s.png' },
-    { order: 3, name: 'M', include: true, icon: 'agile_sims_relative_m.png' },
-    { order: 4, name: 'L', include: true, icon: 'agile_sims_relative_l.png' },
-    { order: 5, name: 'XL', include: true, icon: 'agile_sims_relative_xl.png' }
-  ],
-  'fruit': [
-    { order: 1, name: 'grape', include: true, icon: 'agile_sims_fruit_grape.jpg' },
-    { order: 2, name: 'cherry', include: true, icon: 'agile_sims_fruit_cherry.jpg' },
-    { order: 3, name: 'apple', include: true, icon: 'agile_sims_fruit_apple.jpg' },
-    { order: 4, name: 'kiwi', include: true, icon: 'agile_sims_fruit_kiwi.jpg' },
-    { order: 5, name: 'watermelon', include: true, icon: 'agile_sims_fruit_watermelon.jpg' },
-    { order: 6, name: 'pineapple', include: true, icon: 'agile_sims_fruit_pineapple.jpg' }
-  ],
-  'custom': []
+function newTeam(name) {
+  return {
+    id: uuidv4(),
+    name: name,
+    estimationType: 'fibonacci',
+    estimationValues: estimation.defaultValues(),
+    timerType: 'estimation',
+    useEstimationTimer: false,
+    timerAutoReveal: false,
+    estimationTimerTime: null,
+    useDiscussionTimer: false,
+    discussionTimerTime: null,
+    relativeSizing: true,
+    gameView: 'poker',
+    logo:  null,
+    members: [],
+    backlog: []
+  }
 }
-
-const defaultBacklog = [
-  { id: 1, uid: '1', order: 1, title: 'Build an API', selected: false, committed: false, description: 'Build the API by updating the domain model to allow feature x to connect'},
-  { id: 2, uid: '2', order: 2, title: 'Do the UI', selected: false, committed: false, description: 'Update the GUI to allow product selection. Date comes from the API'},
-  { id: 3, uid: '3', order: 3, title: 'Build the login', selected: false, committed: false, description: 'Store user details in database'},
-  { id: 4, uid: '4', order: 4, title: 'Add Logging', selected: false, committed: false, description: 'Update logging system to log new feature'}
-]
-
-const defaultTeams = [
-  { name: 'Eagle', estimationType: 'fibonacci', include: true, velocity: 20, timerType: 'estimation', useEstimationTimer: true, timerAutoReveal: false, estimationTimerTime: 30, useDiscussionTimer: true, discussionTimerTime: 120, relativeSizing: true, gameView: 'poker', logo: 'agile_sims_icon_eagle.png' },
-  { name: 'Lion', estimationType: 't-shirt', include: true, velocity: 20, timerType: 'estimation', timerType: '', useEstimationTimer: true, timerAutoReveal: false, estimationTimerTime: 30, useDiscussionTimer: true, discussionTimerTime: 120, relativeSizing: true, gameView: 'poker', logo: 'agile_sims_icon_lion.png' },
-  { name: 'Dragon', estimationType: 'relative', include: true, velocity: 20, timerType: 'estimation', useEstimationTimer: true, timerAutoReveal: false, estimationTimerTime: 30, useDiscussionTimer: true, discussionTimerTime: 120, relativeSizing: true, gameView: 'poker', logo: 'agile_sims_icon_dragon.png' },
-  { name: 'Gryphen', estimationType: 'fruit', include: true, velocity: 20, timerType: 'estimation', useEstimationTimer: true, timerAutoReveal: false, estimationTimerTime: 30, useDiscussionTimer: true, discussionTimerTime: 120, relativeSizing: true, gameView: 'poker', logo: 'agile_sims_icon_gryphen.png' }
-]
-
-const defaultTeamMembers = [
-  { name: 'Steve', uid: '1', include: true, voted: false },
-  { name: 'Bill', uid: '2', include: true, voted: false },
-  { name: 'Penny', uid: '3', include: true, voted: false },
-  { name: 'Mike', uid: '4', include: true, voted: false },
-  { name: 'Julia', uid: '5', include: true, voted: false },
-  { name: 'Carol', uid: '6', include: true, voted: false }
-]
 
 function cardsMatch(card1, card2) {
   return card1.id == card2.id && card1.title == card2.title && card1.description == card2.description
@@ -84,7 +52,7 @@ function escapeField(field, seperator) {
 
 function createOutputRecord(record, sep) {
   record = [
-    record.id,
+    record.cardId,
     escapeField(record.title, sep),
     escapeField(record.description, sep),
     record.estimate
@@ -110,193 +78,20 @@ function createOutputRecord(record, sep) {
   return outputRecord
 }
 
-function addEstimationTypeToOrganisation(err, client, db, io, data, debugOn) {
+function addEstimationTypeToOrganisation(db, io, data, debugOn) {
 }
 
-function _addTeam(err, client, db, io, data, debugOn) {
-
-  if (debugOn) { console.log('addTeam', data) }
-
-  db.collection('planningPokerOrganisations').findOne({organisation: data.organisation}, function(err, res) {
-    if (err) throw err
-    if (res) {
-      const team = {name: data.teamName, backlog: [], members: [], estimationValues: defaultEstimationValues}
-      if (res.demo) {
-        team.backlog = defaultBacklog
-        team.members = defaultTeamMembers
-        team.relativeSizing = true,
-        team.include = true
-      }
-      const teams = res.teams
-      teams.push(team)
-      data.teams = teams
-      db.collection('planningPokerOrganisations').updateOne({'_id': res._id}, {$set: {teams: teams}}, function(err, res) {
-        if (err) throw err
-        io.emit('loadOrganisation', data)
-        client.close()
-     })
-    }
-  })
-}
-
-function _deleteTeam(err, client, db, io, data, debugOn) {
-
-  if (debugOn) { console.log('deleteTeam', data) }
-
-  db.collection('planningPokerOrganisations').findOne({organisation: data.organisation}, function(err, res) {
-    if (err) throw err
-    if (res) {
-      const teams = []
-      for (let i = 0; i < res.teams.length; i++) {
-        if (res.teams[i].name != data.teamName) {
-          teams.push(res.teams[i])
-        }
-      }
-      data.teams = teams
-      db.collection('planningPokerOrganisations').updateOne({'_id': res._id}, {$set: {teams: teams}}, function(err, res) {
-        if (err) throw err
-        io.emit('loadOrganisation', data)
-        client.close()
-     })
-    }
-  })
-}
-
-function _addTeamMember(err, client, db, io, data, debugOn) {
-
-  if (debugOn) { console.log('addTeamMember', data) }
-
-  db.collection('planningPokerOrganisations').findOne({organisation: data.organisation}, function(err, res) {
-    if (err) throw err
-    if (res) {
-      const teams = []
-      for (let i = 0; i < res.teams.length; i++) {
-        const team = res.teams[i]
-        if (team.name == data.teamName) {
-          team.members.push({
-            uid: uuidv4(),
-            name: data.memberName,
-            include: true,
-            voted: false
-          })
-        }
-        teams.push(team)
-      }
-      data.teams = teams
-      db.collection('planningPokerOrganisations').updateOne({'_id': res._id}, {$set: {teams: teams}}, function(err, res) {
-        if (err) throw err
-        io.emit('loadOrganisation', data)
-        client.close()
-     })
-    }
-  })
-}
-
-function _deleteTeamMember(err, client, db, io, data, debugOn) {
-
-  if (debugOn) { console.log('deleteTeamMember', data) }
-
-  db.collection('planningPokerOrganisations').findOne({organisation: data.organisation}, function(err, res) {
-    if (err) throw err
-    if (res) {
-      const teams = []
-      for (let i = 0; i < res.teams.length; i++) {
-        const team = res.teams[i]
-        if (team.name == data.teamName) {
-          const members = []
-          for (let j = 0; j < team.members.length; j++) {
-            if (team.members[j].name != data.memberName) {
-              members.push(res.teams[i].members[j])
-            }
-          }
-          team.members = members
-        }
-        teams.push(team)
-      }
-      data.teams = teams
-      db.collection('planningPokerOrganisations').updateOne({'_id': res._id}, {$set: {teams: teams}}, function(err, res) {
-        if (err) throw err
-        io.emit('loadOrganisation', data)
-        client.close()
-     })
-    }
-  })
-}
-
-function _loadBacklog(err, client, db, io, data, debugOn) {
-
-  if (debugOn) { console.log('loadBacklog', data) }
-
-  db.collection('planningPokerOrganisations').findOne({organisation: data.organisation}, function(err, res) {
-    if (err) throw err
-    if (res) {
-      const teams = []
-      for (let i = 0; i < res.teams.length; i++) {
-        const team = res.teams[i]
-        if (team.name == data.teamName) {
-          const backlog = data.replace ? [] : team.backlog
-          for (let j = 0; j < data.backlog.length; j++) {
-            data.backlog[j].uid = uuidv4()
-            data.backlog[i].selected = false
-            data.backlog[i].committed = false
-            backlog.push(data.backlog[j])
-          }
-          team.backlog = backlog
-          data.backlogLength = backlog.length
-        }
-        teams.push(team)
-      }
-      data.teams = teams
-      db.collection('planningPokerOrganisations').updateOne({'_id': res._id}, {$set: {teams: teams}}, function(err, res) {
-        if (err) throw err
-        io.emit('loadOrganisation', data)
-        io.emit('backlogLoaded', data)
-        client.close()
-     })
-   }
-  })
-}
-
-function _setOrganisation(err, client, db, io, data, debugOn) {
+function _setOrganisation(db, io, data, debugOn) {
 
   if (debugOn) { console.log('setOrganisation', data) }
 
-  db.collection('planningPokerOrganisations').findOne({organisation: data.organisation}, function(err, res) {
+  db.collection('planningPokerOrganisations').findOne({id: data.organisationId}, function(err, res) {
     if (err) throw err
-    if (!res) {
-      data.teams = data.demo ? defaultTeams : []
-      data.estimationValues = defaultEstimationValues
-      if (data.demo) {
-        for (let i = 0; i < data.teams.length; i++) {
-          data.teams[i].members = defaultTeamMembers
-          data.teams[i].estimationValues = defaultEstimationValues
-          data.teams[i].backlog = defaultBacklog
-          data.teams[i].include = true
-          data.teams[i].gameView = 'poker'
-        }
-      }
-      const created = new Date().toISOString()
-      const lastaccess = new Date().toISOString()
-      db.collection('planningPokerOrganisations').insertOne({organisation: data.organisation, created: created, lastaccess: data.lastaccess, teams: data.teams, estimationTypes: data.estimationValues, demo: data.demo}, function(err, res) {
-        if (err) throw err
-        io.emit('loadOrganisation', data)
-        client.close()
-      })
-    } else {
-      db.collection('planningPokerOrganisations').updateOne({'_id': res._id}, {$set: {lastaccess: new Date().toISOString()}}, function(err, res) {
-        if (err) throw err
-      })
-      data.teams = res.teams
-      if (!data.demo) {
-        io.emit('loadOrganisation', data)
-      } else {
-        db.collection('planningPokerOrganisations').updateOne({'_id': res._id}, {$set: {demo: data.demo}}, function(err, res) {
-          if (err) throw err
-          io.emit('loadOrganisation', data)
-          client.close()
-        })
-      }
-    }
+    data.teams = res.teams
+    io.emit('loadOrganisation', data)
+    db.collection('planningPokerOrganisations').updateOne({'_id': res._id}, {$set: {lastaccess: new Date().toISOString()}}, function(err, res) {
+      if (err) throw err
+    })
   })
 }
 
@@ -314,53 +109,97 @@ function updateTimer(io, t, data, autoReveal) {
   }
 }
 
+function _loadOrganisations(db, io) {
+  db.collection('planningPokerOrganisations').find().toArray( function(err, res) {
+    if (err) throw err
+    io.emit('loadOrganisations', res)
+  })
+}
+
 module.exports = {
+
+  checkSystemWorkshops: function(db, io, data, debugOn) {
+
+    if (debugOn) { console.log('checkSystemWorkshops', data) }
+
+    const demoId = 'ada3f6c5-6929-4b95-abeb-401e0443e23e'
+    db.collection('planningPokerOrganisations').findOne({id: demoId}, function(err, res) {
+      if (err) throw err
+      if (!res) {
+        const organisation = demo.organisation(demoId)
+        db.collection('planningPokerOrganisations').insertOne(organisation, function(err, res) {
+          if (err) throw err
+          _loadOrganisations(db, io)
+        })
+      } else {
+        _loadOrganisations(db, io)
+      }
+    })
+  },
+
 
   // Organisation
 
-  setOrganisation: function(err, client, db, io, data, debugOn) {
+  setOrganisation: function(db, io, data, debugOn) {
 
     if (debugOn) { console.log('setOrganisation', data) }
 
     if (data.startOver) {
       db.collection('planningPokerOrganisations').deleteOne({organisation: data.organisation}, function(err, res) {
-        _setOrganisation(err, client, db, io, data, debugOn)
+        _setOrganisation(db, io, data, debugOn)
       })
     } else {
-      _setOrganisation(err, client, db, io, data, debugOn)
+      _setOrganisation(db, io, data, debugOn)
     }
   },
 
   // Game
 
-  loadTeam:  function(err, client, db, io, data, debugOn) {
+  loadOrganisation:  function(db, io, data, debugOn) {
+
+    if (debugOn) { console.log('loadOrganisation', data) }
+
+    db.collection('planningPokerOrganisations').findOne({id: data.id}, function(err, res) {
+      if (err) throw err
+      if (res) {
+        db.collection('planningPokerOrganisations').updateOne({'_id': res._id}, {$set: {lastaccess: new Date().toISOString()}}, function(err, res) {
+          if (err) throw err
+        })
+        delete res._id
+        io.emit('loadOrganisation', res)
+      }
+    })
+  },
+
+  loadTeam:  function(db, io, data, debugOn) {
 
     if (debugOn) { console.log('loadTeam', data) }
 
-    db.collection('planningPokerOrganisations').findOne({organisation: data.organisation}, function(err, res) {
+    db.collection('planningPokerOrganisations').findOne({id: data.organisationId}, function(err, res) {
       if (err) throw err
       if (res) {
         data.demo = res.demo
         data.team = res.teams.find(function(t) {
           return t.name == data.teamName
         })
-        io.emit('loadTeam', data)
-        client.close()
+        if (data.team) {
+          io.emit('loadTeam', data)
+        }
       }
     })
   },
 
-  setGameView:  function(err, client, db, io, data, debugOn) {
+  setGameView:  function(db, io, data, debugOn) {
 
     if (debugOn) { console.log('setGameView', data) }
 
-    db.collection('planningPokerOrganisations').findOne({organisation: data.organisation}, function(err, res) {
+    db.collection('planningPokerOrganisations').findOne({id: data.organisationId}, function(err, res) {
       if (err) throw err
       if (res) {
         const teams = []
         for (let i = 0; i < res.teams.length; i++) {
           const team = res.teams[i]
-          if (team.name == data.teamName) {
+          if (team.id == data.teamId) {
             team.gameView = data.view
             data.team = team
           }
@@ -370,23 +209,22 @@ module.exports = {
         db.collection('planningPokerOrganisations').updateOne({'_id': res._id}, {$set: {teams: teams}}, function(err, res) {
           if (err) throw err
           io.emit('loadTeam', data)
-          client.close()
         })
       }
     })
   },
 
-  updateBacklog:  function(err, client, db, io, data, debugOn) {
+  updateBacklog:  function(db, io, data, debugOn) {
 
     if (debugOn) { console.log('updateBacklog', data) }
 
-    db.collection('planningPokerOrganisations').findOne({organisation: data.organisation}, function(err, res) {
+    db.collection('planningPokerOrganisations').findOne({id: data.organisationId}, function(err, res) {
       if (err) throw err
       if (res) {
         const teams = []
         for (let i = 0; i < res.teams.length; i++) {
           const team = res.teams[i]
-          if (team.name == data.teamName) {
+          if (team.id == data.teamId) {
             team.backlog = data.backlog
             data.team = team
           }
@@ -396,24 +234,23 @@ module.exports = {
         db.collection('planningPokerOrganisations').updateOne({'_id': res._id}, {$set: {teams: teams}}, function(err, res) {
           if (err) throw err
           io.emit('loadTeam', data)
-          client.close()
         })
       }
     })
   },
 
-  selectCard:  function(err, client, db, io, data, debugOn) {
+  selectCard:  function(db, io, data, debugOn) {
 
     if (debugOn) { console.log('selectCard', data) }
 
-    db.collection('planningPokerOrganisations').findOne({organisation: data.organisation}, function(err, res) {
+    db.collection('planningPokerOrganisations').findOne({id: data.organisationId}, function(err, res) {
       if (err) throw err
       if (res) {
         const teams = []
         let selectedTeam
         for (let i = 0; i < res.teams.length; i++) {
           const team = res.teams[i]
-          if (team.name == data.teamName) {
+          if (team.id == data.teamId) {
             const members = [], backlog = []
             for (let j = 0; j < team.members.length; j++) {
               team.members[j].voted = false
@@ -421,7 +258,7 @@ module.exports = {
               members.push(team.members[j])
             }
             for (let k = 0; k < team.backlog.length; k++) {
-              if (team.backlog[k].uid == data.uid) {
+              if (team.backlog[k].id == data.id) {
                 team.backlog[k].selected = true
               } else {
                 team.backlog[k].selected = false
@@ -434,27 +271,29 @@ module.exports = {
           }
           teams.push(team)
         }
-        data.demo = res.demo
-        db.collection('planningPokerOrganisations').updateOne({'_id': res._id}, {$set: {teams: teams}}, function(err, res) {
+        res.teams = teams
+        const id = res._id
+        delete res._id
+        db.collection('planningPokerOrganisations').updateOne({'_id': id}, {$set: res}, function(err, res) {
           if (err) throw err
+          console.log(data)
           io.emit('loadTeam', data)
-          client.close()
         })
       }
     })
   },
 
-  updateCommittedCards:  function(err, client, db, io, data, debugOn) {
+  updateCommittedCards:  function(db, io, data, debugOn) {
 
     if (debugOn) { console.log('updateCommittedCards', data) }
 
-    db.collection('planningPokerOrganisations').findOne({organisation: data.organisation}, function(err, res) {
+    db.collection('planningPokerOrganisations').findOne({id: data.organisationId}, function(err, res) {
       if (err) throw err
       if (res) {
         const teams = []
         for (let i = 0; i < res.teams.length; i++) {
           const team = res.teams[i]
-          if (team.name == data.teamName) {
+          if (team.id == data.teamId) {
             team.backlog = data.backlog
             data.team = team
           }
@@ -464,23 +303,22 @@ module.exports = {
         db.collection('planningPokerOrganisations').updateOne({'_id': res._id}, {$set: {teams: teams}}, function(err, res) {
           if (err) throw err
           io.emit('loadTeam', data)
-          client.close()
         })
       }
     })
   },
 
-  setTimerType:  function(err, client, db, io, data, debugOn) {
+  setTimerType:  function(db, io, data, debugOn) {
 
     if (debugOn) { console.log('setTimerType', data) }
 
-    db.collection('planningPokerOrganisations').findOne({organisation: data.organisation}, function(err, res) {
+    db.collection('planningPokerOrganisations').findOne({id: data.organisationId}, function(err, res) {
       if (err) throw err
       if (res) {
         const teams = []
         for (let i = 0; i < res.teams.length; i++) {
           const team = res.teams[i]
-          if (team.name == data.teamName) {
+          if (team.id == data.teamId) {
             team.timerType = data.timerType
             data.team = team
           }
@@ -490,46 +328,44 @@ module.exports = {
         db.collection('planningPokerOrganisations').updateOne({'_id': res._id}, {$set: {teams: teams}}, function(err, res) {
           if (err) throw err
           io.emit('loadTeam', data)
-          client.close()
         })
       }
     })
   },
 
-  startTimer:  function(err, client, db, io, data, debugOn) {
+  startTimer:  function(db, io, data, debugOn) {
 
     if (debugOn) { console.log('startTimer', data) }
 
-    db.collection('planningPokerOrganisations').findOne({organisation: data.organisation}, function(err, res) {
+    db.collection('planningPokerOrganisations').findOne({id: data.organisationId}, function(err, res) {
       if (err) throw err
       if (res) {
         for (let i = 0; i < res.teams.length; i++) {
-          if (res.teams[i].name == data.teamName) {
+          if (res.teams[i].id == data.teamId) {
             const team = res.teams[i]
             const t = team.timerType == 'estimation' ? team.estimationTimerTime : team.discussionTimerTime
             updateTimer(io, t, data, res.teams[i].timerAutoReveal)
           }
         }
       }
-      client.close()
     })
   },
 
-  updateEstimateValue:  function(err, client, db, io, data, debugOn) {
+  updateEstimateValue:  function(db, io, data, debugOn) {
 
     if (debugOn) { console.log('updateEstimateValue', data) }
 
-    db.collection('planningPokerOrganisations').findOne({organisation: data.organisation}, function(err, res) {
+    db.collection('planningPokerOrganisations').findOne({id: data.organisationId}, function(err, res) {
       if (err) throw err
       if (res) {
         const teams = []
         let selectedTeam
         for (let i = 0; i < res.teams.length; i++) {
           const team = res.teams[i]
-          if (team.name == data.teamName) {
+          if (team.id == data.teamId) {
             const members = []
             for (let j = 0; j < team.members.length; j++) {
-              if (team.members[j].uid == data.teamMember.uid) {
+              if (team.members[j].id == data.memberId) {
                 team.members[j].voted = true
                 team.members[j].estimate = data.value
                 team.members[j].coffee = false
@@ -539,6 +375,9 @@ module.exports = {
               members.push(team.members[j])
             }
             team.members = members
+            team.lowest = stats.lowest(team.members)
+            team.highest = stats.highest(team.members)
+            team.median = stats.median(team.members)
             data.team = team
           }
           teams.push(team)
@@ -547,32 +386,32 @@ module.exports = {
         db.collection('planningPokerOrganisations').updateOne({'_id': res._id}, {$set: {teams: teams}}, function(err, res) {
           if (err) throw err
           io.emit('loadTeam', data)
-          client.close()
         })
       }
     })
   },
 
-  setMemberValue:  function(err, client, db, io, data, debugOn, field) {
+  setMemberValue:  function(db, io, data, debugOn, field) {
 
-    if (debugOn) { console.log('updateEstimateValue', field, data) }
+    if (debugOn) { console.log('setMemberValue', field, data) }
 
-    db.collection('planningPokerOrganisations').findOne({organisation: data.organisation}, function(err, res) {
+    db.collection('planningPokerOrganisations').findOne({id: data.organisationId}, function(err, res) {
       if (err) throw err
       if (res) {
         const teams = []
         let selectedTeam
         for (let i = 0; i < res.teams.length; i++) {
           const team = res.teams[i]
-          if (team.name == data.teamName) {
+          if (team.id == data.teamId) {
             const members = []
             for (let j = 0; j < team.members.length; j++) {
-              if (team.members[j].uid == data.teamMember.uid) {
+              if (team.members[j].id == data.memberId) {
                 team.members[j].voted = false
                 team.members[j].estimate = null
                 team.members[j].coffee = false
                 team.members[j].question = false
                 team.members[j][field] = data[field]
+                console.log(team.members[j])
               }
               members.push(team.members[j])
             }
@@ -581,30 +420,31 @@ module.exports = {
           }
           teams.push(team)
         }
-        data.demo = res.demo
-        db.collection('planningPokerOrganisations').updateOne({'_id': res._id}, {$set: {teams: teams}}, function(err, res) {
+        res.teams = teams
+        const id = res._id
+        delete res._id
+        db.collection('planningPokerOrganisations').updateOne({'_id': id}, {$set: res}, function(err, res) {
           if (err) throw err
           io.emit('loadTeam', data)
-          client.close()
         })
       }
     })
   },
 
-  updateAgreedEstimate:  function(err, client, db, io, data, debugOn) {
+  updateAgreedEstimate:  function(db, io, data, debugOn) {
 
     if (debugOn) { console.log('updateAgreedEstimate', data) }
 
-    db.collection('planningPokerOrganisations').findOne({organisation: data.organisation}, function(err, res) {
+    db.collection('planningPokerOrganisations').findOne({id: data.organisationId}, function(err, res) {
       if (err) throw err
       if (res) {
         const teams = []
         for (let i = 0; i < res.teams.length; i++) {
           const team = res.teams[i]
-          if (team.name == data.teamName) {
+          if (team.id == data.teamId) {
             const backlog = []
             for (let j = 0; j < team.backlog.length; j++) {
-              if (team.backlog[j].uid == data.selectedCard.uid) {
+              if (team.backlog[j].id == data.selectedCard.id) {
                 team.backlog[j].estimate = data.value
               }
               backlog.push(team.backlog[j])
@@ -622,7 +462,6 @@ module.exports = {
         db.collection('planningPokerOrganisations').updateOne({'_id': res._id}, {$set: {teams: teams}}, function(err, res) {
           if (err) throw err
           io.emit('loadTeam', data)
-          client.close()
         })
       }
     })
@@ -630,23 +469,90 @@ module.exports = {
 
   // Facilitator
 
-  addTeam:  function(err, client, db, io, data, debugOn) {
+  addOrganisation:  function(db, io, data, debugOn) {
 
-    _addTeam(err, client, db, io, data, debugOn)
+    if (debugOn) { console.log('addOrganisation', data) }
+
+    const newOrg =  {
+      id: uuidv4(),
+      protected: false,
+      name: data.name,
+      gameView: 'poker',
+      created: new Date().toISOString(),
+      lastaccess: new Date().toISOString(),
+      teams: []
+    }
+    db.collection('planningPokerOrganisations').insertOne(newOrg, function(err, res) {
+      if (err) throw err
+      _loadOrganisations(db, io)
+    })
   },
 
-  setTeamParameter: function(err, client, db, io, data, debugOn, field) {
+  deleteOrganisation:  function(db, io, data, debugOn) {
+
+    if (debugOn) { console.log('deleteOrganisation', data) }
+
+    db.collection('planningPokerOrganisations').deleteOne({id: data.id}, function(err, res) {
+      if (err) throw err
+      _loadOrganisations(db, io)
+    })
+  },
+
+  addTeam:  function(db, io, data, debugOn) {
+
+    if (debugOn) { console.log('addTeam', data) }
+
+    db.collection('planningPokerOrganisations').findOne({id: data.organisationId}, function(err, res) {
+      if (err) throw err
+      if (res) {
+        const team = newTeam(data.name)
+        const teams = res.teams
+        teams.push(team)
+        db.collection('planningPokerOrganisations').updateOne({'_id': res._id}, {$set: {teams: teams}}, function(err, res) {
+          if (err) throw err
+          _loadOrganisations(db, io)
+        })
+      }
+    })
+  },
+
+  deleteTeam:  function(db, io, data, debugOn) {
+
+    if (debugOn) { console.log('deleteTeam', data) }
+
+    db.collection('planningPokerOrganisations').findOne({id: data.organisationId}, function(err, res) {
+      if (err) throw err
+      if (res) {
+        const teams = []
+        for (let i = 0; i < res.teams.length; i++) {
+          if (res.teams[i].id != data.id) {
+            teams.push(res.teams[i])
+          }
+        }
+        db.collection('planningPokerOrganisations').updateOne({'_id': res._id}, {$set: {teams: teams}}, function(err, res) {
+          if (err) throw err
+          _loadOrganisations(db, io)
+        })
+      }
+    })
+  },
+
+  setTeamParameter: function(db, io, data, debugOn, field) {
 
     if (debugOn) { console.log('setTeamParameter', field, data) }
 
-    db.collection('planningPokerOrganisations').findOne({organisation: data.organisation}, function(err, res) {
+    db.collection('planningPokerOrganisations').findOne({id: data.organisationId}, function(err, res) {
       if (err) throw err
       if (res) {
         const teams = []
         for (let i = 0; i < res.teams.length; i++) {
           const team = res.teams[i]
-          if (team.name == data.teamName) {
-            team[field] = data[field]
+          if (team.id == data.id) {
+            if (data.value) {
+              team[field] = data.value
+            } else {
+              team[field] = !team[field]
+            }
           }
           if (field == 'useEstimationTimer' || field == 'useDiscussionTimer') {
             if (team.useEstimationTimer && !team.useDiscussionTimer) {
@@ -661,105 +567,175 @@ module.exports = {
         data.teams = teams
         db.collection('planningPokerOrganisations').updateOne({'_id': res._id}, {$set: {teams: teams}}, function(err, res) {
           if (err) throw err
-          io.emit('loadTeams', data)
-          client.close()
+          _loadOrganisations(db, io)
         })
       }
     })
   },
 
-  deleteTeam:  function(err, client, db, io, data, debugOn) {
+  addTeamMember:  function(db, io, data, debugOn) {
 
-    _deleteTeam(err, client, db, io, data, debugOn)
-  },
+    if (debugOn) { console.log('addTeamMember', data) }
 
-  addTeamMember:  function(err, client, db, io, data, debugOn) {
-
-    _addTeamMember(err, client, db, io, data, debugOn)
-  },
-
-  includeTeamMember: function(err, client, db, io, data, debugOn) {
-
-    if (debugOn) { console.log('includeTeamMember', data) }
-
-    db.collection('planningPokerOrganisations').findOne({organisation: data.organisation}, function(err, res) {
+    db.collection('planningPokerOrganisations').findOne({id: data.organisationId}, function(err, res) {
       if (err) throw err
       if (res) {
         const teams = []
         for (let i = 0; i < res.teams.length; i++) {
           const team = res.teams[i]
-          if (team.name == data.teamName) {
+          if (team.id == data.teamId) {
+            team.members.push({
+              id: uuidv4(),
+              name: data.name,
+              include: true,
+              voted: false
+            })
+            console.log(team.members)
+          }
+          teams.push(team)
+        }
+        db.collection('planningPokerOrganisations').updateOne({'_id': res._id}, {$set: {teams: teams}}, function(err, res) {
+          if (err) throw err
+          _loadOrganisations(db, io)
+       })
+      }
+    })  },
+
+  includeTeamMember: function(db, io, data, debugOn) {
+
+    if (debugOn) { console.log('includeTeamMember', data) }
+
+    db.collection('planningPokerOrganisations').findOne({id: data.organisationId}, function(err, res) {
+      if (err) throw err
+      if (res) {
+        const teams = []
+        for (let i = 0; i < res.teams.length; i++) {
+          const team = res.teams[i]
+          if (team.id == data.teamId) {
             const members = []
             for (let j = 0; j < team.members.length; j++) {
-              if (team.members[j].uid == data.teamMember.uid) {
-                team.members[j].include = data.include
+              const member = team.members[j]
+              if (member.id == data.id) {
+                member.include = !member.include
               }
-              members.push(team.members[j])
+              members.push(member)
             }
             team.members = members
-            data.team = team
           }
           teams.push(team)
         }
         data.demo = res.demo
         db.collection('planningPokerOrganisations').updateOne({'_id': res._id}, {$set: {teams: teams}}, function(err, res) {
           if (err) throw err
-          io.emit('loadTeam', data)
-          client.close()
+          _loadOrganisations(db, io)
         })
       }
     })
   },
 
-  deleteTeamMember:  function(err, client, db, io, data, debugOn) {
+  deleteTeamMember:  function(db, io, data, debugOn) {
 
-    _deleteTeamMember(err, client, db, io, data, debugOn)
-  },
+    if (debugOn) { console.log('deleteTeamMember', data) }
 
-  setRelativeSizing: function(err, client, db, io, data, debugOn) {
-
-    if (debugOn) { console.log('setRelativeSizing', data) }
-
-    db.collection('planningPokerOrganisations').findOne({organisation: data.organisation}, function(err, res) {
+    db.collection('planningPokerOrganisations').findOne({id: data.organisationId}, function(err, res) {
       if (err) throw err
       if (res) {
         const teams = []
         for (let i = 0; i < res.teams.length; i++) {
-          if (res.teams[i].name == data.teamName) {
-            res.teams[i].relativeSizing = data.relativeSizing
+          const team = res.teams[i]
+          if (team.id == data.teamId) {
+            const members = []
+            for (let j = 0; j < team.members.length; j++) {
+              const member = team.members[j]
+              if (member.id != data.id) {
+                members.push(member)
+              }
+            }
+            team.members = members
           }
-          teams.push(res.teams[i])
+          teams.push(team)
         }
-        data.teams = teams
+        data.demo = res.demo
         db.collection('planningPokerOrganisations').updateOne({'_id': res._id}, {$set: {teams: teams}}, function(err, res) {
           if (err) throw err
-          io.emit('loadTeams', data)
-          client.close()
+          _loadOrganisations(db, io)
         })
       }
     })
   },
 
-  loadBacklog:  function(err, client, db, io, data, debugOn) {
+  setRelativeSizing: function(db, io, data, debugOn) {
 
-    _loadBacklog(err, client, db, io, data, debugOn)
+    if (debugOn) { console.log('setRelativeSizing', data) }
+
+    db.collection('planningPokerOrganisations').findOne({id: data.organisationId}, function(err, res) {
+      if (err) throw err
+      if (res) {
+        const teams = []
+        for (let i = 0; i < res.teams.length; i++) {
+          const team = res.teams[i]
+          if (team.id == data.teamId) {
+            team.relativeSizing = data.relativeSizing
+          }
+          teams.push(team)
+        }
+        db.collection('planningPokerOrganisations').updateOne({'_id': res._id}, {$set: {teams: teams}}, function(err, res) {
+          if (err) throw err
+          _loadOrganisations(db, io)
+        })
+      }
+    })
   },
 
-  saveBacklog:  function(err, client, db, saveDir, logFile, io, data, fs, debugOn) {
+  loadBacklog:  function(db, io, data, debugOn) {
+
+    if (debugOn) { console.log('loadBacklog', data) }
+
+    db.collection('planningPokerOrganisations').findOne({id: data.organisationId}, function(err, res) {
+      if (err) throw err
+      if (res) {
+        const teams = []
+        for (let i = 0; i < res.teams.length; i++) {
+          const team = res.teams[i]
+          if (team.id == data.teamId) {
+            const backlog = data.replace ? [] : team.backlog
+            for (let j = 0; j < data.backlog.length; j++) {
+              const card = backlogFuns.newCard(data.backlog[i])
+              backlog.push(card)
+            }
+            team.backlog = backlogFuns.sortByOrder(backlog)
+            data.teamName = team.name
+            data.backlogLength = backlog.length
+          }
+          teams.push(team)
+        }
+        db.collection('planningPokerOrganisations').updateOne({'_id': res._id}, {$set: {teams: teams}}, function(err, res) {
+          if (err) throw err
+          _loadOrganisations(db, io)
+          io.emit('backlogLoaded', data)
+       })
+     }
+    })
+  },
+
+  saveBacklog:  function(db, saveDir, logFile, io, data, fs, debugOn) {
 
     if (debugOn) { console.log('saveBacklog', data) }
 
-    db.collection('planningPokerOrganisations').findOne({organisation: data.organisation}, function(err, res) {
+    db.collection('planningPokerOrganisations').findOne({id: data.organisationId}, function(err, res) {
       if (err) throw err
       if (res) {
-        let teamBacklog = []
+        const organisation = res.name
+        let teamName, teamBacklog = []
         for (let i = 0; i < res.teams.length; i++) {
-          if (res.teams[i].name == data.teamName) {
+          if (res.teams[i].id == data.teamId) {
+            teamName = res.teams[i].name
             teamBacklog = res.teams[i].backlog
           }
         }
         const fileName = saveDir + data.file
         if (!data.overwrite && fs.existsSync(fileName)) {
+          data.status = false
           data.errType = 'fileExists'
           io.emit('backlogSaved', data)
         } else {
@@ -771,10 +747,13 @@ module.exports = {
           backlog = backlog.join('\n')
           fs.writeFile(fileName, backlog, function (err, returnData) {
             if (err) {
-              io.emit('backlogSaved', {organisation: data.organisation, teamName: data.teamName, status: false, errType: 'general', err: err})
+              data.status = false
+              data.errType = 'general'
+              io.emit('backlogSaved', data)
             } else {
               if (debugOn) { console.log('Backlog written to ', fileName) }
-              io.emit('backlogSaved', {organisation: data.organisation, teamName: data.teamName, status: true})
+              data.status = true
+              io.emit('backlogSaved', data)
             }
           })
         }
@@ -782,161 +761,146 @@ module.exports = {
     })
   },
 
-  addBacklogCard:  function(err, client, db, io, data, debugOn) {
+  addBacklogCard:  function(db, io, data, debugOn) {
 
     if (debugOn) { console.log('addBacklogCard', data) }
 
-    db.collection('planningPokerOrganisations').findOne({organisation: data.organisation}, function(err, res) {
+    db.collection('planningPokerOrganisations').findOne({id: data.organisationId}, function(err, res) {
       if (err) throw err
       if (res) {
         const teams = []
         for (let i = 0; i < res.teams.length; i++) {
           const team = res.teams[i]
-          if (team.name == data.teamName) {
-            data.card.uid = uuidv4()
-            team.backlog.push(data.card)
+          if (team.id == data.teamId) {
+            const card = backlogFuns.newCard(data, res.backlog.length + 1)
+            team.backlog.push(card)
           }
           teams.push(team)
         }
         data.teams = teams
         db.collection('planningPokerOrganisations').updateOne({'_id': res._id}, {$set: {teams: teams}}, function(err, res) {
           if (err) throw err
-          io.emit('loadOrganisation', data)
-          client.close()
+          _loadOrganisations(db, io)
        })
      }
     })
   },
 
-  deleteBacklogCard:  function(err, client, db, io, data, debugOn) {
+  deleteBacklogCard:  function(db, io, data, debugOn) {
 
     if (debugOn) { console.log('deleteBacklogCard', data) }
 
-    db.collection('planningPokerOrganisations').findOne({organisation: data.organisation}, function(err, res) {
+    db.collection('planningPokerOrganisations').findOne({id: data.organisationId}, function(err, res) {
       if (err) throw err
       if (res) {
         const teams = []
         for (let i = 0; i < res.teams.length; i++) {
           const team = res.teams[i]
-          if (team.name == data.teamName) {
+          if (team.id == data.teamId) {
             const backlog = []
             for (let j = 0; j < team.backlog.length; j++) {
-              if (team.backlog[j].uid != data.card.uid) {
+              if (team.backlog[j].id != data.id) {
                 backlog.push(team.backlog[j])
               }
             }
-            team.backlog = backlog
+            team.backlog = backlogFuns.sortByOrder(backlog)
           }
           teams.push(team)
         }
-        data.teams = teams
         db.collection('planningPokerOrganisations').updateOne({'_id': res._id}, {$set: {teams: teams}}, function(err, res) {
           if (err) throw err
-          io.emit('loadOrganisation', data)
-          client.close()
+          _loadOrganisations(db, io)
        })
      }
     })
   },
 
-  updateEstimationType:  function(err, client, db, io, data, debugOn) {
+  updateEstimationType:  function(db, io, data, debugOn) {
 
     if (debugOn) { console.log('updateEstimationType', data) }
 
-    db.collection('planningPokerOrganisations').findOne({organisation: data.organisation}, function(err, res) {
+    db.collection('planningPokerOrganisations').findOne({id: data.organisationId}, function(err, res) {
       if (err) throw err
       if (res) {
         const teams = []
         for (let i = 0; i < res.teams.length; i++) {
           const team = res.teams[i]
-          if (team.name == data.teamName) {
+          if (team.id == data.teamId) {
             team.estimationType = data.estimationType
-            data.estimateTeam = team
           }
           teams.push(team)
         }
-        data.teams = teams
         db.collection('planningPokerOrganisations').updateOne({'_id': res._id}, {$set: {teams: teams}}, function(err, res) {
           if (err) throw err
-          io.emit('loadOrganisation', data)
-          io.emit('updateEstimateTeam', data)
-          client.close()
+          _loadOrganisations(db, io)
        })
       }
     })
   },
 
-  addEstimationType:  function(err, client, db, io, data, debugOn) {
+  addEstimationType:  function(db, io, data, debugOn) {
 
     if (debugOn) { console.log('addEstimationType', data) }
 
-    db.collection('planningPokerOrganisations').findOne({organisation: data.organisation}, function(err, res) {
+    db.collection('planningPokerOrganisations').findOne({id: data.organisationId}, function(err, res) {
       if (err) throw err
       if (res) {
         const teams = []
         for (let i = 0; i < res.teams.length; i++) {
           const team = res.teams[i]
-          if (team.name == data.teamName || data.allTeams) {
+          if (team.id == data.id || data.allTeams) {
             team.estimationValues[data.estimationType] = []
-            data.estimateTeam = team
           }
           teams.push(team)
         }
-        data.teams = teams
         db.collection('planningPokerOrganisations').updateOne({'_id': res._id}, {$set: {teams: teams}}, function(err, res) {
           if (err) throw err
-          io.emit('loadOrganisation', data)
-          io.emit('updateEstimateTeam', data)
-          client.close()
+          _loadOrganisations(db, io)
        })
       }
     })
   },
 
-  addEstimationValue:  function(err, client, db, io, data, debugOn) {
+  addEstimationValue:  function(db, io, data, debugOn) {
 
     if (debugOn) { console.log('addEstimationValue', data) }
 
-    db.collection('planningPokerOrganisations').findOne({organisation: data.organisation}, function(err, res) {
+    db.collection('planningPokerOrganisations').findOne({id: data.organisationId}, function(err, res) {
       if (err) throw err
       if (res) {
         const teams = []
         for (let i = 0; i < res.teams.length; i++) {
           const team = res.teams[i]
-          if (team.name == data.teamName || data.allTeams) {
+          if (team.id == data.teamId || data.allTeams) {
             const order = team.estimationValues[data.estimationType].length + 1
             team.estimationValues[data.estimationType].push({
               name: data.value,
               order: order,
               include: true
             })
-            data.estimateTeam = team
           }
           teams.push(team)
         }
-        data.teams = teams
         db.collection('planningPokerOrganisations').updateOne({'_id': res._id}, {$set: {teams: teams}}, function(err, res) {
           if (err) throw err
-          io.emit('loadOrganisation', data)
-          io.emit('updateEstimateTeam', data)
-          client.close()
+          _loadOrganisations(db, io)
        })
       }
     })
   },
 
-  deleteEstimationValue:  function(err, client, db, io, data, debugOn) {
+  deleteEstimationValue:  function(db, io, data, debugOn) {
 
     if (debugOn) { console.log('deleteEstimationValue', data) }
 
-    db.collection('planningPokerOrganisations').findOne({organisation: data.organisation}, function(err, res) {
+    db.collection('planningPokerOrganisations').findOne({organisationId: data.organisationId}, function(err, res) {
       if (err) throw err
       if (res) {
         const teams = []
         let i, j, k
         for (i = 0; i < res.teams.length; i++) {
           const team = res.teams[i]
-          if (team.name == data.teamName || data.allTeams) {
+          if (team.id == data.teamId || data.allTeams) {
             const estimationTypes = [], estTypes = team.estimationValues[data.estimationType]
             for (j = 0; j < estTypes.length; j++) {
               if (estTypes[j].name != data.value) {
@@ -947,16 +911,12 @@ module.exports = {
               estimationTypes[j].order = k
             }
             team.estimationValues[data.estimationType] = estimationTypes
-            data.estimateTeam = team
           }
           teams.push(team)
         }
-        data.teams = teams
         db.collection('planningPokerOrganisations').updateOne({'_id': res._id}, {$set: {teams: teams}}, function(err, res) {
           if (err) throw err
-          io.emit('loadOrganisation', data)
-          io.emit('updateEstimateTeam', data)
-          client.close()
+          _loadOrganisations(db, io)
        })
       }
     })

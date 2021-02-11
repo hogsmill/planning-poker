@@ -19,9 +19,16 @@ ON_DEATH(function(signal, err) {
   })
 })
 
-const app = require('express')()
+const express = require('express')
+const app = express()
 const http = require('http').createServer(app)
-const io = require('socket.io')(http)
+const io = require('socket.io')(http, {
+  cors: {
+    origins: ['http://localhost:*', 'http://agilesimulations.co.uk'],
+    methods: ['GET', 'POST'],
+    credentials: true
+  }
+})
 
 const dbStore = require('./store/dbStore.js')
 
@@ -51,106 +58,118 @@ function doDb(fun, data) {
     switch(fun) {
 
       // Game
-      case 'setOrganisation':
-        dbStore.setOrganisation(err, client, db, io, data, debugOn)
+      case 'checkSystemWorkshops':
+        dbStore.checkSystemWorkshops(db, io, debugOn)
         break
+      case 'loadOrganisation':
+        dbStore.loadOrganisation(db, io, data, debugOn)
+        break
+      //case 'setOrganisation':
+      //  dbStore.setOrganisation(db, io, data, debugOn)
+      //  break
       case 'loadTeam':
-        dbStore.loadTeam(err, client, db, io, data, debugOn)
+        dbStore.loadTeam(db, io, data, debugOn)
         break
       case 'setGameView':
-        dbStore.setGameView(err, client, db, io, data, debugOn)
+        dbStore.setGameView(db, io, data, debugOn)
         break
       case 'updateBacklog':
-        dbStore.updateBacklog(err, client, db, io, data, debugOn)
+        dbStore.updateBacklog(db, io, data, debugOn)
         break
       case 'selectCard':
-        dbStore.selectCard(err, client, db, io, data, debugOn)
+        dbStore.selectCard(db, io, data, debugOn)
         break
       case 'updateCommittedCards':
-        dbStore.updateCommittedCards(err, client, db, io, data, debugOn)
+        dbStore.updateCommittedCards(db, io, data, debugOn)
         break
       case 'setTimerType':
-        dbStore.setTimerType(err, client, db, io, data, debugOn)
+        dbStore.setTimerType(db, io, data, debugOn)
         break
       case 'startTimer':
-        dbStore.startTimer(err, client, db, io, data, debugOn)
+        dbStore.startTimer(db, io, data, debugOn)
         break
       case 'updateEstimateValue':
-        dbStore.updateEstimateValue(err, client, db, io, data, debugOn)
+        dbStore.updateEstimateValue(db, io, data, debugOn)
         break
       case 'memberCoffee':
-        dbStore.setMemberValue(err, client, db, io, data, debugOn, 'coffee')
+        dbStore.setMemberValue(db, io, data, debugOn, 'coffee')
         break
       case 'memberQuestion':
-        dbStore.setMemberValue(err, client, db, io, data, debugOn, 'question')
+        dbStore.setMemberValue(db, io, data, debugOn, 'question')
         break
       case 'updateAgreedEstimate':
-        dbStore.updateAgreedEstimate(err, client, db, io, data, debugOn)
+        dbStore.updateAgreedEstimate(db, io, data, debugOn)
         break
 
       // Facilitator
+      case 'addOrganisation':
+        dbStore.addOrganisation(db, io, data, debugOn)
+        break
+      case 'deleteOrganisation':
+        dbStore.deleteOrganisation(db, io, data, debugOn)
+        break
       case 'addTeam':
-        dbStore.addTeam(err, client, db, io, data, debugOn)
+        dbStore.addTeam(db, io, data, debugOn)
         break
       case 'includeTeam':
-        dbStore.setTeamParameter(err, client, db, io, data, debugOn, 'include')
+        dbStore.setTeamParameter(db, io, data, debugOn, 'include')
         break
       case 'setUseEstimationTimer':
-        dbStore.setTeamParameter(err, client, db, io, data, debugOn, 'useEstimationTimer')
+        dbStore.setTeamParameter(db, io, data, debugOn, 'useEstimationTimer')
         break
       case 'setUseDiscussionTimer':
-        dbStore.setTeamParameter(err, client, db, io, data, debugOn, 'useDiscussionTimer')
+        dbStore.setTeamParameter(db, io, data, debugOn, 'useDiscussionTimer')
         break
       case 'setTimerAutoReveal':
-        dbStore.setTeamParameter(err, client, db, io, data, debugOn, 'timerAutoReveal')
+        dbStore.setTeamParameter(db, io, data, debugOn, 'timerAutoReveal')
         break
       case 'setEstimationTimerTime':
-        dbStore.setTeamParameter(err, client, db, io, data, debugOn, 'estimationTimerTime')
+        dbStore.setTeamParameter(db, io, data, debugOn, 'estimationTimerTime')
         break
       case 'setDiscussionTimerTime':
-        dbStore.setTeamParameter(err, client, db, io, data, debugOn, 'discussionTimerTime')
+        dbStore.setTeamParameter(db, io, data, debugOn, 'discussionTimerTime')
         break
       case 'setVelocity':
-        dbStore.setTeamParameter(err, client, db, io, data, debugOn, 'velocity')
+        dbStore.setTeamParameter(db, io, data, debugOn, 'velocity')
         break
       case 'deleteTeam':
-        dbStore.deleteTeam(err, client, db, io, data, debugOn)
+        dbStore.deleteTeam(db, io, data, debugOn)
         break
       case 'addTeamMember':
-        dbStore.addTeamMember(err, client, db, io, data, debugOn)
+        dbStore.addTeamMember(db, io, data, debugOn)
         break
       case 'includeTeamMember':
-        dbStore.includeTeamMember(err, client, db, io, data, debugOn)
+        dbStore.includeTeamMember(db, io, data, debugOn)
         break
       case 'deleteTeamMember':
-        dbStore.deleteTeamMember(err, client, db, io, data, debugOn)
+        dbStore.deleteTeamMember(db, io, data, debugOn)
         break
       case 'updateEstimationType':
-        dbStore.updateEstimationType(err, client, db, io, data, debugOn)
+        dbStore.updateEstimationType(db, io, data, debugOn)
         break
       case 'addEstimationType':
-        dbStore.addEstimationType(err, client, db, io, data, debugOn)
+        dbStore.addEstimationType(db, io, data, debugOn)
         break
       case 'addEstimationValue':
-        dbStore.addEstimationValue(err, client, db, io, data, debugOn)
+        dbStore.addEstimationValue(db, io, data, debugOn)
         break
       case 'deleteEstimationValue':
-        dbStore.deleteEstimationValue(err, client, db, io, data, debugOn)
+        dbStore.deleteEstimationValue(db, io, data, debugOn)
         break
       case 'setRelativeSizing':
-        dbStore.setRelativeSizing(err, client, db, io, data, debugOn)
+        dbStore.setRelativeSizing(db, io, data, debugOn)
         break
       case 'loadBacklog':
-        dbStore.loadBacklog(err, client, db, io, data, debugOn)
+        dbStore.loadBacklog(db, io, data, debugOn)
         break
       case 'saveBacklog':
-        dbStore.saveBacklog(err, client, db, saveDir, logFile, io, data, fs, debugOn)
+        dbStore.saveBacklog(db, saveDir, logFile, io, data, fs, debugOn)
         break
       case 'addBacklogCard':
-        dbStore.addBacklogCard(err, client, db, io, data, debugOn)
+        dbStore.addBacklogCard(db, io, data, debugOn)
         break
       case 'deleteBacklogCard':
-        dbStore.deleteBacklogCard(err, client, db, io, data, debugOn)
+        dbStore.deleteBacklogCard(db, io, data, debugOn)
         break
       default:
         console.log('Unknown function ', fun)
@@ -177,7 +196,11 @@ io.on('connection', (socket) => {
   })
 
   // Game
-  socket.on('setOrganisation', (data) => { doDb('setOrganisation', data) })
+  socket.on('checkSystemWorkshops', () => { doDb('checkSystemWorkshops') })
+
+  socket.on('loadOrganisation', (data) => { doDb('loadOrganisation', data) })
+
+  //socket.on('setOrganisation', (data) => { doDb('setOrganisation', data) })
 
   socket.on('loadTeam', (data) => { doDb('loadTeam', data) })
 
@@ -204,6 +227,13 @@ io.on('connection', (socket) => {
   socket.on('updateAgreedEstimate', (data) => { doDb('updateAgreedEstimate', data) })
 
   // Facilitator
+
+  socket.on('openEditPane', (data) => { emit('openEditPane', data) })
+
+  socket.on('addOrganisation', (data) => { doDb('addOrganisation', data) })
+
+  socket.on('deleteOrganisation', (data) => { doDb('deleteOrganisation', data) })
+
   socket.on('addTeam', (data) => { doDb('addTeam', data) })
 
   socket.on('includeTeam', (data) => { doDb('includeTeam', data) })

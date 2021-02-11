@@ -1,7 +1,7 @@
 <template>
   <table class="facilitator-table">
     <tr>
-      <td>
+      <td colspan="2">
         <h4>Team Members</h4>
         <i v-if="showTeamMembers" @click="setShowTeamMembers(false)" title="collapse" class="fas fa-caret-up toggle" />
         <i v-if="!showTeamMembers" @click="setShowTeamMembers(true)" title="expand" class="fas fa-caret-down toggle" />
@@ -9,52 +9,60 @@
     </tr>
     <tr v-if="showTeamMembers">
       <td>
-        <table class="inner-table">
-          <tr>
-            <td>Team</td>
+        Organisation
+      </td>
+      <td>
+        <select id="organisation-select" @change="setSelectedOrganisationId(true)">
+          <option> -- Select -- </option>
+          <option v-for="(org, oindex) in organisations" :key="oindex" :value="org.id" :selected="org.id == selectedOrganisationId">
+            {{ org.name }}
+          </option>
+        </select>
+      </td>
+    </tr>
+    <tr v-if="showTeamMembers">
+      <td>
+        Team
+      </td>
+      <td>
+        <select id="team-select" @change="setSelectedTeamId()">
+          <option value="">
+            -- Select --
+          </option>
+          <option v-for="(team, tindex) in teams" :key="tindex" :value="team.id" :selected="team.id == selectedTeamId">
+            {{ team.name }}
+          </option>
+        </select>
+      </td>
+    </tr>
+    <tr v-if="showTeamMembers">
+      <td>
+        Add Team Member
+      </td>
+      <td>
+        <input type="text" id="new-team-member">
+        <button class="btn btn-sm btn-secondary smaller-font" :disabled="!selectedTeamId || selectedTeam.protected" @click="addTeamMember()">
+          Add
+        </button>
+      </td>
+    </tr>
+    <tr v-if="showTeamMembers">
+      <td>
+        Team Members
+      </td>
+      <td>
+        <table>
+          <tr v-for="(teamMember, mindex) in selectedTeam.members" :key="mindex">
             <td>
-              <select id="team-name" v-model="selectedTeam">
-                <option value="">
-                  -- Select --
-                </option>
-                <option v-for="(team, index) in teams" :key="index" :value="team.name" :selected="team.name == selectedTeam">
-                  {{ team.name }}
-                </option>
-              </select>
+              <input type="checkbox" :checked="teamMember.include" :disabled="selectedTeam.protected" @click="includeTeamMember(teamMember.id)">
             </td>
-          </tr>
-          <tr>
-            <td class="team-members-team">
-              Add team member to {{ selectedTeam }}
-            </td><td colspan="2">
-              <input type="text" id="add-member-name">
-              <button class="btn btn-sm btn-secondary smaller-font" :disabled="!selectedTeam" @click="addTeamMember()">
-                Add
+            <td>
+              {{ teamMember.name }}
+            </td>
+            <td>
+              <button class="btn btn-sm btn-secondary smaller-font" :disabled="selectedTeam.protected" @click="deleteTeamMember(teamMember.id)">
+                Delete
               </button>
-            </td>
-          </tr>
-          <tr>
-            <td>Team Members</td>
-            <td>
-              <div v-for="(team, index) in teams" :key="index">
-                <table v-if="team.name == selectedTeam" class="inner-table">
-                  <tr>
-                    <td class="center">
-                      Include?
-                    </td>
-                    <td colspan="2" />
-                  </tr>
-                  <tr v-for="(teamMember, mindex) in team.members" :key="mindex">
-                    <td><input type="checkbox" :checked="teamMember.include" @click="includeTeamMember(team, teamMember)"></td>
-                    <td>{{ teamMember.name }}</td>
-                    <td>
-                      <button class="btn btn-sm btn-secondary smaller-font" @click="deleteTeamMember(teamMember)">
-                        Delete
-                      </button>
-                    </td>
-                  </tr>
-                </table>
-              </div>
             </td>
           </tr>
         </table>
@@ -70,40 +78,67 @@ export default {
   ],
   data() {
     return {
-      selectedTeam: ''
+      showTeamMembers: false,
+      selectedOrganisationId: null,
+      teams: [],
+      selectedTeamId: null,
+      selectedTeam: {}
     }
   },
   computed: {
-    organisation() {
-      return this.$store.getters.getOrganisation
-    },
-    teamName() {
-      return this.$store.getters.getTeamName
-    },
-    showTeamMembers() {
-      return this.$store.getters.getShowTeamMembers
-    },
-    teams() {
-      return this.$store.getters.getTeams
-    },
-    teamMembers() {
-      return this.$store.getters.getTeamMembers
+    organisations() {
+      return this.$store.getters.getOrganisations
     }
+  },
+  created() {
+    this.socket.on('loadOrganisations', (data) => {
+      if (this.showTeamMembers) {
+        this.setSelectedOrganisationId(false)
+        this.setSelectedTeamId()
+      }
+    })
+    this.socket.on('openEditPane', (data) => {
+      if (data != 'showTeamMembers') {
+        this.showTeamMembers = false
+      }
+    })
   },
   methods: {
     setShowTeamMembers(val) {
-      this.$store.dispatch('setShowTeamMembers', val)
+      this.showTeamMembers = val
+      if (val) {
+        this.socket.emit('openEditPane', 'showTeamMembers')
+      }
+    },
+    setSelectedOrganisationId(clear) {
+      if (clear) {
+        this.selectedTeamId = null
+        this.selectedTeam = {}
+      }
+      const orgId = document.getElementById('organisation-select').value
+      this.selectedOrganisationId = orgId
+      const organisation = this.organisations.find(function(o) {
+        return o.id == orgId
+      })
+      this.teams = organisation ? organisation.teams : []
+    },
+    setSelectedTeamId() {
+      const teamId = document.getElementById('team-select').value
+      this.selectedTeamId = teamId
+      const selectedTeam = this.teams.find(function(t) {
+        return t.id == teamId
+      })
+      this.selectedTeam = selectedTeam ? selectedTeam : {}
     },
     addTeamMember() {
-      const memberName = document.getElementById('add-member-name').value
-      this.socket.emit('addTeamMember', {organisation: this.organisation, teamName: this.selectedTeam, memberName: memberName})
+      const name = document.getElementById('new-team-member').value
+      this.socket.emit('addTeamMember', {organisationId: this.selectedOrganisationId, teamId: this.selectedTeamId, name: name})
     },
-    includeTeamMember(team, teamMember) {
-      const include = !teamMember.include
-      this.socket.emit('includeTeamMember', {organisation: this.organisation, teamName: team.name, teamMember: teamMember, include: include})
+    includeTeamMember(id) {
+      this.socket.emit('includeTeamMember', {organisationId: this.selectedOrganisationId, teamId: this.selectedTeamId, id: id})
     },
-    deleteTeamMember(teamMember) {
-      this.socket.emit('deleteTeamMember', {organisation: this.organisation, teamName: this.selectedTeam, memberName: teamMember.name})
+    deleteTeamMember(id) {
+      this.socket.emit('deleteTeamMember', {organisationId: this.selectedOrganisationId, teamId: this.selectedTeamId, id: id})
     }
   }
 }
