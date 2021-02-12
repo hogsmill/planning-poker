@@ -4,7 +4,7 @@
       Explain this for me...
     </button>
 
-    <modal name="walk-through" id="walk-through" :classes="['rounded']">
+    <modal name="walk-through" id="walk-through" :height="350" :classes="['rounded']">
       <div class="float-right mr-2 mt-1">
         <button type="button" class="close" @click="hide" aria-label="Close">
           <span aria-hidden="true">&times;</span>
@@ -22,6 +22,16 @@
             want to estimate from a file - and save them back out again to save
             the estimates.
           </p>
+          <p>
+            If you'd like more info, or would like to discuss facilitation, send us your email
+            in the box below, and we can discuss your needs.
+          </p>
+          <div>
+            Email: <input type="email" id="email" placeholder="Email address">
+            <button class="btn btn-info btn-sm" @click="facilitate()">
+              Submit
+            </button>
+          </div>
         </div>
       </div>
       <div class="mt-4" v-if="step == 2">
@@ -109,13 +119,14 @@
 </template>
 
 <script>
+import mailFuns from '../../lib/mail.js'
 import params from '../../lib/params.js'
 
 export default {
   data() {
     return {
       step: 1,
-      default: { width: 600, height: 360 },
+      default: { width: 600, height: 380 },
       positions: {
         2: {  },
         3: {  },
@@ -189,20 +200,36 @@ export default {
       elem.style.top = positions.top + 'px'
       elem.style.width = positions.width + 'px'
       elem.style.height = positions.height +'px'
+    },
+    facilitate() {
+      mailFuns.post({
+        action: 'Facilitation request (Walkthrough) from ' + this.thisGame,
+        email: encodeURIComponent(document.getElementById('email').value),
+        comments: 'Facilitation Request'
+        },
+        'Thanks for your request - we\'ll get back to you as soon as we can with details'
+      )
     }
-  },
+  }
 }
 </script>
 
-<style>
+<style lang="scss">
 .buttons {
   padding: 6px;
 }
-#walk-through p {
-  margin-left: 8px;
-  margin-right: 8px;
-}
-li {
-  text-align: left;
+
+#walk-through {
+  p {
+    margin-left: 12px;
+    margin-right: 12px;
+  }
+  li {
+    text-align: left;
+  }
+  input {
+    width: 250px;
+    margin-right: 6px;
+  }
 }
 </style>
