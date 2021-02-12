@@ -135,6 +135,9 @@ export default {
     }
   },
   computed: {
+    thisGame() {
+      return this.$store.getters.thisGame
+    },
     walkThrough() {
       return this.$store.getters.getWalkThrough
     },
