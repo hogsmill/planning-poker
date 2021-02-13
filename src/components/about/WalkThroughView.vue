@@ -22,16 +22,7 @@
             want to estimate from a file - and save them back out again to save
             the estimates.
           </p>
-          <p>
-            If you'd like more info, or would like to discuss facilitation, send us your email
-            in the box below, and we can discuss your needs.
-          </p>
-          <div>
-            Email: <input type="email" id="email" placeholder="Email address">
-            <button class="btn btn-info btn-sm" @click="facilitate()">
-              Submit
-            </button>
-          </div>
+          <Facilitation />
         </div>
       </div>
       <div class="mt-4" v-if="step == 2">
@@ -119,10 +110,14 @@
 </template>
 
 <script>
-import mailFuns from '../../lib/mail.js'
 import params from '../../lib/params.js'
 
+import Facilitation from './Facilitation.vue'
+
 export default {
+  components: {
+    Facilitation
+  },
   data() {
     return {
       step: 1,
@@ -203,15 +198,6 @@ export default {
       elem.style.top = positions.top + 'px'
       elem.style.width = positions.width + 'px'
       elem.style.height = positions.height +'px'
-    },
-    facilitate() {
-      mailFuns.post({
-        action: 'Facilitation request (Walkthrough) from ' + this.thisGame,
-        email: encodeURIComponent(document.getElementById('email').value),
-        comments: 'Facilitation Request'
-        },
-        'Thanks for your request - we\'ll get back to you as soon as we can with details'
-      )
     }
   }
 }
