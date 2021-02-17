@@ -590,7 +590,6 @@ module.exports = {
               include: true,
               voted: false
             })
-            console.log(team.members)
           }
           teams.push(team)
         }
@@ -599,7 +598,8 @@ module.exports = {
           _loadOrganisations(db, io)
        })
       }
-    })  },
+    })
+  },
 
   includeTeamMember: function(db, io, data, debugOn) {
 

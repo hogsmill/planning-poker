@@ -48,7 +48,7 @@
             members, and much more, i.e.
           </p>
           <p>
-            <a href="http://agilesimulations.co.uk/planning-poker?host">http://agilesimulations.co.uk/planning-poker?host</a>
+            <a href="https://agilesimulations.co.uk/planning-poker?host">https://agilesimulations.co.uk/planning-poker?host</a>
           </p>
         </div>
       </div>

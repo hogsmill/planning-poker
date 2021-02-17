@@ -155,7 +155,6 @@ export const store = new Vuex.Store({
       state.member = state.team.members.find(function(m) {
         return m.id == payload
       })
-      console.log(state)
     },
     updateOrganisations: (state, payload) => {
       state.organisations = payload
