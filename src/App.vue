@@ -1,9 +1,6 @@
 <template>
   <div id="app" class="mb-4">
     <Header />
-    <h1>
-      Planning Poker
-    </h1>
     <h2>
       <span v-if="organisation.id">({{ organisation.name }}</span>
       <span v-if="team.id">, {{ team.name }}</span>
@@ -14,13 +11,13 @@
       <AboutView />
     </div>
     <div v-if="showTab == 'facilitator'">
-      <FacilitatorView :socket="socket" />
+      <FacilitatorView />
     </div>
     <div v-if="showTab == 'game'">
       <div class="game-params">
-        <SetGame :socket="socket" />
+        <SetGame />
         <WalkThroughView v-if="!organisation.id" />
-        <GameView v-if="organisation.id && team.id && member.id" :socket="socket" />
+        <GameView v-if="organisation.id && team.id && member.id" />
       </div>
       <div v-if="!organisation.id" class="poker-train" />
       <div v-if="organisation.id && gameView == 'poker'" class="container">
@@ -28,24 +25,24 @@
           <table class="poker-table" border>
             <tr>
               <td class="backlog">
-                <Backlog :socket="socket" />
+                <Backlog />
               </td>
               <td class="poker">
-                <Poker :socket="socket" />
+                <Poker />
               </td>
             </tr>
           </table>
         </div>
       </div>
       <div v-if="organisation && gameView == 'train'" class="container">
-        <Train v-if="organisation && gameView == 'train'" :socket="socket" />
+        <Train v-if="organisation && gameView == 'train'" />
       </div>
     </div>
   </div>
 </template>
 
 <script>
-import io from 'socket.io-client'
+import bus from './socket.js'
 
 import params from './lib/params.js'
 
@@ -96,34 +93,24 @@ export default {
     }
   },
   created() {
-    let connStr
-    if (location.hostname == 'localhost') {
-      connStr = 'http://localhost:3004'
-    } else {
-      connStr = 'https://agilesimulations.co.uk:3004'
-    }
-    console.log('Connecting to: ' + connStr)
-    this.socket = io(connStr)
-
     if (params.isParam('host')) {
       this.$store.dispatch('updateHost', true)
     }
 
-    this.socket.emit('checkSystemWorkshops')
+    bus.$emit('sendCheckSystemWorkshops')
 
-    this.socket.on('loadOrganisations', (data) => {
+    bus.$on('loadOrganisations', (data) => {
       this.$store.dispatch('updateOrganisations', data)
 
       const orgId = localStorage.getItem('organisation-pp')
       if (orgId) {
         this.$store.dispatch('updateOrganisation', orgId)
-        this.socket.emit('setOrganisation', {organisationId: orgId})
       }
 
       const teamId = localStorage.getItem('team-pp')
       if (orgId && teamId) {
         this.$store.dispatch('updateTeam', teamId)
-        this.socket.emit('loadTeam', {organisationId: orgId, teamId: teamId})
+        bus.$emit('sendLoadTeam', {organisationId: orgId, teamId: teamId})
       }
 
       const memberId = localStorage.getItem('member-pp')
@@ -132,50 +119,49 @@ export default {
       }
     })
 
-    this.socket.on('loadTeam', (data) => {
+    bus.$on('loadTeam', (data) => {
       if (this.team.id == data.teamId && this.organisation.id == data.organisationId) {
-      console.log(data)
         this.$store.dispatch('loadTeam', data)
       }
     })
 
-    this.socket.on('loadOrganisation', (data) => {
+    bus.$on('loadOrganisation', (data) => {
       if (this.organisation.id == data.organisationId) {
         this.$store.dispatch('loadOrganisation', data)
       }
     })
 
-    this.socket.on('loadTeams', (data) => {
+    bus.$on('loadTeams', (data) => {
       if (this.organisation.id == data.organisationId) {
         this.$store.dispatch('loadTeams', data)
       }
     })
 
-    this.socket.on('updateEstimationType', (data) => {
+    bus.$on('updateEstimationType', (data) => {
       if (this.team.id == data.teamId && this.organisation.id == data.organisationId) {
         this.$store.dispatch('updateEstimationType', data)
       }
     })
 
-    this.socket.on('updateEstimateTeam', (data) => {
+    bus.$on('updateEstimateTeam', (data) => {
       if (this.organisation.id == data.organisationId) {
         this.$store.dispatch('updateEstimateTeam', data)
       }
     })
 
-    this.socket.on('updateTimer', (data) => {
+    bus.$on('updateTimer', (data) => {
       if (this.team.id == data.teamId && this.organisation.id == data.organisationId) {
         this.$store.dispatch('updateTimer', data)
       }
     })
 
-    this.socket.on('reveal', (data) => {
+    bus.$on('reveal', (data) => {
       if (this.team.id == data.teamId && this.organisation.id == data.organisationId) {
         this.$store.dispatch('reveal', data)
       }
     })
 
-    this.socket.on('updateConnections', (data) => {
+    bus.$on('updateConnections', (data) => {
       this.$store.dispatch('updateConnections', data)
     })
   }

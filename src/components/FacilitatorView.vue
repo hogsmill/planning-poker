@@ -3,11 +3,11 @@
     <div class="connections">
       Current server connections: {{ connections.connections }} / {{ connections.maxConnections }}
     </div>
-    <Organisation :socket="socket" />
-    <Teams :socket="socket" />
-    <TeamMembers :socket="socket" />
-    <Estimates :socket="socket" />
-    <Backlog :socket="socket" />
+    <Organisation />
+    <Teams />
+    <TeamMembers />
+    <Estimates />
+    <Backlog />
   </div>
 </template>
 
@@ -26,9 +26,6 @@ export default {
     Estimates,
     Backlog
   },
-  props: [
-    'socket'
-  ],
   computed: {
     connections() {
       return this.$store.getters.getConnections

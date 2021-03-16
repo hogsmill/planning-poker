@@ -68,9 +68,6 @@
 import stringFuns from '../lib/stringFuns.js'
 
 export default {
-  props: [
-    'socket'
-  ],
   computed: {
     organisations() {
       return this.$store.getters.getOrganisations

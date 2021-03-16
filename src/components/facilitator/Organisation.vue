@@ -34,10 +34,9 @@
 </template>
 
 <script>
+import bus from '../../socket.js'
+
 export default {
-  props: [
-    'socket'
-  ],
   data() {
     return {
       showOrganisation: false
@@ -49,7 +48,7 @@ export default {
     }
   },
   created() {
-    this.socket.on('openEditPane', (data) => {
+    bus.$on('openEditPane', (data) => {
       if (data != 'showOrganisation') {
         this.showOrganisation = false
       }
@@ -59,16 +58,16 @@ export default {
     setShowOrganisation(val) {
       this.showOrganisation = val
       if (val) {
-        this.socket.emit('openEditPane', 'showOrganisation')
+        bus.$emit('openEditPane', 'showOrganisation')
       }
     },
     addOrganisation() {
       const name = document.getElementById('new-organisation').value
-      this.socket.emit('addOrganisation', {name: name})
+      bus.$emit('sendAddOrganisation', {name: name})
     },
     deleteOrganisation(organisation) {
       if (confirm('Delete ' + organisation.name)) {
-        this.socket.emit('deleteOrganisation', {id: organisation.id})
+        bus.$emit('sendDeleteOrganisation', {id: organisation.id})
       }
     }
   }

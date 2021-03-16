@@ -1,8 +1,10 @@
 
+import bus from '../socket.js'
+
 const papa = require('papaparse')
 const { v4: uuidv4 } = require('uuid')
 
-function createBacklog(data, organisationId, teamId, replace, socket) {
+function createBacklog(data, organisationId, teamId, replace) {
   const backlog = []
   for (let i = 0; i < data.length; i++) {
     const card = {
@@ -15,12 +17,12 @@ function createBacklog(data, organisationId, teamId, replace, socket) {
     }
     backlog.push(card)
   }
-  socket.emit('loadBacklog', {organisationId: organisationId, teamId: teamId, backlog: backlog, replace: replace})
+  bus.$emit('sendLoadBacklog', {organisationId: organisationId, teamId: teamId, backlog: backlog, replace: replace})
 }
 
 const FileFuns = {
 
-  loadBacklog: function(file, separator, organisationId, teamId, replace, socket) {
+  loadBacklog: function(file, separator, organisationId, teamId, replace) {
 
     switch(separator) {
       case 'tab':
@@ -43,7 +45,7 @@ const FileFuns = {
       delimiter: separator,
       skipEmptyLines: true,
 	    complete: function(results) {
-		    createBacklog(results.data, organisationId, teamId, replace, socket)
+		    createBacklog(results.data, organisationId, teamId, replace)
 	    }
     })
   }

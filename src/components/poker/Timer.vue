@@ -25,10 +25,9 @@
 </template>
 
 <script>
+import bus from '../../socket.js'
+
 export default {
-  props: [
-    'socket'
-  ],
   computed: {
     organisation() {
       return this.$store.getters.getOrganisation
@@ -56,13 +55,13 @@ export default {
       return this.time > 0 && this.time < 10
     },
     setTimerType(timerType) {
-      this.socket.emit('setTimerType', {organisationId: this.organisation.id, teamId: this.team.id, timerType: timerType})
+      bus.$emit('sendSetTimerType', {organisationId: this.organisation.id, teamId: this.team.id, timerType: timerType})
     },
     startTimer() {
-      this.socket.emit('startTimer', {organisationId: this.organisation.id, teamId: this.team.id, })
+      bus.$emit('sendStartTimer', {organisationId: this.organisation.id, teamId: this.team.id })
     },
     stopTimer() {
-      this.socket.emit('stopTimer', {organisationId: this.organisation.id, teamId: this.team.id, })
+      bus.$emit('sendStopTimer', {organisationId: this.organisation.id, teamId: this.team.id })
     }
   }
 }

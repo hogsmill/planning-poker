@@ -61,11 +61,9 @@
 </template>
 
 <script>
+import bus from '../socket.js'
 
 export default {
-  props: [
-    'socket'
-  ],
   computed: {
     organisation() {
       return this.$store.getters.getOrganisation
@@ -85,7 +83,7 @@ export default {
       return 'url("../planning-poker/icons/' + estimate.icon + '")'
     },
     selectCard(id) {
-      this.socket.emit('selectCard', {organisationId: this.organisation.id, teamId: this.team.id, id: id})
+      bus.$emit('sendSelectCard', {organisationId: this.organisation.id, teamId: this.team.id, id: id})
     }
   }
 }

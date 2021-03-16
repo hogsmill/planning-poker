@@ -134,10 +134,9 @@
 </template>
 
 <script>
+import bus from '../../socket.js'
+
 export default {
-  props: [
-    'socket'
-  ],
   data() {
     return {
       showTeams: false,
@@ -152,12 +151,12 @@ export default {
     }
   },
   created() {
-    this.socket.on('loadOrganisations', (data) => {
+    bus.$on('loadOrganisations', (data) => {
       if (this.showTeams) {
         this.setSelectedOrganisationId()
       }
     })
-    this.socket.on('openEditPane', (data) => {
+    bus.$on('openEditPane', (data) => {
       if (data != 'showTeams') {
         this.showTeams = false
       }
@@ -167,7 +166,7 @@ export default {
     setShowTeams(val) {
       this.showTeams = val
       if (val) {
-        this.socket.emit('openEditPane', 'showTeams')
+        bus.$emit('openEditPane', 'showTeams')
       }
     },
     setSelectedOrganisationId() {
@@ -184,34 +183,34 @@ export default {
     },
     addTeam() {
       const team = document.getElementById('new-team').value
-      this.socket.emit('addTeam', {organisationId: this.selectedOrganisationId, name: team})
+      bus.$emit('sendAddTeam', {organisationId: this.selectedOrganisationId, name: team})
     },
     deleteTeam(team) {
-      this.socket.emit('deleteTeam', {organisationId: this.selectedOrganisationId, id: team.id})
+      bus.$emit('sendDeleteTeam', {organisationId: this.selectedOrganisationId, id: team.id})
     },
     includeTeam(team) {
-      this.socket.emit('includeTeam', {organisationId: this.selectedOrganisationId, id: team.id})
+      bus.$emit('sendIncludeTeam', {organisationId: this.selectedOrganisationId, id: team.id})
     },
     toggleDiscussionTimer(team) {
-      this.socket.emit('setUseDiscussionTimer', {organisationId: this.selectedOrganisationId, id: team.id})
+      bus.$emit('sendSetUseDiscussionTimer', {organisationId: this.selectedOrganisationId, id: team.id})
     },
     toggleEstimationTimer(team) {
-      this.socket.emit('setUseEstimationTimer', {organisationId: this.selectedOrganisationId, id: team.id})
+      bus.e$mit('sendSetUseEstimationTimer', {organisationId: this.selectedOrganisationId, id: team.id})
     },
     toggleTimerAutoReveal(team) {
-      this.socket.emit('setTimerAutoReveal', {organisationId: this.selectedOrganisationId, id: team.id})
+      bus.$emit('sendSetTimerAutoReveal', {organisationId: this.selectedOrganisationId, id: team.id})
     },
     setVelocity(team) {
       const velocity = document.getElementById('velocity-' + this.sanitized(team.name)).value
-      this.socket.emit('setVelocity', {organisationId: this.selectedOrganisationId, id: team.id, value: velocity})
+      bus.$emit('sendSetVelocity', {organisationId: this.selectedOrganisationId, id: team.id, value: velocity})
     },
     setEstimationTimerTime(team) {
       const timerTime = document.getElementById('estimation-timer-time-' + this.sanitized(team.name)).value
-      this.socket.emit('setEstimationTimerTime', {organisationId: this.selectedOrganisationId, id: team.id, value: timerTime})
+      bus.$emit('sendSetEstimationTimerTime', {organisationId: this.selectedOrganisationId, id: team.id, value: timerTime})
     },
     setDiscussionTimerTime(team) {
       const timerTime = document.getElementById('discussion-timer-time-' + this.sanitized(team.name)).value
-      this.socket.emit('setDiscussionTimerTime', {organisationId: this.selectedOrganisationId, id: team.id, value: timerTime})
+      bus.$emit('sendSetDiscussionTimerTime', {organisationId: this.selectedOrganisationId, id: team.id, value: timerTime})
     }
   }
 }

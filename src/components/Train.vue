@@ -70,10 +70,9 @@
 </template>
 
 <script>
+import bus from '../socket.js'
+
 export default {
-  props: [
-    'socket'
-  ],
   data() {
     return {
       trainPosition: 0,
@@ -131,7 +130,7 @@ export default {
         card.committed = i < this.trainPosition
         newBacklog.push(card)
       }
-      this.socket.emit('updateBacklog', {organisationId: this.organisation.id, teamId: this.team.id, backlog: newBacklog})
+      bus.$emit('sendUpdateBacklog', {organisationId: this.organisation.id, teamId: this.team.id, backlog: newBacklog})
     },
     cardLeft(card) {
       const backlog = []

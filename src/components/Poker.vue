@@ -13,7 +13,7 @@
         </p>
       </div>
       <div class="final-estimate">
-        <Timer v-if="team.useDiscussionTimer || team.useEstimationTimer" :socket="socket" />
+        <Timer v-if="team.useDiscussionTimer || team.useEstimationTimer" />
         <div class="agreed-estimate">
           <span>Agreed Estimate: </span>
           <select id="agreed-estimate-value">
@@ -83,15 +83,14 @@
 </template>
 
 <script>
+import bus from '../socket.js'
+
 import Timer from './poker/Timer.vue'
 
 export default {
   components: {
     Timer
   },
-  props: [
-    'socket'
-  ],
   data() {
     return {
       estimating: false
@@ -155,10 +154,10 @@ export default {
       this.estimating = true
     },
     coffee(member) {
-      this.socket.emit('memberCoffee', {organisationId: this.organisation.id, teamId: this.team.id, memberId: this.member.id, coffee: true})
+      bus.$emit('sendMemberCoffee', {organisationId: this.organisation.id, teamId: this.team.id, memberId: this.member.id, coffee: true})
     },
     question(member) {
-      this.socket.emit('memberQuestion', {organisationId: this.organisation.id, teamId: this.team.id, memberId: this.member.id, question: true})
+      bus.$emit('sendMemberQuestion', {organisationId: this.organisation.id, teamId: this.team.id, memberId: this.member.id, question: true})
     },
     lowest() {
       return this.team.lowest
@@ -174,18 +173,18 @@ export default {
       const estimationValue = this.estimationValues.find(function(e) {
         return e.name == estValue
       })
-      this.socket.emit('updateEstimateValue', {organisationId: this.organisation.id, teamId: this.team.id, memberId: this.member.id, value: estimationValue})
+      bus.$emit('sendUpdateEstimateValue', {organisationId: this.organisation.id, teamId: this.team.id, memberId: this.member.id, value: estimationValue})
       this.estimating = false
     },
     reveal(value) {
-      this.socket.emit('reveal', {organisationId: this.organisation.id, teamId: this.team.id, reveal: value})
+      bus.$emit('sendReveal', {organisationId: this.organisation.id, teamId: this.team.id, reveal: value})
     },
     saveAgreedEstimate() {
       const estValue = document.getElementById('agreed-estimate-value').value
       const estimationValue = this.estimationValues.find(function(e) {
         return e.name == estValue
       })
-      this.socket.emit('updateAgreedEstimate', {organisationId: this.organisation.id, teamId: this.team.id, selectedCard: this.selectedCard, value: estimationValue})
+      bus.$emit('sendUpdateAgreedEstimate', {organisationId: this.organisation.id, teamId: this.team.id, selectedCard: this.selectedCard, value: estimationValue})
     }
   }
 }

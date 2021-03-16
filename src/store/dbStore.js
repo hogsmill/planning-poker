@@ -118,9 +118,9 @@ function _loadOrganisations(db, io) {
 
 module.exports = {
 
-  checkSystemWorkshops: function(db, io, data, debugOn) {
+  checkSystemWorkshops: function(db, io, debugOn) {
 
-    if (debugOn) { console.log('checkSystemWorkshops', data) }
+    if (debugOn) { console.log('checkSystemWorkshops') }
 
     const demoId = 'ada3f6c5-6929-4b95-abeb-401e0443e23e'
     db.collection('planningPokerOrganisations').findOne({id: demoId}, function(err, res) {

@@ -72,10 +72,9 @@
 </template>
 
 <script>
+import bus from '../../socket.js'
+
 export default {
-  props: [
-    'socket'
-  ],
   data() {
     return {
       showTeamMembers: false,
@@ -91,13 +90,13 @@ export default {
     }
   },
   created() {
-    this.socket.on('loadOrganisations', (data) => {
+    bus.$on('loadOrganisations', (data) => {
       if (this.showTeamMembers) {
         this.setSelectedOrganisationId(false)
         this.setSelectedTeamId()
       }
     })
-    this.socket.on('openEditPane', (data) => {
+    bus.$on('openEditPane', (data) => {
       if (data != 'showTeamMembers') {
         this.showTeamMembers = false
       }
@@ -107,7 +106,7 @@ export default {
     setShowTeamMembers(val) {
       this.showTeamMembers = val
       if (val) {
-        this.socket.emit('openEditPane', 'showTeamMembers')
+        bus.$emit('sendOpenEditPane', 'showTeamMembers')
       }
     },
     setSelectedOrganisationId(clear) {
@@ -132,13 +131,13 @@ export default {
     },
     addTeamMember() {
       const name = document.getElementById('new-team-member').value
-      this.socket.emit('addTeamMember', {organisationId: this.selectedOrganisationId, teamId: this.selectedTeamId, name: name})
+      bus.$emit('sendAddTeamMember', {organisationId: this.selectedOrganisationId, teamId: this.selectedTeamId, name: name})
     },
     includeTeamMember(id) {
-      this.socket.emit('includeTeamMember', {organisationId: this.selectedOrganisationId, teamId: this.selectedTeamId, id: id})
+      bus.$emit('sendIncludeTeamMember', {organisationId: this.selectedOrganisationId, teamId: this.selectedTeamId, id: id})
     },
     deleteTeamMember(id) {
-      this.socket.emit('deleteTeamMember', {organisationId: this.selectedOrganisationId, teamId: this.selectedTeamId, id: id})
+      bus.$emit('sendDeleteTeamMember', {organisationId: this.selectedOrganisationId, teamId: this.selectedTeamId, id: id})
     }
   }
 }

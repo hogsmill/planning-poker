@@ -13,10 +13,9 @@
 </template>
 
 <script>
+import bus from '../socket.js'
+
 export default {
-  props: [
-    'socket'
-  ],
   computed: {
     organisation() {
       return this.$store.getters.getOrganisation
@@ -30,7 +29,7 @@ export default {
   },
   methods: {
     setGameView(view) {
-      this.socket.emit('setGameView', {organisationId: this.organisation.id, teamId: this.team.id, view: view})
+      bus.$emit('sendSetGameView', {organisationId: this.organisation.id, teamId: this.team.id, view: view})
     }
   }
 }
