@@ -28,9 +28,7 @@ bus.$on('sendStartTimer', (data) => { socket.emit('sendStartTimer', data) })
 
 bus.$on('sendStopTimer', (data) => { socket.emit('sendStopTimer', data) })
 
-bus.$on('sendMemberCoffee', (data) => { socket.emit('sendMemberCoffee', data) })
-
-bus.$on('sendMemberQuestion', (data) => { socket.emit('sendMemberQuestion', data) })
+bus.$on('sendSetMemberValue', (data) => { socket.emit('sendSetMemberValue', data) })
 
 bus.$on('sendUpdateEstimateValue', (data) => { socket.emit('sendUpdateEstimateValue', data) })
 
@@ -109,6 +107,8 @@ socket.on('updateEstimationType', (data) => { bus.$emit('updateEstimationType', 
 socket.on('updateEstimateTeam', (data) => { bus.$emit('updateEstimateTeam', data) })
 
 socket.on('updateTimer', (data) => { bus.$emit('updateTimer', data) })
+
+socket.on('stopTimer', (data) => { bus.$emit('stopTimer', data) })
 
 socket.on('reveal', (data) => { bus.$emit('reveal', data) })
 

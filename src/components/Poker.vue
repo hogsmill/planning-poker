@@ -41,7 +41,8 @@
       </div>
       <div class="members">
         <div v-for="(teamMember, index) in teamMembers" :key="index" class="member rounded"
-             :class="{ 'median': isMedian(teamMember), 'highest': isHighest(teamMember), 'lowest': isLowest(teamMember) }">
+             :class="{ 'median': isMedian(teamMember), 'highest': isHighest(teamMember), 'lowest': isLowest(teamMember) }"
+        >
           <div><b>{{ teamMember.name }}</b></div>
           <div v-if="teamMember.id == member.id || revealed" class="poker-card rounded">
             <div class="options">
@@ -154,10 +155,12 @@ export default {
       this.estimating = true
     },
     coffee(member) {
-      bus.$emit('sendMemberCoffee', {organisationId: this.organisation.id, teamId: this.team.id, memberId: this.member.id, coffee: true})
+      const val = !(this.memberStatus(member) == 'coffee')
+      bus.$emit('sendSetMemberValue', {organisationId: this.organisation.id, teamId: this.team.id, memberId: this.member.id, field: 'coffee', value: val})
     },
     question(member) {
-      bus.$emit('sendMemberQuestion', {organisationId: this.organisation.id, teamId: this.team.id, memberId: this.member.id, question: true})
+      const val = !(this.memberStatus(member) == 'question')
+      bus.$emit('sendSetMemberValue', {organisationId: this.organisation.id, teamId: this.team.id, memberId: this.member.id, field: 'question', value: val})
     },
     lowest() {
       return this.team.lowest

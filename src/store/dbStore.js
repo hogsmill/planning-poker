@@ -103,9 +103,12 @@ function updateTimer(io, t, data, autoReveal) {
     setTimeout(function() {
       updateTimer(io, t, data, autoReveal)
     }, 1000)
-  } else if (autoReveal) {
-    data.reveal = true
-    io.emit('reveal', data)
+  } else {
+    io.emit('stopTimer', data)
+    if (autoReveal) {
+      data.reveal = true
+      io.emit('reveal', data)
+    }
   }
 }
 
@@ -276,7 +279,6 @@ module.exports = {
         delete res._id
         db.collection('planningPokerOrganisations').updateOne({'_id': id}, {$set: res}, function(err, res) {
           if (err) throw err
-          console.log(data)
           io.emit('loadTeam', data)
         })
       }
@@ -393,7 +395,7 @@ module.exports = {
 
   setMemberValue:  function(db, io, data, debugOn, field) {
 
-    if (debugOn) { console.log('setMemberValue', field, data) }
+    if (debugOn) { console.log('setMemberValue', data) }
 
     db.collection('planningPokerOrganisations').findOne({id: data.organisationId}, function(err, res) {
       if (err) throw err
@@ -410,8 +412,7 @@ module.exports = {
                 team.members[j].estimate = null
                 team.members[j].coffee = false
                 team.members[j].question = false
-                team.members[j][field] = data[field]
-                console.log(team.members[j])
+                team.members[j][data.field] = data.value
               }
               members.push(team.members[j])
             }

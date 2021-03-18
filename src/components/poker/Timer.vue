@@ -9,12 +9,12 @@
             </div>
           </td>
           <td>
-            <i v-if="time == 0" class="fas fa-play-circle" @click="startTimer()" />
-            <i v-if="time > 0" class="fas fa-stop-circle" @click="stopTimer()" />
+            <i v-if="!timerRunning" class="fas fa-play-circle" @click="startTimer()" />
+            <i v-if="timerRunning" class="fas fa-stop-circle" @click="stopTimer()" />
           </td>
         </tr>
         <tr v-if="team.useEstimationTimer && team.useDiscussionTimer">
-          <td>
+          <td colspan="2">
             <input type="radio" name="timerType" :checked="team.timerType == 'estimation'" @click="setTimerType('estimation')"> Estimation
             <input type="radio" name="timerType" :checked="team.timerType == 'discussion'" @click="setTimerType('discussion')"> Discussion
           </td>
@@ -37,6 +37,9 @@ export default {
     },
     time() {
       return this.$store.getters.getTime
+    },
+    timerRunning() {
+      return this.$store.getters.getTimerRunning
     }
   },
   methods: {
@@ -58,9 +61,11 @@ export default {
       bus.$emit('sendSetTimerType', {organisationId: this.organisation.id, teamId: this.team.id, timerType: timerType})
     },
     startTimer() {
+      this.$store.dispatch('startTimer')
       bus.$emit('sendStartTimer', {organisationId: this.organisation.id, teamId: this.team.id })
     },
     stopTimer() {
+      this.$store.dispatch('stopTimer')
       bus.$emit('sendStopTimer', {organisationId: this.organisation.id, teamId: this.team.id })
     }
   }
@@ -74,6 +79,13 @@ export default {
     margin: 0 auto 12px auto;
     width: 250px;
     box-shadow: 2px 2px 3px #aaa;
+
+    input {
+      width: initial;
+      margin-left: 6px;
+      position: relative;
+      top: 1px;
+    }
 
     .fas {
       font-size: xxx-large;
@@ -94,6 +106,7 @@ export default {
       width: 140px;
       font-size: 48px;
       font-weight: bold;
+      margin: 0 auto;
     }
   }
 </style>

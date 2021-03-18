@@ -107,9 +107,8 @@ MongoClient.connect(url, { useUnifiedTopology: true }, function (err, client) {
 
     socket.on('updateCommittedCards', (data) => { dbStore.updateCommittedCards(db, io, data, debugOn) })
 
-    socket.on('sendMemberCoffee', (data) => { dbStore.memberCoffee(db, io, data, debugOn) })
+    socket.on('sendSetMemberValue', (data) => { dbStore.setMemberValue(db, io, data, debugOn) })
 
-    socket.on('sendMemberQuestion', (data) => { dbStore.memberQuestion(db, io, data, debugOn) })
 
     socket.on('sendUpdateEstimateValue', (data) => { dbStore.updateEstimateValue(db, io, data, debugOn) })
 
@@ -117,7 +116,7 @@ MongoClient.connect(url, { useUnifiedTopology: true }, function (err, client) {
 
     socket.on('sendStartTimer', (data) => { dbStore.startTimer(db, io, data, debugOn) })
 
-    socket.on('sendStopTimer', (data) => { dbStore.stopTimer(db, io, data, debugOn) })
+    socket.on('sendStopTimer', (data) => { emit('stopTimer', data) })
 
     socket.on('sendReveal', (data) => { emit('reveal', data) })
 

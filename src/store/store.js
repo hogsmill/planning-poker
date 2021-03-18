@@ -15,6 +15,7 @@ export const store = new Vuex.Store({
     team: {},
     member: {},
     time: 0,
+    timerRunning: false,
     revealed: false,
   },
   getters: {
@@ -71,8 +72,11 @@ export const store = new Vuex.Store({
     getEstimationType: (state) => {
       return state.team.estimationType
     },
+    getTimerRunning: (state) => {
+      return state.timerRunning
+    },
     getTime: (state) => {
-      return state.team.time
+      return state.time
     },
     getRevealed: (state) => {
       return state.revealed
@@ -171,8 +175,17 @@ export const store = new Vuex.Store({
     updateEstimateTeam: (state, payload) => {
       state.editing.estimateTeam = payload.estimateTeam
     },
+    startTimer: (state, payload) => {
+      state.timerRunning = true
+    },
     updateTimer: (state, payload) => {
-      state.time = payload.time
+      if (state.timerRunning) {
+        state.time = payload.time
+      }
+    },
+    stopTimer: (state, payload) => {
+      state.time = 0
+      state.timerRunning = false
     },
     reveal: (state, payload) => {
       state.revealed = payload.reveal
@@ -240,8 +253,14 @@ export const store = new Vuex.Store({
     loadTeam: ({ commit }, payload) => {
       commit('loadTeam', payload)
     },
+    startTimer: ({ commit }, payload) => {
+      commit('startTimer', payload)
+    },
     updateTimer: ({ commit }, payload) => {
       commit('updateTimer', payload)
+    },
+    stopTimer: ({ commit }, payload) => {
+      commit('stopTimer', payload)
     },
     reveal: ({ commit }, payload) => {
       commit('reveal', payload)

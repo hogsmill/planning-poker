@@ -151,7 +151,15 @@ export default {
 
     bus.$on('updateTimer', (data) => {
       if (this.team.id == data.teamId && this.organisation.id == data.organisationId) {
-        this.$store.dispatch('updateTimer', data)
+        if (this.$store.getters.getTimerRunning) {
+          this.$store.dispatch('updateTimer', data)
+        }
+      }
+    })
+
+    bus.$on('stopTimer', (data) => {
+      if (this.team.id == data.teamId && this.organisation.id == data.organisationId) {
+        this.$store.dispatch('stopTimer', data)
       }
     })
 
