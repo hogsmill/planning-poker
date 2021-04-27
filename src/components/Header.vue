@@ -17,7 +17,7 @@
 
     <div class="collapse navbar-collapse" id="navbarSupportedContent">
       <h1>
-        Planning Poker
+        {{ appName }}
       </h1>
       <ul class="navbar-nav ml-auto">
         <li class="nav-item" :class="{active: showTab == 'game'}">
@@ -76,6 +76,9 @@ export default {
       return this.$store.getters.getShowTab
     }
   },
+  created() {
+    this.appName = process.env.VUE_APP_NAME
+  },
   methods: {
     updateShowTab(payload) {
       this.$store.dispatch('updateShowTab', payload)
@@ -109,7 +112,7 @@ export default {
     font-size: xx-large;
     line-height: 1;
   }
-  
+
   .feedback {
     letter-spacing: 0;
     color: #212529;
