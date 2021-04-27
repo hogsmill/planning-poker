@@ -85,11 +85,11 @@ function _setOrganisation(db, io, data, debugOn) {
 
   if (debugOn) { console.log('setOrganisation', data) }
 
-  db.collection('planningPokerOrganisations').findOne({id: data.organisationId}, function(err, res) {
+  db.gameCollection.findOne({id: data.organisationId}, function(err, res) {
     if (err) throw err
     data.teams = res.teams
     io.emit('loadOrganisation', data)
-    db.collection('planningPokerOrganisations').updateOne({'_id': res._id}, {$set: {lastaccess: new Date().toISOString()}}, function(err, res) {
+    db.gameCollection.updateOne({'_id': res._id}, {$set: {lastaccess: new Date().toISOString()}}, function(err, res) {
       if (err) throw err
     })
   })
@@ -113,7 +113,7 @@ function updateTimer(io, t, data, autoReveal) {
 }
 
 function _loadOrganisations(db, io) {
-  db.collection('planningPokerOrganisations').find().toArray( function(err, res) {
+  db.gameCollection.find().toArray( function(err, res) {
     if (err) throw err
     io.emit('loadOrganisations', res)
   })
@@ -126,11 +126,11 @@ module.exports = {
     if (debugOn) { console.log('checkSystemWorkshops') }
 
     const demoId = 'ada3f6c5-6929-4b95-abeb-401e0443e23e'
-    db.collection('planningPokerOrganisations').findOne({id: demoId}, function(err, res) {
+    db.gameCollection.findOne({id: demoId}, function(err, res) {
       if (err) throw err
       if (!res) {
         const organisation = demo.organisation(demoId)
-        db.collection('planningPokerOrganisations').insertOne(organisation, function(err, res) {
+        db.gameCollection.insertOne(organisation, function(err, res) {
           if (err) throw err
           _loadOrganisations(db, io)
         })
@@ -148,7 +148,7 @@ module.exports = {
     if (debugOn) { console.log('setOrganisation', data) }
 
     if (data.startOver) {
-      db.collection('planningPokerOrganisations').deleteOne({organisation: data.organisation}, function(err, res) {
+      db.gameCollection.deleteOne({organisation: data.organisation}, function(err, res) {
         _setOrganisation(db, io, data, debugOn)
       })
     } else {
@@ -162,10 +162,10 @@ module.exports = {
 
     if (debugOn) { console.log('loadOrganisation', data) }
 
-    db.collection('planningPokerOrganisations').findOne({id: data.id}, function(err, res) {
+    db.gameCollection.findOne({id: data.id}, function(err, res) {
       if (err) throw err
       if (res) {
-        db.collection('planningPokerOrganisations').updateOne({'_id': res._id}, {$set: {lastaccess: new Date().toISOString()}}, function(err, res) {
+        db.gameCollection.updateOne({'_id': res._id}, {$set: {lastaccess: new Date().toISOString()}}, function(err, res) {
           if (err) throw err
         })
         delete res._id
@@ -178,7 +178,7 @@ module.exports = {
 
     if (debugOn) { console.log('loadTeam', data) }
 
-    db.collection('planningPokerOrganisations').findOne({id: data.organisationId}, function(err, res) {
+    db.gameCollection.findOne({id: data.organisationId}, function(err, res) {
       if (err) throw err
       if (res) {
         data.demo = res.demo
@@ -196,7 +196,7 @@ module.exports = {
 
     if (debugOn) { console.log('setGameView', data) }
 
-    db.collection('planningPokerOrganisations').findOne({id: data.organisationId}, function(err, res) {
+    db.gameCollection.findOne({id: data.organisationId}, function(err, res) {
       if (err) throw err
       if (res) {
         const teams = []
@@ -209,7 +209,7 @@ module.exports = {
           teams.push(team)
         }
         data.demo = res.demo
-        db.collection('planningPokerOrganisations').updateOne({'_id': res._id}, {$set: {teams: teams}}, function(err, res) {
+        db.gameCollection.updateOne({'_id': res._id}, {$set: {teams: teams}}, function(err, res) {
           if (err) throw err
           io.emit('loadTeam', data)
         })
@@ -221,7 +221,7 @@ module.exports = {
 
     if (debugOn) { console.log('updateBacklog', data) }
 
-    db.collection('planningPokerOrganisations').findOne({id: data.organisationId}, function(err, res) {
+    db.gameCollection.findOne({id: data.organisationId}, function(err, res) {
       if (err) throw err
       if (res) {
         const teams = []
@@ -234,7 +234,7 @@ module.exports = {
           teams.push(team)
         }
         data.demo = res.demo
-        db.collection('planningPokerOrganisations').updateOne({'_id': res._id}, {$set: {teams: teams}}, function(err, res) {
+        db.gameCollection.updateOne({'_id': res._id}, {$set: {teams: teams}}, function(err, res) {
           if (err) throw err
           io.emit('loadTeam', data)
         })
@@ -246,7 +246,7 @@ module.exports = {
 
     if (debugOn) { console.log('selectCard', data) }
 
-    db.collection('planningPokerOrganisations').findOne({id: data.organisationId}, function(err, res) {
+    db.gameCollection.findOne({id: data.organisationId}, function(err, res) {
       if (err) throw err
       if (res) {
         const teams = []
@@ -277,7 +277,7 @@ module.exports = {
         res.teams = teams
         const id = res._id
         delete res._id
-        db.collection('planningPokerOrganisations').updateOne({'_id': id}, {$set: res}, function(err, res) {
+        db.gameCollection.updateOne({'_id': id}, {$set: res}, function(err, res) {
           if (err) throw err
           io.emit('loadTeam', data)
         })
@@ -289,7 +289,7 @@ module.exports = {
 
     if (debugOn) { console.log('updateCommittedCards', data) }
 
-    db.collection('planningPokerOrganisations').findOne({id: data.organisationId}, function(err, res) {
+    db.gameCollection.findOne({id: data.organisationId}, function(err, res) {
       if (err) throw err
       if (res) {
         const teams = []
@@ -302,7 +302,7 @@ module.exports = {
           teams.push(team)
         }
         data.demo = res.demo
-        db.collection('planningPokerOrganisations').updateOne({'_id': res._id}, {$set: {teams: teams}}, function(err, res) {
+        db.gameCollection.updateOne({'_id': res._id}, {$set: {teams: teams}}, function(err, res) {
           if (err) throw err
           io.emit('loadTeam', data)
         })
@@ -314,7 +314,7 @@ module.exports = {
 
     if (debugOn) { console.log('setTimerType', data) }
 
-    db.collection('planningPokerOrganisations').findOne({id: data.organisationId}, function(err, res) {
+    db.gameCollection.findOne({id: data.organisationId}, function(err, res) {
       if (err) throw err
       if (res) {
         const teams = []
@@ -327,7 +327,7 @@ module.exports = {
           teams.push(team)
         }
         data.demo = res.demo
-        db.collection('planningPokerOrganisations').updateOne({'_id': res._id}, {$set: {teams: teams}}, function(err, res) {
+        db.gameCollection.updateOne({'_id': res._id}, {$set: {teams: teams}}, function(err, res) {
           if (err) throw err
           io.emit('loadTeam', data)
         })
@@ -339,7 +339,7 @@ module.exports = {
 
     if (debugOn) { console.log('startTimer', data) }
 
-    db.collection('planningPokerOrganisations').findOne({id: data.organisationId}, function(err, res) {
+    db.gameCollection.findOne({id: data.organisationId}, function(err, res) {
       if (err) throw err
       if (res) {
         for (let i = 0; i < res.teams.length; i++) {
@@ -357,7 +357,7 @@ module.exports = {
 
     if (debugOn) { console.log('updateEstimateValue', data) }
 
-    db.collection('planningPokerOrganisations').findOne({id: data.organisationId}, function(err, res) {
+    db.gameCollection.findOne({id: data.organisationId}, function(err, res) {
       if (err) throw err
       if (res) {
         const teams = []
@@ -385,7 +385,7 @@ module.exports = {
           teams.push(team)
         }
         data.demo = res.demo
-        db.collection('planningPokerOrganisations').updateOne({'_id': res._id}, {$set: {teams: teams}}, function(err, res) {
+        db.gameCollection.updateOne({'_id': res._id}, {$set: {teams: teams}}, function(err, res) {
           if (err) throw err
           io.emit('loadTeam', data)
         })
@@ -397,7 +397,7 @@ module.exports = {
 
     if (debugOn) { console.log('setMemberValue', data) }
 
-    db.collection('planningPokerOrganisations').findOne({id: data.organisationId}, function(err, res) {
+    db.gameCollection.findOne({id: data.organisationId}, function(err, res) {
       if (err) throw err
       if (res) {
         const teams = []
@@ -424,7 +424,7 @@ module.exports = {
         res.teams = teams
         const id = res._id
         delete res._id
-        db.collection('planningPokerOrganisations').updateOne({'_id': id}, {$set: res}, function(err, res) {
+        db.gameCollection.updateOne({'_id': id}, {$set: res}, function(err, res) {
           if (err) throw err
           io.emit('loadTeam', data)
         })
@@ -436,7 +436,7 @@ module.exports = {
 
     if (debugOn) { console.log('updateAgreedEstimate', data) }
 
-    db.collection('planningPokerOrganisations').findOne({id: data.organisationId}, function(err, res) {
+    db.gameCollection.findOne({id: data.organisationId}, function(err, res) {
       if (err) throw err
       if (res) {
         const teams = []
@@ -460,7 +460,7 @@ module.exports = {
           teams.push(team)
         }
         data.demo = res.demo
-        db.collection('planningPokerOrganisations').updateOne({'_id': res._id}, {$set: {teams: teams}}, function(err, res) {
+        db.gameCollection.updateOne({'_id': res._id}, {$set: {teams: teams}}, function(err, res) {
           if (err) throw err
           io.emit('loadTeam', data)
         })
@@ -483,7 +483,7 @@ module.exports = {
       lastaccess: new Date().toISOString(),
       teams: []
     }
-    db.collection('planningPokerOrganisations').insertOne(newOrg, function(err, res) {
+    db.gameCollection.insertOne(newOrg, function(err, res) {
       if (err) throw err
       _loadOrganisations(db, io)
     })
@@ -493,7 +493,7 @@ module.exports = {
 
     if (debugOn) { console.log('deleteOrganisation', data) }
 
-    db.collection('planningPokerOrganisations').deleteOne({id: data.id}, function(err, res) {
+    db.gameCollection.deleteOne({id: data.id}, function(err, res) {
       if (err) throw err
       _loadOrganisations(db, io)
     })
@@ -503,13 +503,13 @@ module.exports = {
 
     if (debugOn) { console.log('addTeam', data) }
 
-    db.collection('planningPokerOrganisations').findOne({id: data.organisationId}, function(err, res) {
+    db.gameCollection.findOne({id: data.organisationId}, function(err, res) {
       if (err) throw err
       if (res) {
         const team = newTeam(data.name)
         const teams = res.teams
         teams.push(team)
-        db.collection('planningPokerOrganisations').updateOne({'_id': res._id}, {$set: {teams: teams}}, function(err, res) {
+        db.gameCollection.updateOne({'_id': res._id}, {$set: {teams: teams}}, function(err, res) {
           if (err) throw err
           _loadOrganisations(db, io)
         })
@@ -521,7 +521,7 @@ module.exports = {
 
     if (debugOn) { console.log('deleteTeam', data) }
 
-    db.collection('planningPokerOrganisations').findOne({id: data.organisationId}, function(err, res) {
+    db.gameCollection.findOne({id: data.organisationId}, function(err, res) {
       if (err) throw err
       if (res) {
         const teams = []
@@ -530,7 +530,7 @@ module.exports = {
             teams.push(res.teams[i])
           }
         }
-        db.collection('planningPokerOrganisations').updateOne({'_id': res._id}, {$set: {teams: teams}}, function(err, res) {
+        db.gameCollection.updateOne({'_id': res._id}, {$set: {teams: teams}}, function(err, res) {
           if (err) throw err
           _loadOrganisations(db, io)
         })
@@ -542,7 +542,7 @@ module.exports = {
 
     if (debugOn) { console.log('setTeamParameter', field, data) }
 
-    db.collection('planningPokerOrganisations').findOne({id: data.organisationId}, function(err, res) {
+    db.gameCollection.findOne({id: data.organisationId}, function(err, res) {
       if (err) throw err
       if (res) {
         const teams = []
@@ -566,7 +566,7 @@ module.exports = {
           teams.push(team)
         }
         data.teams = teams
-        db.collection('planningPokerOrganisations').updateOne({'_id': res._id}, {$set: {teams: teams}}, function(err, res) {
+        db.gameCollection.updateOne({'_id': res._id}, {$set: {teams: teams}}, function(err, res) {
           if (err) throw err
           _loadOrganisations(db, io)
         })
@@ -578,7 +578,7 @@ module.exports = {
 
     if (debugOn) { console.log('addTeamMember', data) }
 
-    db.collection('planningPokerOrganisations').findOne({id: data.organisationId}, function(err, res) {
+    db.gameCollection.findOne({id: data.organisationId}, function(err, res) {
       if (err) throw err
       if (res) {
         const teams = []
@@ -594,7 +594,7 @@ module.exports = {
           }
           teams.push(team)
         }
-        db.collection('planningPokerOrganisations').updateOne({'_id': res._id}, {$set: {teams: teams}}, function(err, res) {
+        db.gameCollection.updateOne({'_id': res._id}, {$set: {teams: teams}}, function(err, res) {
           if (err) throw err
           _loadOrganisations(db, io)
        })
@@ -606,7 +606,7 @@ module.exports = {
 
     if (debugOn) { console.log('includeTeamMember', data) }
 
-    db.collection('planningPokerOrganisations').findOne({id: data.organisationId}, function(err, res) {
+    db.gameCollection.findOne({id: data.organisationId}, function(err, res) {
       if (err) throw err
       if (res) {
         const teams = []
@@ -626,7 +626,7 @@ module.exports = {
           teams.push(team)
         }
         data.demo = res.demo
-        db.collection('planningPokerOrganisations').updateOne({'_id': res._id}, {$set: {teams: teams}}, function(err, res) {
+        db.gameCollection.updateOne({'_id': res._id}, {$set: {teams: teams}}, function(err, res) {
           if (err) throw err
           _loadOrganisations(db, io)
         })
@@ -638,7 +638,7 @@ module.exports = {
 
     if (debugOn) { console.log('deleteTeamMember', data) }
 
-    db.collection('planningPokerOrganisations').findOne({id: data.organisationId}, function(err, res) {
+    db.gameCollection.findOne({id: data.organisationId}, function(err, res) {
       if (err) throw err
       if (res) {
         const teams = []
@@ -657,7 +657,7 @@ module.exports = {
           teams.push(team)
         }
         data.demo = res.demo
-        db.collection('planningPokerOrganisations').updateOne({'_id': res._id}, {$set: {teams: teams}}, function(err, res) {
+        db.gameCollection.updateOne({'_id': res._id}, {$set: {teams: teams}}, function(err, res) {
           if (err) throw err
           _loadOrganisations(db, io)
         })
@@ -669,7 +669,7 @@ module.exports = {
 
     if (debugOn) { console.log('setRelativeSizing', data) }
 
-    db.collection('planningPokerOrganisations').findOne({id: data.organisationId}, function(err, res) {
+    db.gameCollection.findOne({id: data.organisationId}, function(err, res) {
       if (err) throw err
       if (res) {
         const teams = []
@@ -680,7 +680,7 @@ module.exports = {
           }
           teams.push(team)
         }
-        db.collection('planningPokerOrganisations').updateOne({'_id': res._id}, {$set: {teams: teams}}, function(err, res) {
+        db.gameCollection.updateOne({'_id': res._id}, {$set: {teams: teams}}, function(err, res) {
           if (err) throw err
           _loadOrganisations(db, io)
         })
@@ -692,7 +692,7 @@ module.exports = {
 
     if (debugOn) { console.log('loadBacklog', data) }
 
-    db.collection('planningPokerOrganisations').findOne({id: data.organisationId}, function(err, res) {
+    db.gameCollection.findOne({id: data.organisationId}, function(err, res) {
       if (err) throw err
       if (res) {
         const teams = []
@@ -710,7 +710,7 @@ module.exports = {
           }
           teams.push(team)
         }
-        db.collection('planningPokerOrganisations').updateOne({'_id': res._id}, {$set: {teams: teams}}, function(err, res) {
+        db.gameCollection.updateOne({'_id': res._id}, {$set: {teams: teams}}, function(err, res) {
           if (err) throw err
           _loadOrganisations(db, io)
           io.emit('backlogLoaded', data)
@@ -723,7 +723,7 @@ module.exports = {
 
     if (debugOn) { console.log('saveBacklog', data) }
 
-    db.collection('planningPokerOrganisations').findOne({id: data.organisationId}, function(err, res) {
+    db.gameCollection.findOne({id: data.organisationId}, function(err, res) {
       if (err) throw err
       if (res) {
         const organisation = res.name
@@ -766,7 +766,7 @@ module.exports = {
 
     if (debugOn) { console.log('addBacklogCard', data) }
 
-    db.collection('planningPokerOrganisations').findOne({id: data.organisationId}, function(err, res) {
+    db.gameCollection.findOne({id: data.organisationId}, function(err, res) {
       if (err) throw err
       if (res) {
         const teams = []
@@ -779,7 +779,7 @@ module.exports = {
           teams.push(team)
         }
         data.teams = teams
-        db.collection('planningPokerOrganisations').updateOne({'_id': res._id}, {$set: {teams: teams}}, function(err, res) {
+        db.gameCollection.updateOne({'_id': res._id}, {$set: {teams: teams}}, function(err, res) {
           if (err) throw err
           _loadOrganisations(db, io)
        })
@@ -791,7 +791,7 @@ module.exports = {
 
     if (debugOn) { console.log('deleteBacklogCard', data) }
 
-    db.collection('planningPokerOrganisations').findOne({id: data.organisationId}, function(err, res) {
+    db.gameCollection.findOne({id: data.organisationId}, function(err, res) {
       if (err) throw err
       if (res) {
         const teams = []
@@ -808,7 +808,7 @@ module.exports = {
           }
           teams.push(team)
         }
-        db.collection('planningPokerOrganisations').updateOne({'_id': res._id}, {$set: {teams: teams}}, function(err, res) {
+        db.gameCollection.updateOne({'_id': res._id}, {$set: {teams: teams}}, function(err, res) {
           if (err) throw err
           _loadOrganisations(db, io)
        })
@@ -820,7 +820,7 @@ module.exports = {
 
     if (debugOn) { console.log('updateEstimationType', data) }
 
-    db.collection('planningPokerOrganisations').findOne({id: data.organisationId}, function(err, res) {
+    db.gameCollection.findOne({id: data.organisationId}, function(err, res) {
       if (err) throw err
       if (res) {
         const teams = []
@@ -831,7 +831,7 @@ module.exports = {
           }
           teams.push(team)
         }
-        db.collection('planningPokerOrganisations').updateOne({'_id': res._id}, {$set: {teams: teams}}, function(err, res) {
+        db.gameCollection.updateOne({'_id': res._id}, {$set: {teams: teams}}, function(err, res) {
           if (err) throw err
           _loadOrganisations(db, io)
        })
@@ -843,7 +843,7 @@ module.exports = {
 
     if (debugOn) { console.log('addEstimationType', data) }
 
-    db.collection('planningPokerOrganisations').findOne({id: data.organisationId}, function(err, res) {
+    db.gameCollection.findOne({id: data.organisationId}, function(err, res) {
       if (err) throw err
       if (res) {
         const teams = []
@@ -854,7 +854,7 @@ module.exports = {
           }
           teams.push(team)
         }
-        db.collection('planningPokerOrganisations').updateOne({'_id': res._id}, {$set: {teams: teams}}, function(err, res) {
+        db.gameCollection.updateOne({'_id': res._id}, {$set: {teams: teams}}, function(err, res) {
           if (err) throw err
           _loadOrganisations(db, io)
        })
@@ -866,7 +866,7 @@ module.exports = {
 
     if (debugOn) { console.log('addEstimationValue', data) }
 
-    db.collection('planningPokerOrganisations').findOne({id: data.organisationId}, function(err, res) {
+    db.gameCollection.findOne({id: data.organisationId}, function(err, res) {
       if (err) throw err
       if (res) {
         const teams = []
@@ -882,7 +882,7 @@ module.exports = {
           }
           teams.push(team)
         }
-        db.collection('planningPokerOrganisations').updateOne({'_id': res._id}, {$set: {teams: teams}}, function(err, res) {
+        db.gameCollection.updateOne({'_id': res._id}, {$set: {teams: teams}}, function(err, res) {
           if (err) throw err
           _loadOrganisations(db, io)
        })
@@ -894,7 +894,7 @@ module.exports = {
 
     if (debugOn) { console.log('deleteEstimationValue', data) }
 
-    db.collection('planningPokerOrganisations').findOne({organisationId: data.organisationId}, function(err, res) {
+    db.gameCollection.findOne({organisationId: data.organisationId}, function(err, res) {
       if (err) throw err
       if (res) {
         const teams = []
@@ -915,7 +915,7 @@ module.exports = {
           }
           teams.push(team)
         }
-        db.collection('planningPokerOrganisations').updateOne({'_id': res._id}, {$set: {teams: teams}}, function(err, res) {
+        db.gameCollection.updateOne({'_id': res._id}, {$set: {teams: teams}}, function(err, res) {
           if (err) throw err
           _loadOrganisations(db, io)
        })

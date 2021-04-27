@@ -3,7 +3,10 @@ const ON_DEATH = require('death')({uncaughtException: true})
 const os = require('os')
 
 const prod = os.hostname() == 'agilesimulations' ? true : false
+
+const port = prod ? process.env.VUE_APP_PORT : 3007
 const logFile = prod ? process.argv[4] : 'server.log'
+const gameCollection =  prod ? process.env.VUE_APP_COLLECTION : 'planningPokerOrganisations'
 
 ON_DEATH(function(signal, err) {
   let logStr = new Date()
@@ -71,6 +74,10 @@ MongoClient.connect(url, { useUnifiedTopology: true }, function (err, client) {
   if (err) throw err
   const db = client.db('db')
 
+  db.createCollection(gameCollection, function(error, collection) {})
+
+  db.gameCollection = db.collection(gameCollection)
+  
   io.on('connection', (socket) => {
     const connection = socket.handshake.headers.host
     connections[connection] = connections[connection] ? connections[connection] + 1 : 1
@@ -174,8 +181,6 @@ MongoClient.connect(url, { useUnifiedTopology: true }, function (err, client) {
     socket.on('sendDeleteBacklogCard', (data) => { dbStore.deleteBacklogCard(db, io, data, debugOn) })
   })
 })
-
-const port = process.argv[2] || 3004
 
 httpServer.listen(port, () => {
   console.log('Listening on *:' + port)
