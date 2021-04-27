@@ -1,3 +1,6 @@
+const path = require('path')
+require('dotenv').config({ path: path.resolve(__dirname, '../.env') })
+
 const fs = require('fs')
 const ON_DEATH = require('death')({uncaughtException: true})
 const os = require('os')
@@ -77,7 +80,7 @@ MongoClient.connect(url, { useUnifiedTopology: true }, function (err, client) {
   db.createCollection(gameCollection, function(error, collection) {})
 
   db.gameCollection = db.collection(gameCollection)
-  
+
   io.on('connection', (socket) => {
     const connection = socket.handshake.headers.host
     connections[connection] = connections[connection] ? connections[connection] + 1 : 1
