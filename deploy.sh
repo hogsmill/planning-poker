@@ -15,7 +15,7 @@ done
 
 REPO="https://github.com/hogsmill/planning-poker.git"
 APPS=(
-  'planning-poker,planningPokerOrganisations,3004'
+  'planning-poker,planningPokerOrganisations,3004,Planning Poker'
   'planning-poker-new,planningPokerNewOrganisations,3029,Planning Poker New,123456'
 )
 
@@ -44,7 +44,6 @@ do
   ENVFILE="$DIR/.env"
   echo "VUE_APP_PORT=$PORT" > $ENVFILE
   echo "VUE_APP_COLLECTION=$COLLECTION" >> $ENVFILE
-  echo "VUE_APP_GAME_COLLECTION=$GAMECOLLECTION" >> $ENVFILE
   if [ ! -z "$APPNAME" ]; then
     echo "VUE_APP_NAME=$APPNAME" >> $ENVFILE
   fi
