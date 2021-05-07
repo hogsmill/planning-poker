@@ -15,7 +15,7 @@ done
 
 REPO="https://github.com/hogsmill/planning-poker.git"
 APPS=(
-  'planning-poker,planningPokerOrganisations,3004,Planning Poker'
+  'planning-poker,planningPokerOrganisations,3004'
   'planning-poker-new,planningPokerNewOrganisations,3029,Planning Poker New,123456'
 )
 
