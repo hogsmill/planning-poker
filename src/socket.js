@@ -38,6 +38,8 @@ bus.$on('sendUpdateAgreedEstimate', (data) => { socket.emit('sendUpdateAgreedEst
 
 bus.$on('sendUpdateBacklog', (data) => { socket.emit('sendUpdateBacklog', data) })
 
+bus.$on('sendStartAgain', (data) => { socket.emit('sendStartAgain', data) })
+
 
 // Facilitator
 

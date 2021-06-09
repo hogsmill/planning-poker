@@ -1,8 +1,11 @@
 <template>
   <div>
     <h4>Backlog <br>({{ items(backlog.length) }})</h4>
+    <button class="btn btn-info btn-sm" @click="startAgain()">
+      Start Again
+    </button>
     <p v-if="team.relativeSizing">
-      Orderd by estimate (<i>largest at the top</i>)
+      Ordered by estimate (<i>largest at the top</i>)
     </p>
     <div v-if="team.relativeSizing">
       <div v-for="card in backlog" :key="card.id" class="rounded backlog-item" :class="{ 'not-estimated': !card.estimate }" @click="selectCard(card.id)">
@@ -84,6 +87,9 @@ export default {
     },
     selectCard(id) {
       bus.$emit('sendSelectCard', {organisationId: this.organisation.id, teamId: this.team.id, id: id})
+    },
+    startAgain() {
+      bus.$emit('sendStartAgain', {organisationId: this.organisation.id, teamId: this.team.id})
     }
   }
 }

@@ -158,7 +158,7 @@ module.exports = {
 
   // Game
 
-  loadOrganisation:  function(db, io, data, debugOn) {
+  loadOrganisation: function(db, io, data, debugOn) {
 
     if (debugOn) { console.log('loadOrganisation', data) }
 
@@ -174,7 +174,7 @@ module.exports = {
     })
   },
 
-  loadTeam:  function(db, io, data, debugOn) {
+  loadTeam: function(db, io, data, debugOn) {
 
     if (debugOn) { console.log('loadTeam', data) }
 
@@ -192,7 +192,7 @@ module.exports = {
     })
   },
 
-  setGameView:  function(db, io, data, debugOn) {
+  setGameView: function(db, io, data, debugOn) {
 
     if (debugOn) { console.log('setGameView', data) }
 
@@ -217,7 +217,7 @@ module.exports = {
     })
   },
 
-  updateBacklog:  function(db, io, data, debugOn) {
+  updateBacklog: function(db, io, data, debugOn) {
 
     if (debugOn) { console.log('updateBacklog', data) }
 
@@ -242,7 +242,38 @@ module.exports = {
     })
   },
 
-  selectCard:  function(db, io, data, debugOn) {
+  startAgain: function(db, io, data, debugOn) {
+
+    if (debugOn) { console.log('updateBacklog', data) }
+
+    db.gameCollection.findOne({id: data.organisationId}, function(err, res) {
+      if (err) throw err
+      if (res) {
+        const teams = []
+        for (let i = 0; i < res.teams.length; i++) {
+          const team = res.teams[i]
+          if (team.id == data.teamId) {
+            const backlog = []
+            for (let j = 0; j < team.backlog.length; j++) {
+              const card = team.backlog[j]
+              card.estimate = null
+              backlog.push(card)
+            }
+            team.backlog = backlog
+            data.team = team
+          }
+          teams.push(team)
+        }
+        data.demo = res.demo
+        db.gameCollection.updateOne({'_id': res._id}, {$set: {teams: teams}}, function(err, res) {
+          if (err) throw err
+          io.emit('loadTeam', data)
+        })
+      }
+    })
+  },
+
+  selectCard: function(db, io, data, debugOn) {
 
     if (debugOn) { console.log('selectCard', data) }
 
@@ -285,7 +316,7 @@ module.exports = {
     })
   },
 
-  updateCommittedCards:  function(db, io, data, debugOn) {
+  updateCommittedCards: function(db, io, data, debugOn) {
 
     if (debugOn) { console.log('updateCommittedCards', data) }
 
@@ -310,7 +341,7 @@ module.exports = {
     })
   },
 
-  setTimerType:  function(db, io, data, debugOn) {
+  setTimerType: function(db, io, data, debugOn) {
 
     if (debugOn) { console.log('setTimerType', data) }
 
@@ -335,7 +366,7 @@ module.exports = {
     })
   },
 
-  startTimer:  function(db, io, data, debugOn) {
+  startTimer: function(db, io, data, debugOn) {
 
     if (debugOn) { console.log('startTimer', data) }
 
@@ -353,7 +384,7 @@ module.exports = {
     })
   },
 
-  updateEstimateValue:  function(db, io, data, debugOn) {
+  updateEstimateValue: function(db, io, data, debugOn) {
 
     if (debugOn) { console.log('updateEstimateValue', data) }
 
@@ -393,7 +424,7 @@ module.exports = {
     })
   },
 
-  setMemberValue:  function(db, io, data, debugOn, field) {
+  setMemberValue: function(db, io, data, debugOn, field) {
 
     if (debugOn) { console.log('setMemberValue', data) }
 
@@ -432,7 +463,7 @@ module.exports = {
     })
   },
 
-  updateAgreedEstimate:  function(db, io, data, debugOn) {
+  updateAgreedEstimate: function(db, io, data, debugOn) {
 
     if (debugOn) { console.log('updateAgreedEstimate', data) }
 
@@ -470,7 +501,7 @@ module.exports = {
 
   // Facilitator
 
-  addOrganisation:  function(db, io, data, debugOn) {
+  addOrganisation: function(db, io, data, debugOn) {
 
     if (debugOn) { console.log('addOrganisation', data) }
 
@@ -489,7 +520,7 @@ module.exports = {
     })
   },
 
-  deleteOrganisation:  function(db, io, data, debugOn) {
+  deleteOrganisation: function(db, io, data, debugOn) {
 
     if (debugOn) { console.log('deleteOrganisation', data) }
 
@@ -499,7 +530,7 @@ module.exports = {
     })
   },
 
-  addTeam:  function(db, io, data, debugOn) {
+  addTeam: function(db, io, data, debugOn) {
 
     if (debugOn) { console.log('addTeam', data) }
 
@@ -517,7 +548,7 @@ module.exports = {
     })
   },
 
-  deleteTeam:  function(db, io, data, debugOn) {
+  deleteTeam: function(db, io, data, debugOn) {
 
     if (debugOn) { console.log('deleteTeam', data) }
 
@@ -574,7 +605,7 @@ module.exports = {
     })
   },
 
-  addTeamMember:  function(db, io, data, debugOn) {
+  addTeamMember: function(db, io, data, debugOn) {
 
     if (debugOn) { console.log('addTeamMember', data) }
 
@@ -634,7 +665,7 @@ module.exports = {
     })
   },
 
-  deleteTeamMember:  function(db, io, data, debugOn) {
+  deleteTeamMember: function(db, io, data, debugOn) {
 
     if (debugOn) { console.log('deleteTeamMember', data) }
 
@@ -688,7 +719,7 @@ module.exports = {
     })
   },
 
-  loadBacklog:  function(db, io, data, debugOn) {
+  loadBacklog: function(db, io, data, debugOn) {
 
     if (debugOn) { console.log('loadBacklog', data) }
 
@@ -719,7 +750,7 @@ module.exports = {
     })
   },
 
-  saveBacklog:  function(db, saveDir, logFile, io, data, fs, debugOn) {
+  saveBacklog: function(db, saveDir, logFile, io, data, fs, debugOn) {
 
     if (debugOn) { console.log('saveBacklog', data) }
 
@@ -762,7 +793,7 @@ module.exports = {
     })
   },
 
-  addBacklogCard:  function(db, io, data, debugOn) {
+  addBacklogCard: function(db, io, data, debugOn) {
 
     if (debugOn) { console.log('addBacklogCard', data) }
 
@@ -787,7 +818,7 @@ module.exports = {
     })
   },
 
-  deleteBacklogCard:  function(db, io, data, debugOn) {
+  deleteBacklogCard: function(db, io, data, debugOn) {
 
     if (debugOn) { console.log('deleteBacklogCard', data) }
 
@@ -816,7 +847,7 @@ module.exports = {
     })
   },
 
-  updateEstimationType:  function(db, io, data, debugOn) {
+  updateEstimationType: function(db, io, data, debugOn) {
 
     if (debugOn) { console.log('updateEstimationType', data) }
 
@@ -839,7 +870,7 @@ module.exports = {
     })
   },
 
-  addEstimationType:  function(db, io, data, debugOn) {
+  addEstimationType: function(db, io, data, debugOn) {
 
     if (debugOn) { console.log('addEstimationType', data) }
 
@@ -862,7 +893,7 @@ module.exports = {
     })
   },
 
-  addEstimationValue:  function(db, io, data, debugOn) {
+  addEstimationValue: function(db, io, data, debugOn) {
 
     if (debugOn) { console.log('addEstimationValue', data) }
 
@@ -890,7 +921,7 @@ module.exports = {
     })
   },
 
-  deleteEstimationValue:  function(db, io, data, debugOn) {
+  deleteEstimationValue: function(db, io, data, debugOn) {
 
     if (debugOn) { console.log('deleteEstimationValue', data) }
 

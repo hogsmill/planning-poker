@@ -113,12 +113,13 @@ MongoClient.connect(url, { useUnifiedTopology: true }, function (err, client) {
 
     socket.on('sendUpdateBacklog', (data) => { dbStore.updateBacklog(db, io, data, debugOn) })
 
+    socket.on('sendStartAgain', (data) => { dbStore.startAgain(db, io, data, debugOn) })
+
     socket.on('sendSelectCard', (data) => { dbStore.selectCard(db, io, data, debugOn) })
 
     socket.on('updateCommittedCards', (data) => { dbStore.updateCommittedCards(db, io, data, debugOn) })
 
     socket.on('sendSetMemberValue', (data) => { dbStore.setMemberValue(db, io, data, debugOn) })
-
 
     socket.on('sendUpdateEstimateValue', (data) => { dbStore.updateEstimateValue(db, io, data, debugOn) })
 
