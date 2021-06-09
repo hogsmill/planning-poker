@@ -100,6 +100,7 @@ export default {
     bus.$emit('sendCheckSystemWorkshops')
 
     bus.$on('loadOrganisations', (data) => {
+      console.log(data)
       this.$store.dispatch('updateOrganisations', data)
 
       const orgId = localStorage.getItem('organisation-pp')

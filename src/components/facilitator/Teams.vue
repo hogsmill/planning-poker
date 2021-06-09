@@ -13,7 +13,9 @@
       </td>
       <td>
         <select id="organisation-select" @change="setSelectedOrganisationId()">
-          <option> -- Select -- </option>
+          <option value="">
+            -- Select --
+          </option>
           <option v-for="(org, oindex) in organisations" :key="oindex" :value="org.id" :selected="org.id == selectedOrganisationId">
             {{ org.name }}
           </option>

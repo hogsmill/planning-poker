@@ -18,7 +18,9 @@
             <td>Organisation: </td>
             <td>
               <select id="organisation-select" @change="setOrganisation()">
-                <option> -- Select -- </option>
+                <option value="">
+                  -- Select --
+                </option>
                 <option v-for="(org, oindex) in organisations" :key="oindex" :value="org.id" :selected="org.id == organisation.id">
                   {{ org.name }}
                 </option>
@@ -32,7 +34,9 @@
             <td>Team: </td>
             <td>
               <select id="team-select" @change="setTeam()">
-                <option> -- Select -- </option>
+                <option value="">
+                  -- Select --
+                </option>
                 <option v-for="(t, tindex) in organisation.teams" :key="tindex" :value="t.id" :selected="team.id == t.id">
                   {{ t.name }}
                 </option>
@@ -46,7 +50,9 @@
             <td>My Name: </td>
             <td>
               <select id="name-select" @change="setMember()">
-                <option> -- Select -- </option>
+                <option value="">
+                  -- Select --
+                </option>
                 <option v-for="(name, nindex) in team.members" :key="nindex" :value="name.id" :selected="member.id == name.id">
                   {{ name.name }}
                 </option>
