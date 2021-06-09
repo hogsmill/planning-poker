@@ -7,7 +7,7 @@ const os = require('os')
 
 const prod = os.hostname() == 'agilesimulations' ? true : false
 
-const port = prod ? process.env.VUE_APP_PORT : 3007
+const port = prod ? process.env.VUE_APP_PORT : 3004
 const logFile = prod ? process.argv[4] : 'server.log'
 const gameCollection =  prod ? process.env.VUE_APP_COLLECTION : 'planningPokerOrganisations'
 
