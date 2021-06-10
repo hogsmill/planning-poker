@@ -119,6 +119,35 @@ function _loadOrganisations(db, io) {
   })
 }
 
+function startAgain(db, io, data) {
+
+  db.gameCollection.findOne({id: data.organisationId}, function(err, res) {
+    if (err) throw err
+    if (res) {
+      const teams = []
+      for (let i = 0; i < res.teams.length; i++) {
+        const team = res.teams[i]
+        if (team.id == data.teamId) {
+          const backlog = []
+          for (let j = 0; j < team.backlog.length; j++) {
+            const card = team.backlog[j]
+            card.estimate = null
+            backlog.push(card)
+          }
+          team.backlog = backlog
+          data.team = team
+        }
+        teams.push(team)
+      }
+      data.demo = res.demo
+      db.gameCollection.updateOne({'_id': res._id}, {$set: {teams: teams}}, function(err, res) {
+        if (err) throw err
+        io.emit('loadTeam', data)
+      })
+    }
+  })
+}
+
 module.exports = {
 
   checkSystemWorkshops: function(db, io, debugOn) {
@@ -244,33 +273,9 @@ module.exports = {
 
   startAgain: function(db, io, data, debugOn) {
 
-    if (debugOn) { console.log('updateBacklog', data) }
+    if (debugOn) { console.log('startAgain', data) }
 
-    db.gameCollection.findOne({id: data.organisationId}, function(err, res) {
-      if (err) throw err
-      if (res) {
-        const teams = []
-        for (let i = 0; i < res.teams.length; i++) {
-          const team = res.teams[i]
-          if (team.id == data.teamId) {
-            const backlog = []
-            for (let j = 0; j < team.backlog.length; j++) {
-              const card = team.backlog[j]
-              card.estimate = null
-              backlog.push(card)
-            }
-            team.backlog = backlog
-            data.team = team
-          }
-          teams.push(team)
-        }
-        data.demo = res.demo
-        db.gameCollection.updateOne({'_id': res._id}, {$set: {teams: teams}}, function(err, res) {
-          if (err) throw err
-          io.emit('loadTeam', data)
-        })
-      }
-    })
+    _startAgain(db, io, data)
   },
 
   selectCard: function(db, io, data, debugOn) {
@@ -861,6 +866,7 @@ module.exports = {
             team.estimationType = data.estimationType
           }
           teams.push(team)
+          _startAgain(db, io, data)
         }
         db.gameCollection.updateOne({'_id': res._id}, {$set: {teams: teams}}, function(err, res) {
           if (err) throw err

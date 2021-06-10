@@ -16,7 +16,7 @@ done
 REPO="https://github.com/hogsmill/planning-poker.git"
 APPS=(
   'planning-poker,planningPokerOrganisations,3004'
-  'planning-poker-new,planningPokerNewOrganisations,3029,Planning Poker New,123456'
+  'planning-poker-guardian,planningPokerGuardianOrganisations,3029,Planning Poker,123456'
 )
 
 for ((i = 0; i < ${#APPS[@]}; i++))
