@@ -21,7 +21,7 @@ const Params = {
         found = p[2]
       }
     }
-    return found
+    return decodeURIComponent(found)
   }
 }
 
