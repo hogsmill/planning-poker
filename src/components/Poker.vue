@@ -41,7 +41,7 @@
       </div>
       <div class="members">
         <div v-for="(teamMember, index) in teamMembers" :key="index" class="member rounded"
-             :class="{ 'median': isMedian(teamMember), 'highest': isHighest(teamMember), 'lowest': isLowest(teamMember) }"
+             :class="{ 'median': revealed && isMedian(teamMember), 'highest': revealed && isHighest(teamMember), 'lowest':revealed && isLowest(teamMember) }"
         >
           <div><b>{{ teamMember.name }}</b></div>
           <div v-if="teamMember.id == member.id || revealed" class="poker-card rounded">
