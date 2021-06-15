@@ -51,7 +51,7 @@ bus.$on('sendDeleteOrganisation', (data) => { socket.emit('sendDeleteOrganisatio
 
 bus.$on('sendSetRelativeSizing', (data) => { socket.emit('sendSetRelativeSizing', data) })
 
-bus.$on('sendLoadBacklog', (data) => { socket.emit('sendSaveBacklog', data) })
+bus.$on('sendLoadBacklog', (data) => { socket.emit('sendLoadBacklog', data) })
 
 bus.$on('sendAddBacklogCard', (data) => { socket.emit('sendAddBacklogCard', data) })
 
