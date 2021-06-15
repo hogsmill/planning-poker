@@ -119,7 +119,7 @@ function _loadOrganisations(db, io) {
   })
 }
 
-function startAgain(db, io, data) {
+function _startAgain(db, io, data) {
 
   db.gameCollection.findOne({id: data.organisationId}, function(err, res) {
     if (err) throw err
