@@ -17,8 +17,6 @@ function createBacklog(data, organisationId, teamId, replace) {
     }
     backlog.push(card)
   }
-  console.log({organisationId: organisationId, teamId: teamId, backlog: backlog, replace: replace})
-
   bus.$emit('sendLoadBacklog', {organisationId: organisationId, teamId: teamId, backlog: backlog, replace: replace})
 }
 

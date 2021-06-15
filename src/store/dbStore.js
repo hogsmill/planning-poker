@@ -737,7 +737,7 @@ module.exports = {
           if (team.id == data.teamId) {
             const backlog = data.replace ? [] : team.backlog
             for (let j = 0; j < data.backlog.length; j++) {
-              const card = backlogFuns.newCard(data.backlog[i])
+              const card = backlogFuns.newCard(data.backlog[j])
               backlog.push(card)
             }
             team.backlog = backlogFuns.sortByOrder(backlog)
