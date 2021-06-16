@@ -204,7 +204,7 @@ export default {
     },
     setVelocity(team) {
       const velocity = document.getElementById('velocity-' + this.sanitized(team.name)).value
-      bus.$emit('sendSetVelocity', {organisationId: this.selectedOrganisationId, id: team.id, value: velocity})
+      bus.$emit('sendSetVelocity', {organisationId: this.selectedOrganisationId, id: team.id, velocity: velocity})
     },
     setEstimationTimerTime(team) {
       const timerTime = document.getElementById('estimation-timer-time-' + this.sanitized(team.name)).value

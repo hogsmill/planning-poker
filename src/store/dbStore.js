@@ -680,6 +680,29 @@ module.exports = {
     })
   },
 
+  setVelocity: function(db, io, data, debugOn) {
+
+    if (debugOn) { console.log('setVelocity', data) }
+
+    db.gameCollection.findOne({id: data.organisationId}, function(err, res) {
+      if (err) throw err
+      if (res) {
+        const teams = []
+        for (let i = 0; i < res.teams.length; i++) {
+          const team = res.teams[i]
+          if (team.id == data.id) {
+            team.velocity = data.velocity
+          }
+          teams.push(team)
+        }
+        db.gameCollection.updateOne({'_id': res._id}, {$set: {teams: teams}}, function(err, res) {
+          if (err) throw err
+          _loadOrganisations(db, io)
+        })
+      }
+    })
+  },
+
   setTeamParameter: function(db, io, data, debugOn, field) {
 
     if (debugOn) { console.log('setTeamParameter', field, data) }

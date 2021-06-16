@@ -3,7 +3,7 @@
     <button class="btn btn-sm btn-secondary smaller-font" @click="startTrain()">
       Start the train!
     </button>
-    <div v-if="isNumeric(estimationType)" class="commitment">
+    <div v-if="isNumeric(estimationType)" class="commitment" :class="{'over-committed': overCommitted() }">
       Sprint backlog: {{ committedTotal() }} <span v-if="velocity">(Capacity: {{ velocity }})</span>
     </div>
     <div v-if="!isNumeric(estimationType)" class="commitment">
@@ -121,6 +121,9 @@ export default {
       }
       return n
     },
+    overCommitted() {
+      return this.isNumeric(this.estimationType) && this.committedTotal() > parseInt(this.team.velocity)
+    },
     updateBacklog(backlog) {
       const newBacklog = []
       for (let i = 0, j = 1; i < backlog.length; i++, j++) {
@@ -208,6 +211,10 @@ export default {
       padding: 12px;
       font-weight: bold;
       font-size: xx-large;
+
+      &.over-committed {
+        color: red;
+      }
     }
 
     #train-div {
