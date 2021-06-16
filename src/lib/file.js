@@ -10,9 +10,10 @@ function createBacklog(data, organisationId, teamId, replace) {
     const card = {
       id: uuidv4(),
       cardId: data[i][0],
-      title: data[i][1],
-      description: data[i][2],
-      estimate: data[i][3] ? data[i][3] : '',
+      order: data[i][1],
+      title: data[i][2],
+      description: data[i][3],
+      estimate: data[i][4] ? data[i][4] : '',
       selected: false
     }
     backlog.push(card)
