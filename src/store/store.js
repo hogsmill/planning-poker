@@ -10,6 +10,7 @@ export const store = new Vuex.Store({
     walkThrough: false,
     showTab: 'game',
     host: false,
+    onlyHostCanControl: false,
     organisations: [],
     organisation: {},
     team: {},
@@ -30,6 +31,16 @@ export const store = new Vuex.Store({
     },
     getShowTab: (state) => {
       return state.showTab
+    },
+    getController: (state) => {
+      let control = true
+      if (state.organisation.onlyHostCanControl && !state.host) {
+        control = false
+      }
+      if (state.organisation.facilitatorControls && !state.member.facilitator) {
+        control = false
+      }
+      return control
     },
     getGameView: (state) => {
       return state.team.gameView

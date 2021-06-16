@@ -16,6 +16,8 @@ const socket = io(connStr)
 
 bus.$on('sendCheckSystemWorkshops', (data) => { socket.emit('sendCheckSystemWorkshops', data) })
 
+bus.$on('sendMakeFacilitator', (data) => { socket.emit('sendMakeFacilitator', data) })
+
 bus.$on('sendLoadTeam', (data) => { socket.emit('sendLoadTeam', data) })
 
 bus.$on('sendSetGameView', (data) => { socket.emit('sendSetGameView', data) })
@@ -28,11 +30,15 @@ bus.$on('sendStartTimer', (data) => { socket.emit('sendStartTimer', data) })
 
 bus.$on('sendStopTimer', (data) => { socket.emit('sendStopTimer', data) })
 
+bus.$on('sendMemberAbstain', (data) => { socket.emit('sendMemberAbstain', data) })
+
 bus.$on('sendSetMemberValue', (data) => { socket.emit('sendSetMemberValue', data) })
 
 bus.$on('sendUpdateEstimateValue', (data) => { socket.emit('sendUpdateEstimateValue', data) })
 
 bus.$on('sendReveal', (data) => { socket.emit('sendReveal', data) })
+
+bus.$on('sendReEstimate', (data) => { socket.emit('sendReEstimate', data) })
 
 bus.$on('sendUpdateAgreedEstimate', (data) => { socket.emit('sendUpdateAgreedEstimate', data) })
 
@@ -48,6 +54,10 @@ bus.$on('sendOpenEditPane', (data) => { socket.emit('sendOpenEditPane', data) })
 bus.$on('sendAddOrganisation', (data) => { socket.emit('sendAddOrganisation', data) })
 
 bus.$on('sendDeleteOrganisation', (data) => { socket.emit('sendDeleteOrganisation', data) })
+
+bus.$on('sendUpdateOnlyHostCanControl', (data) => { socket.emit('sendUpdateOnlyHostCanControl', data) })
+
+bus.$on('sendUpdateFacilitatorControls', (data) => { socket.emit('sendUpdateFacilitatorControls', data) })
 
 bus.$on('sendSetRelativeSizing', (data) => { socket.emit('sendSetRelativeSizing', data) })
 
@@ -103,6 +113,8 @@ socket.on('loadOrganisation', (data) => { bus.$emit('loadOrganisation', data) })
 socket.on('loadTeams', (data) => { bus.$emit('loadTeams', data) })
 
 socket.on('loadTeam', (data) => { bus.$emit('loadTeam', data) })
+
+socket.on('memberAction', (data) => { bus.$emit('memberAction', data) })
 
 socket.on('updateEstimationType', (data) => { bus.$emit('updateEstimationType', data) })
 

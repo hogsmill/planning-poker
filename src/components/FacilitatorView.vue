@@ -4,6 +4,7 @@
       Current server connections: {{ connections.connections }} / {{ connections.maxConnections }}
     </div>
     <Organisation />
+    <Control />
     <Teams />
     <TeamMembers />
     <Estimates />
@@ -13,6 +14,7 @@
 
 <script>
 import Organisation from './facilitator/Organisation.vue'
+import Control from './facilitator/Control.vue'
 import Teams from './facilitator/Teams.vue'
 import TeamMembers from './facilitator/TeamMembers.vue'
 import Estimates from './facilitator/Estimates.vue'
@@ -21,6 +23,7 @@ import Backlog from './facilitator/Backlog.vue'
 export default {
   components: {
     Organisation,
+    Control,
     Teams,
     TeamMembers,
     Estimates,

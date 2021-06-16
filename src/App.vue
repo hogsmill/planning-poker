@@ -2,10 +2,10 @@
   <div id="app" class="mb-4">
     <Header />
     <h2>
-      <span v-if="organisation.id">({{ organisation.name }}</span>
+      <span v-if="organisation.id">{{ organisation.name }}</span>
       <span v-if="team.id">, {{ team.name }}</span>
       <span v-if="member.id">, {{ member.name }}</span>
-      <span v-if="organisation.id">)</span>
+      <i v-if="member.facilitator" class="fas fa-brain" title="I am the facilitator/controller" />
     </h2>
     <div v-if="showTab == 'about'">
       <AboutView />
@@ -16,6 +16,7 @@
     <div v-if="showTab == 'game'">
       <div class="game-params">
         <SetGame />
+        <SetFacilitator v-if="organisation && organisation.facilitatorControls" />
         <WalkThroughView v-if="!organisation.id" />
         <GameView v-if="organisation.id && team.id && member.id" />
       </div>
@@ -51,6 +52,7 @@ import WalkThroughView from './components/about/WalkThroughView.vue'
 import AboutView from './components/about/AboutView.vue'
 import FacilitatorView from './components/FacilitatorView.vue'
 import SetGame from './components/SetGame.vue'
+import SetFacilitator from './components/SetFacilitator.vue'
 import GameView from './components/GameView.vue'
 import Backlog from './components/Backlog.vue'
 import Poker from './components/Poker.vue'
@@ -63,6 +65,7 @@ export default {
     WalkThroughView,
     AboutView,
     FacilitatorView,
+    SetFacilitator,
     SetGame,
     GameView,
     Backlog,
@@ -121,7 +124,14 @@ export default {
 
     bus.$on('loadTeam', (data) => {
       if (this.team.id == data.teamId && this.organisation.id == data.organisationId) {
+        console.log(data)
         this.$store.dispatch('loadTeam', data)
+      }
+    })
+
+    bus.$on('memberAction', (data) => {
+      if (this.team.id == data.teamId && this.organisation.id == data.organisationId) {
+        this.setMemberStatus(data)
       }
     })
 
@@ -172,20 +182,52 @@ export default {
     bus.$on('updateConnections', (data) => {
       this.$store.dispatch('updateConnections', data)
     })
+  },
+  methods: {
+    setMemberStatus(data) {
+      if (data.memberId != this.member.id) {
+        const member = data.team.members.find((m) => {
+          return m.id == data.memberId
+        })
+        let str = ''
+        if (member.coffee) {
+          str = str + ' has requested a coffee break'
+        } else if (member.question) {
+          str = str + ' would like to ask a question'
+        }
+        if (str) {
+          str = member.name + str
+          alert(str)
+        }
+      }
+    }
   }
 }
 </script>
 
 <style lang="scss">
-  .not-host { height: 0px; visibility: hidden; }
+  .not-host {
+    height: 0px;
+    visibility: hidden;
+  }
+
   .connections {
     text-align: right;
     margin: 6px
   }
+
   .game-params {
     height: 60px;
     text-align: center;
   }
+
+  .fa-brain {
+    margin-left: 6px;
+    color: darksalmon;
+    display: inline-block;
+    text-shadow: 1px 1px 1px #888;
+  }
+
   .poker-train {
      width: 800px;
      height: 400px;
@@ -195,19 +237,21 @@ export default {
      background-repeat: no-repeat;
      background-position: center;
   }
+
   .poker-table {
     background-color: #35654d;
     color: #fff;
     margin: 0 auto;
     width: 100%;
+
     .backlog {
       width: 25%;
       vertical-align: top;
     }
+
     .poker {
       width: 75%;
       vertical-align: top;
     }
   }
-
 </style>

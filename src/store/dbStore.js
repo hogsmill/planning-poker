@@ -3,6 +3,7 @@ const stats = require('./lib/stats.js')
 const demo = require('./lib/demo.js')
 const estimation = require('./lib/estimation.js')
 const backlogFuns = require('./lib/backlog.js')
+const memberFuns = require('./lib/member.js')
 
 const { v4: uuidv4 } = require('uuid')
 
@@ -125,16 +126,22 @@ function _startAgain(db, io, data) {
     if (err) throw err
     if (res) {
       const teams = []
-      for (let i = 0; i < res.teams.length; i++) {
+      let i, j
+      for (i = 0; i < res.teams.length; i++) {
         const team = res.teams[i]
         if (team.id == data.teamId) {
-          const backlog = []
-          for (let j = 0; j < team.backlog.length; j++) {
+          const backlog = [], members = []
+          for (j = 0; j < team.backlog.length; j++) {
             const card = team.backlog[j]
             card.estimate = null
             backlog.push(card)
           }
+          for (j = 0; j < team.members.length; j++) {
+            const member = memberFuns.clear(team.members[j])
+            members.push(member)
+          }
           team.backlog = backlog
+          team.members = members
           data.team = team
         }
         teams.push(team)
@@ -429,6 +436,43 @@ module.exports = {
     })
   },
 
+  setMemberAbstain: function(db, io, data, debugOn, field) {
+
+    if (debugOn) { console.log('setMemberAbstain', data) }
+
+    db.gameCollection.findOne({id: data.organisationId}, function(err, res) {
+      if (err) throw err
+      if (res) {
+        const teams = []
+        let selectedTeam
+        for (let i = 0; i < res.teams.length; i++) {
+          const team = res.teams[i]
+          if (team.id == data.teamId) {
+            const members = []
+            for (let j = 0; j < team.members.length; j++) {
+              if (team.members[j].id == data.memberId) {
+                team.members[j].abstain = true
+                team.members[j].estimate = null
+                team.members[j].voted = true
+              }
+              members.push(team.members[j])
+            }
+            team.members = members
+            data.team = team
+          }
+          teams.push(team)
+        }
+        res.teams = teams
+        const id = res._id
+        delete res._id
+        db.gameCollection.updateOne({'_id': id}, {$set: res}, function(err, res) {
+          if (err) throw err
+          io.emit('loadTeam', data)
+        })
+      }
+    })
+  },
+
   setMemberValue: function(db, io, data, debugOn, field) {
 
     if (debugOn) { console.log('setMemberValue', data) }
@@ -463,6 +507,7 @@ module.exports = {
         db.gameCollection.updateOne({'_id': id}, {$set: res}, function(err, res) {
           if (err) throw err
           io.emit('loadTeam', data)
+          io.emit('memberAction', data)
         })
       }
     })
@@ -491,6 +536,37 @@ module.exports = {
               b = b.estimate ? b.estimate : { order: 0 }
               return b.order - a.order
             })
+            data.team = team
+          }
+          teams.push(team)
+        }
+        data.demo = res.demo
+        db.gameCollection.updateOne({'_id': res._id}, {$set: {teams: teams}}, function(err, res) {
+          if (err) throw err
+          io.emit('loadTeam', data)
+        })
+      }
+    })
+  },
+
+  reEstimate: function(db, io, data, debugOn) {
+
+    if (debugOn) { console.log('reEstimate', data) }
+
+    db.gameCollection.findOne({id: data.organisationId}, function(err, res) {
+      if (err) throw err
+      if (res) {
+        const teams = []
+        let i, j
+        for (i = 0; i < res.teams.length; i++) {
+          const team = res.teams[i]
+          if (team.id == data.teamId) {
+            const members = []
+            for (j = 0; j < team.members.length; j++) {
+              const member = memberFuns.clear(team.members[j])
+              members.push(member)
+            }
+            team.members = members
             data.team = team
           }
           teams.push(team)
@@ -549,6 +625,36 @@ module.exports = {
           if (err) throw err
           _loadOrganisations(db, io)
         })
+      }
+    })
+  },
+
+  updateOnlyHostCanControl: function(db, io, data, debugOn) {
+
+    if (debugOn) { console.log('updateOnlyHostCanControl', data) }
+
+    db.gameCollection.findOne({id: data.organisationId}, function(err, res) {
+      if (err) throw err
+      if (res) {
+        db.gameCollection.updateOne({'_id': res._id}, {$set: {onlyHostCanControl: data.onlyHostCanControl}}, function(err, res) {
+          if (err) throw err
+          _loadOrganisations(db, io)
+       })
+      }
+    })
+  },
+
+  updateFacilitatorControls: function(db, io, data, debugOn) {
+
+    if (debugOn) { console.log('updateFacilitatorControls', data) }
+
+    db.gameCollection.findOne({id: data.organisationId}, function(err, res) {
+      if (err) throw err
+      if (res) {
+        db.gameCollection.updateOne({'_id': res._id}, {$set: {facilitatorControls: data.facilitatorControls}}, function(err, res) {
+          if (err) throw err
+          _loadOrganisations(db, io)
+       })
       }
     })
   },
@@ -687,6 +793,36 @@ module.exports = {
               if (member.id != data.id) {
                 members.push(member)
               }
+            }
+            team.members = members
+          }
+          teams.push(team)
+        }
+        data.demo = res.demo
+        db.gameCollection.updateOne({'_id': res._id}, {$set: {teams: teams}}, function(err, res) {
+          if (err) throw err
+          _loadOrganisations(db, io)
+        })
+      }
+    })
+  },
+
+  makeFacilitator: function(db, io, data, debugOn) {
+
+    if (debugOn) { console.log('makeFacilitator', data) }
+
+    db.gameCollection.findOne({id: data.organisationId}, function(err, res) {
+      if (err) throw err
+      if (res) {
+        const teams = []
+        for (let i = 0; i < res.teams.length; i++) {
+          const team = res.teams[i]
+          if (team.id == data.teamId) {
+            const members = []
+            for (let j = 0; j < team.members.length; j++) {
+              const member = team.members[j]
+              member.facilitator = member.id == data.memberId
+              members.push(member)
             }
             team.members = members
           }

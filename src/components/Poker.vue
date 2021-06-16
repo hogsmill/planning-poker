@@ -14,7 +14,7 @@
       </div>
       <div class="final-estimate">
         <Timer v-if="team.useDiscussionTimer || team.useEstimationTimer" />
-        <div class="agreed-estimate">
+        <div v-if="controller" class="agreed-estimate">
           <span>Agreed Estimate: </span>
           <select id="agreed-estimate-value">
             <option value="" />
@@ -31,10 +31,13 @@
           Lowest: {{ lowest() }}, Median: {{ median() }}, Highest {{ highest() }}
         </div>
         <div>
-          <button v-if="!revealed" class="btn btn-sm btn-secondary smaller-font reveal" @click="reveal(true)">
+          <button v-if="controller" class="btn btn-sm btn-secondary smaller-font reveal" :disabled="revealed" @click="reEstimate(true)">
+            Re-Estimate Card
+          </button>
+          <button v-if="controller && !revealed" class="btn btn-sm btn-secondary smaller-font reveal" @click="reveal(true)">
             Reveal Estimates
           </button>
-          <button v-if="revealed" class="btn btn-sm btn-secondary smaller-font reveal" @click="reveal(false)">
+          <button v-if="controller && revealed" class="btn btn-sm btn-secondary smaller-font reveal" @click="reveal(false)">
             Hide Estimates
           </button>
         </div>
@@ -44,6 +47,9 @@
              :class="{ 'median': revealed && isMedian(teamMember), 'highest': revealed && isHighest(teamMember), 'lowest':revealed && isLowest(teamMember) }"
         >
           <div><b>{{ teamMember.name }}</b></div>
+
+          <!-- Card Front -->
+
           <div v-if="teamMember.id == member.id || revealed" class="poker-card rounded">
             <div class="options">
               <i v-if="teamMember.id == member.id" class="coffee fas fa-mug-hot rounded" :class="{ 'selected' : memberStatus(teamMember) == 'coffee' }" @click="coffee(teamMember)" />
@@ -56,25 +62,35 @@
                   {{ value.name }}
                 </option>
               </select>
+              <div v-if="teamMember.id == member.id">
+                <i class="fas fa-comment-slash abstain-button" title="abstain" @click="abstain(teamMember)" />
+              </div>
             </div>
             <div v-if="!estimating" class="poker-card-value" @click="startEstimating()">
               <div v-if="teamMember.estimate && teamMember.estimate.icon" class="estimate-icon" :style="{ 'background-image': icon(teamMember.estimate) }" />
               <span v-if="teamMember.estimate && !teamMember.estimate.icon">{{ teamMember.estimate.name }}</span>
-              <span v-if="!teamMember.estimate" class="tbd">TBD</span>
+              <span v-if="!teamMember.estimate && !teamMember.abstain" class="tbd">TBD</span>
+              <i v-if="teamMember.abstain" class="fas fa-comment-slash abstained" title="has abstained" />
             </div>
           </div>
+
+          <!-- Card Back -->
+
           <div v-if="teamMember.id != member.id && !revealed" class="poker-card back rounded">
             <div v-if="memberStatus(teamMember) == 'coffee'" class="poker-card-voted rounded-circle">
-              <i class="coffee-status fas fa-mug-hot" />
+              <i class="coffee-status fas fa-mug-hot" title="requested coffee break" />
             </div>
             <div v-if="memberStatus(teamMember) == 'question'" class="poker-card-voted rounded-circle">
-              <i class="question-status far fa-question-circle" />
+              <i class="question-status far fa-question-circle" title="wants to ask a question" />
             </div>
             <div v-if="memberStatus(teamMember) == 'voted'" class="poker-card-voted rounded-circle voted">
-              <i class="fas fa-check-circle" />
+              <i class="fas fa-check-circle" title="has voted" />
             </div>
             <div v-if="memberStatus(teamMember) == 'not-voted'" class="poker-card-voted rounded-circle not-voted">
-              <i class="fas fa-times-circle" />
+              <i class="fas fa-times-circle" title="has not voted" />
+            </div>
+            <div v-if="memberStatus(teamMember) == 'abstain'" class="poker-card-voted rounded-circle abstain">
+              <i class="fas fa-comment-slash" title="has abstained" />
             </div>
           </div>
         </div>
@@ -98,6 +114,9 @@ export default {
     }
   },
   computed: {
+    controller() {
+      return this.$store.getters.getController
+    },
     organisation() {
       return this.$store.getters.getOrganisation
     },
@@ -130,13 +149,13 @@ export default {
       return 'url("../planning-poker/icons/' + estimate.icon + '")'
     },
     isHighest(member) {
-      return member.voted && member.estimate.name == this.team.highest
+      return member.voted && !member.abstain && member.estimate.name == this.team.highest
     },
     isLowest(member) {
-      return  member.voted && member.estimate.name == this.team.lowest
+      return member.voted && !member.abstain && member.estimate.name == this.team.lowest
     },
     isMedian(member) {
-      return  member.voted && member.estimate.name == this.team.median
+      return member.voted && !member.abstain && member.estimate.name == this.team.median
     },
     memberStatus(member) {
       let status = ''
@@ -146,6 +165,8 @@ export default {
         status = 'question'
       } else if (member.voted) {
         status = 'voted'
+      } else if (member.abstain) {
+        status = 'abstain'
       } else {
         status = 'not-voted'
       }
@@ -153,6 +174,9 @@ export default {
     },
     startEstimating() {
       this.estimating = true
+    },
+    abstain(member) {
+      bus.$emit('sendMemberAbstain', {organisationId: this.organisation.id, teamId: this.team.id, memberId: this.member.id})
     },
     coffee(member) {
       const val = !(this.memberStatus(member) == 'coffee')
@@ -181,6 +205,10 @@ export default {
     },
     reveal(value) {
       bus.$emit('sendReveal', {organisationId: this.organisation.id, teamId: this.team.id, reveal: value})
+    },
+    reEstimate() {
+      this.reveal(false)
+      bus.$emit('sendReEstimate', {organisationId: this.organisation.id, teamId: this.team.id})
     },
     saveAgreedEstimate() {
       const estValue = document.getElementById('agreed-estimate-value').value
@@ -283,6 +311,12 @@ export default {
         box-shadow: 2px 2px 3px #aaa;
         position: relative;
 
+        .abstain-button {
+          font-size: 16px;
+          position: relative;
+          top: -32px;
+        }
+
         .coffee {
           position: absolute;
           left: 3px;
@@ -294,6 +328,7 @@ export default {
             background-color: green;
           }
         }
+
         .question {
           position: absolute;
           right: 3px;
@@ -322,9 +357,11 @@ export default {
           background-position: center;
           background-color: #888;
         }
-        .tbd {
+
+        .tbd, .abstained {
           color: #aaa;
         }
+
         .estimate-icon {
           width: 50px;
           height: 50px;
@@ -333,9 +370,10 @@ export default {
           background-repeat: no-repeat;
           background-position: center;
         }
+
         .poker-card-value {
-          font-size: 40px;
           margin-top: 24px;
+          font-size: 40px;
           font-weight: bold;
           color: #444;
 
@@ -368,6 +406,16 @@ export default {
 
           &.not-voted {
             color: red;
+          }
+
+          &.abstain {
+
+            .fa-comment-slash {
+              color: #444;
+              font-size: 24px;
+              top: -3px;
+              position: relative;
+            }
           }
         }
       }

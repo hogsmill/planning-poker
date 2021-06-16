@@ -3,10 +3,10 @@
     <div class="label">
       View:
     </div>
-    <div class="view-button rounded" :class="{ 'selected' : gameView == 'poker'}">
+    <div class="view-button rounded" :class="{ 'selected' : gameView == 'poker', 'enabled': controller }">
       <div class="poker" @click="setGameView('poker')" />
     </div>
-    <div class="view-button rounded" :class="{ 'selected' : gameView == 'train'}">
+    <div class="view-button rounded" :class="{ 'selected' : gameView == 'train', 'enabled': controller}">
       <div class="train" @click="setGameView('train')" />
     </div>
   </div>
@@ -17,6 +17,9 @@ import bus from '../socket.js'
 
 export default {
   computed: {
+    controller() {
+      return this.$store.getters.getController
+    },
     organisation() {
       return this.$store.getters.getOrganisation
     },
@@ -29,7 +32,9 @@ export default {
   },
   methods: {
     setGameView(view) {
-      bus.$emit('sendSetGameView', {organisationId: this.organisation.id, teamId: this.team.id, view: view})
+      if (this.controller) {
+        bus.$emit('sendSetGameView', {organisationId: this.organisation.id, teamId: this.team.id, view: view})
+      }
     }
   }
 }
@@ -55,9 +60,14 @@ export default {
       border: 1px solid #bbb;
       position: relative;
       top: 11px;
+      opacity: 0.75;
 
-      &:hover {
-        cursor: pointer;
+      &.enabled {
+        opacity: 1;
+
+        &:hover {
+          cursor: pointer;
+        }
       }
 
       &.selected {

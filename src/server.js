@@ -107,6 +107,8 @@ MongoClient.connect(url, { useUnifiedTopology: true }, function (err, client) {
 
     socket.on('sendLoadTeam', (data) => { dbStore.loadTeam(db, io, data, debugOn) })
 
+    socket.on('sendMakeFacilitator', (data) => { dbStore.makeFacilitator(db, io, data, debugOn) })
+
     socket.on('sendSetGameView', (data) => { dbStore.setGameView(db, io, data, debugOn) })
 
     socket.on('sendUpdateEstimationType', (data) => { dbStore.updateEstimationType(db, io, data, debugOn) })
@@ -118,6 +120,8 @@ MongoClient.connect(url, { useUnifiedTopology: true }, function (err, client) {
     socket.on('sendSelectCard', (data) => { dbStore.selectCard(db, io, data, debugOn) })
 
     socket.on('updateCommittedCards', (data) => { dbStore.updateCommittedCards(db, io, data, debugOn) })
+
+    socket.on('sendMemberAbstain', (data) => { dbStore.setMemberAbstain(db, io, data, debugOn) })
 
     socket.on('sendSetMemberValue', (data) => { dbStore.setMemberValue(db, io, data, debugOn) })
 
@@ -131,6 +135,8 @@ MongoClient.connect(url, { useUnifiedTopology: true }, function (err, client) {
 
     socket.on('sendReveal', (data) => { emit('reveal', data) })
 
+    socket.on('sendReEstimate', (data) => { dbStore.reEstimate(db, io, data, debugOn) })
+
     socket.on('sendUpdateAgreedEstimate', (data) => { dbStore.updateAgreedEstimate(db, io, data, debugOn) })
 
     // Facilitator
@@ -140,6 +146,10 @@ MongoClient.connect(url, { useUnifiedTopology: true }, function (err, client) {
     socket.on('sendAddOrganisation', (data) => { dbStore.addOrganisation(db, io, data, debugOn) })
 
     socket.on('sendDeleteOrganisation', (data) => { dbStore.deleteOrganisation(db, io, data, debugOn) })
+
+    socket.on('sendUpdateOnlyHostCanControl', (data) => { dbStore.updateOnlyHostCanControl(db, io, data, debugOn) })
+
+    socket.on('sendUpdateFacilitatorControls', (data) => { dbStore.updateFacilitatorControls(db, io, data, debugOn) })
 
     socket.on('sendAddTeam', (data) => { dbStore.addTeam(db, io, data, debugOn) })
 

@@ -1,9 +1,12 @@
 <template>
   <div>
     <h4>Backlog <br>({{ items(backlog.length) }})</h4>
-    <button class="btn btn-info btn-sm" @click="startAgain()">
+    <button v-if="controller" class="btn btn-info btn-sm" @click="startAgain()">
       Start Again
     </button>
+    <p v-if="controller">
+      Click on a card to start estimating it
+    </p>
     <p v-if="team.relativeSizing">
       Ordered by estimate (<i>largest at the top</i>)
     </p>
@@ -68,6 +71,9 @@ import bus from '../socket.js'
 
 export default {
   computed: {
+    controller() {
+      return this.$store.getters.getController
+    },
     organisation() {
       return this.$store.getters.getOrganisation
     },
@@ -86,7 +92,9 @@ export default {
       return 'url("../planning-poker/icons/' + estimate.icon + '")'
     },
     selectCard(id) {
-      bus.$emit('sendSelectCard', {organisationId: this.organisation.id, teamId: this.team.id, id: id})
+      if (this.controller) {
+        bus.$emit('sendSelectCard', {organisationId: this.organisation.id, teamId: this.team.id, id: id})
+      }
     },
     startAgain() {
       bus.$emit('sendStartAgain', {organisationId: this.organisation.id, teamId: this.team.id})
