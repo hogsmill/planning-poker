@@ -15,6 +15,7 @@
     </div>
     <div v-if="showTab == 'game'">
       <div class="game-params">
+        <Away />
         <SetGame />
         <SetFacilitator v-if="organisation && organisation.facilitatorControls" />
         <WalkThroughView v-if="!organisation.id" />
@@ -51,6 +52,7 @@ import Header from './components/Header.vue'
 import WalkThroughView from './components/about/WalkThroughView.vue'
 import AboutView from './components/about/AboutView.vue'
 import FacilitatorView from './components/FacilitatorView.vue'
+import Away from './components/Away.vue'
 import SetGame from './components/SetGame.vue'
 import SetFacilitator from './components/SetFacilitator.vue'
 import GameView from './components/GameView.vue'
@@ -66,6 +68,7 @@ export default {
     AboutView,
     FacilitatorView,
     SetFacilitator,
+    Away,
     SetGame,
     GameView,
     Backlog,
@@ -125,6 +128,7 @@ export default {
     bus.$on('loadTeam', (data) => {
       if (this.team.id == data.teamId && this.organisation.id == data.organisationId) {
         this.$store.dispatch('loadTeam', data)
+        this.$store.dispatch('updateMember', data.memberId)
       }
     })
 

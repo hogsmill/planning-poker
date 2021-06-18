@@ -121,6 +121,8 @@ MongoClient.connect(url, { useUnifiedTopology: true }, function (err, client) {
 
     socket.on('updateCommittedCards', (data) => { dbStore.updateCommittedCards(db, io, data, debugOn) })
 
+    socket.on('sendUpdateAway', (data) => { dbStore.updateAway(db, io, data, debugOn) })
+    
     socket.on('sendMemberAbstain', (data) => { dbStore.setMemberAbstain(db, io, data, debugOn) })
 
     socket.on('sendSetMemberValue', (data) => { dbStore.setMemberValue(db, io, data, debugOn) })

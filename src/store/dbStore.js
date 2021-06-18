@@ -416,7 +416,6 @@ module.exports = {
                 team.members[j].coffee = false
                 team.members[j].question = false
                 team.members[j].abstain = false
-                team.members[j].away = false
               }
               members.push(team.members[j])
             }
@@ -430,6 +429,44 @@ module.exports = {
         }
         data.demo = res.demo
         db.gameCollection.updateOne({'_id': res._id}, {$set: {teams: teams}}, function(err, res) {
+          if (err) throw err
+          io.emit('loadTeam', data)
+        })
+      }
+    })
+  },
+
+  updateAway: function(db, io, data, debugOn, field) {
+
+    if (debugOn) { console.log('updateAway', data) }
+
+    db.gameCollection.findOne({id: data.organisationId}, function(err, res) {
+      if (err) throw err
+      if (res) {
+        const teams = []
+        let selectedTeam
+        for (let i = 0; i < res.teams.length; i++) {
+          const team = res.teams[i]
+          if (team.id == data.teamId) {
+            const members = []
+            for (let j = 0; j < team.members.length; j++) {
+              if (team.members[j].id == data.memberId) {
+                team.members[j].abstain = false
+                team.members[j].estimate = null
+                team.members[j].voted = false
+                team.members[j].away = data.away
+              }
+              members.push(team.members[j])
+            }
+            team.members = members
+            data.team = team
+          }
+          teams.push(team)
+        }
+        res.teams = teams
+        const id = res._id
+        delete res._id
+        db.gameCollection.updateOne({'_id': id}, {$set: res}, function(err, res) {
           if (err) throw err
           io.emit('loadTeam', data)
         })

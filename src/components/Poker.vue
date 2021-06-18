@@ -77,6 +77,9 @@
           <!-- Card Back -->
 
           <div v-if="teamMember.id != member.id && !revealed" class="poker-card back rounded">
+            <div v-if="memberStatus(teamMember) == 'away'" class="poker-card-voted rounded-circle" away>
+              <i class="away-status fas fa-plane-departure" title="away" />
+            </div>
             <div v-if="memberStatus(teamMember) == 'coffee'" class="poker-card-voted rounded-circle">
               <i class="coffee-status fas fa-mug-hot" title="requested coffee break" />
             </div>
@@ -159,7 +162,9 @@ export default {
     },
     memberStatus(member) {
       let status = ''
-      if (member.coffee) {
+      if (member.away) {
+        status = 'away'
+      } else if (member.coffee) {
         status = 'coffee'
       } else if (member.question) {
         status = 'question'
@@ -394,6 +399,11 @@ export default {
             position: relative;
             top: -2px;
             left: 2px;
+          }
+
+          .away-status {
+            font-size: 28px;
+            color: #444;
           }
 
           .question-status {

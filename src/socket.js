@@ -30,6 +30,8 @@ bus.$on('sendStartTimer', (data) => { socket.emit('sendStartTimer', data) })
 
 bus.$on('sendStopTimer', (data) => { socket.emit('sendStopTimer', data) })
 
+bus.$on('sendUpdateAway', (data) => { socket.emit('sendUpdateAway', data) })
+
 bus.$on('sendMemberAbstain', (data) => { socket.emit('sendMemberAbstain', data) })
 
 bus.$on('sendSetMemberValue', (data) => { socket.emit('sendSetMemberValue', data) })
