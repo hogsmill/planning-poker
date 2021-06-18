@@ -415,7 +415,8 @@ module.exports = {
                 team.members[j].estimate = data.value
                 team.members[j].coffee = false
                 team.members[j].question = false
-
+                team.members[j].abstain = false
+                team.members[j].away = false
               }
               members.push(team.members[j])
             }
