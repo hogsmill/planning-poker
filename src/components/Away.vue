@@ -1,7 +1,7 @@
 <template>
   <span>
     Away: {{ member.away }}
-    <button class="btn btn-sm btn-secondary smaller-font away" :class="{ 'selected': member.away }" @click="setAway()">
+    <button class="btn btn-sm btn-secondary smaller-font away" title="set my status to 'away'" :class="{ 'selected': member.away }" @click="setAway()">
       <i class="fas fa-plane-departure" />
     </button>
   </span>

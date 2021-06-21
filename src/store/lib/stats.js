@@ -6,7 +6,7 @@ module.exports = {
     for (let i = 0; i < members.length; i++) {
       const member = members[i]
       if (member.voted) {
-        if (!lowest || member.estimate.order <= lowest.order) {
+        if (!lowest || (member.estimate && member.estimate.order <= lowest.order)) {
           lowest = member.estimate
         }
       }
