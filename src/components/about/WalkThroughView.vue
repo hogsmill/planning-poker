@@ -80,12 +80,12 @@
         <p>
           Demo mode allows you to explore the features of the app; 4 teams are pre-defined, and
           each one has a different default way to estimate
-          (<i>You can set up your own in the Facilitator tab</i>)
+          (<i>You can these and set up your own in the premium version</i>)
           <ul>
             <li>Eagle - Fibonacci</li>
             <li>Lion - T-Shirt</li>
             <li>Dragon - Relative</li>
-            <li>Gryphen Fruit</li>
+            <li>Gryphen - Fruit</li>
           </ul>
         </p>
       </div>
