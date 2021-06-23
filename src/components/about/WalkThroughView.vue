@@ -43,12 +43,9 @@
         <h4>Welcome to Planning Poker</h4>
         <div>
           <p>
-            Add <b>host</b> as a URL parameter to see the facilitation tab where you can
-            add teams and players, set units, upload and save items, define teams and team
-            members, and much more, i.e.
-          </p>
-          <p>
-            <a href="https://agilesimulations.co.uk/planning-poker?host">https://agilesimulations.co.uk/planning-poker?host</a>
+            You can use the game with  own teams, members - even team logos! - by using
+            on of our premium packages described
+            <a href="https://agilesimulations.co.uk/?pricing">here</a>.
           </p>
         </div>
       </div>
