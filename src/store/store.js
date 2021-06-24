@@ -6,6 +6,9 @@ Vue.use(Vuex)
 export const store = new Vuex.Store({
   state: {
     thisGame: 'Planning Poker',
+    session: null,
+    userName: '',
+    admin: false,
     connections: 0,
     walkThrough: false,
     showTab: 'game',
