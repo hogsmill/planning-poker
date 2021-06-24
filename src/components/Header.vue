@@ -79,7 +79,6 @@ export default {
       return this.$store.getters.thisGame
     },
     session() {
-      console.log(this.$store.getters.getSession)
       return this.$store.getters.getSession
     },
     userName() {
@@ -108,7 +107,6 @@ export default {
     }
 
     bus.$on('loginSuccess', (data) => {
-      console.log('loginSuccess', data)
       this.$store.dispatch('updateSession', data.session)
       this.$store.dispatch('updateUserName', data.userName)
       this.$store.dispatch('updateAdmin', data.loggedInAsAdmin)
