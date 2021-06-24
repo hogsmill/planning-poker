@@ -112,7 +112,7 @@ export default {
       this.$store.dispatch('updateAdmin', data.loggedInAsAdmin)
     })
 
-    bus.$on('logout', (data) => {
+    bus.$on('logout', () => {
       this.$store.dispatch('updateSession', '')
       this.$store.dispatch('updateUserName', '')
       this.$store.dispatch('updateAdmin', false)
