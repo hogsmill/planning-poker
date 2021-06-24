@@ -32,6 +32,13 @@
         <li class="nav-item">
           <a class="nav-link pointer" @click="show()">Feedback</a>
         </li>
+        <li class="nav-item logged-in">
+          <a class="nav-link pointer">
+            <i v-if="!session" class="fas fa-handshake-slash" title="Not logged in" />
+            <i v-if="session && !admin" class="far fa-handshake" :title="'Logged in as ' + userName" />
+            <i v-if="session && admin" class="fas fa-handshake" :title="'Logged in as ' + userName + ' (Admin)'" />
+          </a>
+        </li>
       </ul>
 
       <modal name="feedback" :height="400" :classes="['rounded', 'feedback']">
@@ -62,12 +69,23 @@
 </template>
 
 <script>
+import bus from '../socket.js'
+
 import mailFuns from '../lib/mail.js'
 
 export default {
   computed: {
     thisGame() {
       return this.$store.getters.thisGame
+    },
+    session() {
+      return this.$store.getters.getSession
+    },
+    userName() {
+      return this.$store.getters.getUserName
+    },
+    admin() {
+      return this.$store.getters.getAdmin
     },
     isHost() {
       return this.$store.getters.getHost
@@ -78,6 +96,27 @@ export default {
   },
   created() {
     this.appName = process.env.VUE_APP_NAME
+
+    let session = localStorage.getItem('session-agilesimulations')
+    if (session) {
+      session = JSON.parse(session)
+      this.$store.dispatch('updateSession', session.session)
+      bus.$emit('sendCheckLogin', {id: this.id, session: session})
+    } else {
+      this.$store.dispatch('updateSession', '')
+    }
+
+    bus.$on('loginSuccess', (data) => {
+      this.$store.dispatch('updateSession', data.session)
+      this.$store.dispatch('updateUserName', data.userName)
+      this.$store.dispatch('updateAdmin', data.loggedInAsAdmin)
+    })
+
+    bus.$on('logout', (data) => {
+      this.$store.dispatch('updateSession', '')
+      this.$store.dispatch('updateUserName', '')
+      this.$store.dispatch('updateAdmin', false)
+    })
   },
   methods: {
     updateShowTab(payload) {
@@ -103,7 +142,7 @@ export default {
 }
 </script>
 
-<style>
+<style lang="scss">
   h1 {
     letter-spacing: initial;
     margin-left: 6px;
@@ -111,6 +150,32 @@ export default {
     text-shadow: 2px 2px 3px #444;
     font-size: xx-large;
     line-height: 1;
+  }
+
+  .logged-in {
+
+    a {
+      padding: 11px 6px !important;
+
+      &:hover {
+        cursor: default;
+      }
+    }
+
+    .fas, .far {
+      font-size: x-large;
+      color: #fff !important;
+      position: relative;
+      top: 2px;
+    }
+
+    &:hover {
+
+      .fas, .far {
+        color: #f4511e !important;
+        cursor: default;
+      }
+    }
   }
 
   .feedback {
