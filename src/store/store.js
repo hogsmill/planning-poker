@@ -26,6 +26,15 @@ export const store = new Vuex.Store({
     thisGame: (state) => {
       return state.thisGame
     },
+    getSession: (state) => {
+      return state.session
+    },
+    getUserName: (state) => {
+      return state.userName
+    },
+    getAdmin: (state) => {
+      return state.admin
+    },
     getWalkThrough: (state) => {
       return state.walkThrough
     },

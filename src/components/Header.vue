@@ -100,7 +100,6 @@ export default {
     let session = localStorage.getItem('session-agilesimulations')
     if (session) {
       session = JSON.parse(session)
-      console.log(session)
       this.$store.dispatch('updateSession', session.session)
       bus.$emit('sendCheckLogin', {id: this.id, session: session})
     } else {
@@ -108,14 +107,12 @@ export default {
     }
 
     bus.$on('loginSuccess', (data) => {
-      console.log('loginSuccess', data)
       this.$store.dispatch('updateSession', data.session)
       this.$store.dispatch('updateUserName', data.userName)
       this.$store.dispatch('updateAdmin', data.loggedInAsAdmin)
     })
 
     bus.$on('logout', (data) => {
-      console.log('logout', data) 
       this.$store.dispatch('updateSession', '')
       this.$store.dispatch('updateUserName', '')
       this.$store.dispatch('updateAdmin', false)

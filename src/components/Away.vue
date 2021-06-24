@@ -19,7 +19,6 @@ export default {
       return this.$store.getters.getTeam
     },
     member() {
-      console.log(this.$store.getters.getMember)
       return this.$store.getters.getMember
     }
   },
