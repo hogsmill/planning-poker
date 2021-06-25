@@ -1,6 +1,7 @@
 <template>
   <div id="app" class="mb-4">
     <Header />
+    <ClearStorage />
     <h2>
       <span v-if="organisation.id">{{ organisation.name }}</span>
       <span v-if="team.id">, {{ team.name }}</span>
@@ -49,6 +50,7 @@ import bus from './socket.js'
 import params from './lib/params.js'
 
 import Header from './components/Header.vue'
+import ClearStorage from './components/ClearStorage.vue'
 import WalkThroughView from './components/about/WalkThroughView.vue'
 import AboutView from './components/about/AboutView.vue'
 import FacilitatorView from './components/FacilitatorView.vue'
@@ -64,6 +66,7 @@ export default {
   name: 'App',
   components: {
     Header,
+    ClearStorage,
     WalkThroughView,
     AboutView,
     FacilitatorView,

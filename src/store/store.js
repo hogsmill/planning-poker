@@ -26,6 +26,9 @@ export const store = new Vuex.Store({
     thisGame: (state) => {
       return state.thisGame
     },
+    lsSuffix: (state) => {
+      return 'pp'
+    },
     getSession: (state) => {
       return state.session
     },
