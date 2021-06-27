@@ -162,14 +162,10 @@ export const store = new Vuex.Store({
     }
   },
   mutations: {
-    updateSession: (state, payload) => {
-      state.session = payload
-    },
-    updateUserName: (state, payload) => {
-      state.userName = payload
-    },
-    updateAdmin: (state, payload) => {
-      state.admin = payload
+    updateLogin: (state, payload) => {
+      state.session = payload.session
+      state.userName = payload.userName
+      state.admin = payload.loggedInAsAdmin
     },
     updateWalkThrough: (state, payload) => {
       state.walkThrough = payload
@@ -252,8 +248,8 @@ export const store = new Vuex.Store({
     }
   },
   actions: {
-    updateSession: ({ commit }, payload) => {
-      commit('updateSession', payload)
+    updateLogin: ({ commit }, payload) => {
+      commit('updateLogin', payload)
     },
     updateUserName: ({ commit }, payload) => {
       commit('updateUserName', payload)
