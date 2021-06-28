@@ -95,10 +95,10 @@ export default {
     this.appName = process.env.VUE_APP_NAME
 
     let session = localStorage.getItem('session-agilesimulations')
+    console.log('Session', session)
     if (session) {
       session = JSON.parse(session)
-      this.$store.dispatch('updateSession', session.session)
-      bus.$emit('sendCheckLogin', {id: this.id, session: session})
+      bus.$emit('sendCheckLogin', {session: session})
     } else {
       this.clearLogin()
     }

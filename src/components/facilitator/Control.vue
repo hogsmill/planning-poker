@@ -27,7 +27,7 @@
         Only Admin Can Control
       </td>
       <td colspan="2">
-        <input id="only-host-can-control" type="checkbox" :checked="selectedOrganisation && selectedOrganisation.onlyAdminCanControl" @click="updateOnlyAdminCanControl()">
+        <input type="checkbox" :checked="selectedOrganisation && selectedOrganisation.onlyAdminCanControl" @click="updateOnlyAdminCanControl()">
       </td>
     </tr>
     <tr v-if="showControl && selectedOrganisation">
@@ -35,7 +35,7 @@
         Facilitator Controls
       </td>
       <td colspan="2">
-        <input id="facilitator-controls" type="checkbox" :checked="selectedOrganisation && selectedOrganisation.facilitatorControls" @click="updateFacilitatorControls()">
+        <input type="checkbox" :checked="selectedOrganisation && selectedOrganisation.facilitatorControls" @click="updateFacilitatorControls()">
       </td>
     </tr>
   </table>

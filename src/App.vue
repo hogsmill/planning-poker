@@ -212,10 +212,6 @@ export default {
 </script>
 
 <style lang="scss">
-  .not-host {
-    height: 0px;
-    visibility: hidden;
-  }
 
   .connections {
     text-align: right;
