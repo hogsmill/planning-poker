@@ -79,8 +79,8 @@ export default {
     Train
   },
   computed: {
-    isHost() {
-      return this.$store.getters.getHost
+    admin() {
+      return this.$store.getters.getAdmin
     },
     walkThrough() {
       return this.$store.getters.getWalkThrough
@@ -102,8 +102,8 @@ export default {
     }
   },
   created() {
-    if (params.isParam('host')) {
-      this.$store.dispatch('updateHost', true)
+    if (location.hostname == 'localhost' && params.isParam('host')) {
+      this.$store.dispatch('updateAdmin', true)
     }
 
     bus.$emit('sendCheckSystemWorkshops')

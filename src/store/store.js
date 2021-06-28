@@ -12,8 +12,7 @@ export const store = new Vuex.Store({
     connections: 0,
     walkThrough: false,
     showTab: 'game',
-    host: false,
-    onlyHostCanControl: false,
+    onlyAdminCanControl: false,
     organisations: [],
     organisation: {},
     team: {},
@@ -41,15 +40,12 @@ export const store = new Vuex.Store({
     getWalkThrough: (state) => {
       return state.walkThrough
     },
-    getHost: (state) => {
-      return state.host
-    },
     getShowTab: (state) => {
       return state.showTab
     },
     getController: (state) => {
       let control = true
-      if (state.organisation.onlyHostCanControl && !state.host) {
+      if (state.organisation.onlyAdminCanControl && !state.admin) {
         control = false
       }
       if (state.organisation.facilitatorControls && !state.member.facilitator) {
@@ -170,8 +166,8 @@ export const store = new Vuex.Store({
     updateWalkThrough: (state, payload) => {
       state.walkThrough = payload
     },
-    updateHost: (state, payload) => {
-      state.host = payload
+    updateAdmin: (state, payload) => {
+      state.admin = payload
     },
     updateShowTab: (state, payload) => {
       state.showTab = payload

@@ -9,7 +9,7 @@
     </tr>
     <tr v-if="showControl">
       <td>
-        Organisation <span v-if="selectedOrganisation">{{ selectedOrganisation.onlyHostCanControl }}</span>
+        Admin <span v-if="selectedOrganisation">{{ selectedOrganisation.onlyAdminCanControl }}</span>
       </td>
       <td>
         <select id="organisation-select" @change="setSelectedOrganisation()">
@@ -24,10 +24,10 @@
     </tr>
     <tr v-if="showControl && selectedOrganisation">
       <td>
-        Only Host Can Control
+        Only Admin Can Control
       </td>
       <td colspan="2">
-        <input id="only-host-can-control" type="checkbox" :checked="selectedOrganisation && selectedOrganisation.onlyHostCanControl" @click="updateOnlyHostCanControl()">
+        <input id="only-host-can-control" type="checkbox" :checked="selectedOrganisation && selectedOrganisation.onlyAdminCanControl" @click="updateOnlyAdminCanControl()">
       </td>
     </tr>
     <tr v-if="showControl && selectedOrganisation">
@@ -76,9 +76,9 @@ export default {
         return o.id == orgId
       })
     },
-    updateOnlyHostCanControl() {
-      const onlyHostCanControl = !this.selectedOrganisation.onlyHostCanControl
-      bus.$emit('sendUpdateOnlyHostCanControl', {organisationId: this.selectedOrganisation.id, onlyHostCanControl: onlyHostCanControl})
+    updateOnlyAdminCanControl() {
+      const onlyAdminCanControl = !this.selectedOrganisation.onlyAdminCanControl
+      bus.$emit('sendUpdateOnlyAdminCanControl', {organisationId: this.selectedOrganisation.id, onlyAdminCanControl: onlyAdminCanControl})
     },
     updateFacilitatorControls() {
       const facilitatorControls = !this.selectedOrganisation.facilitatorControls

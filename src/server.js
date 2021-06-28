@@ -122,7 +122,7 @@ MongoClient.connect(url, { useUnifiedTopology: true }, function (err, client) {
     socket.on('updateCommittedCards', (data) => { dbStore.updateCommittedCards(db, io, data, debugOn) })
 
     socket.on('sendUpdateAway', (data) => { dbStore.updateAway(db, io, data, debugOn) })
-    
+
     socket.on('sendMemberAbstain', (data) => { dbStore.setMemberAbstain(db, io, data, debugOn) })
 
     socket.on('sendSetMemberValue', (data) => { dbStore.setMemberValue(db, io, data, debugOn) })
@@ -149,7 +149,7 @@ MongoClient.connect(url, { useUnifiedTopology: true }, function (err, client) {
 
     socket.on('sendDeleteOrganisation', (data) => { dbStore.deleteOrganisation(db, io, data, debugOn) })
 
-    socket.on('sendUpdateOnlyHostCanControl', (data) => { dbStore.updateOnlyHostCanControl(db, io, data, debugOn) })
+    socket.on('sendUpdateOnlyAdminCanControl', (data) => { dbStore.updateOnlyAdminCanControl(db, io, data, debugOn) })
 
     socket.on('sendUpdateFacilitatorControls', (data) => { dbStore.updateFacilitatorControls(db, io, data, debugOn) })
 

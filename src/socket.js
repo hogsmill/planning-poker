@@ -69,7 +69,7 @@ bus.$on('sendAddOrganisation', (data) => { socket.emit('sendAddOrganisation', da
 
 bus.$on('sendDeleteOrganisation', (data) => { socket.emit('sendDeleteOrganisation', data) })
 
-bus.$on('sendUpdateOnlyHostCanControl', (data) => { socket.emit('sendUpdateOnlyHostCanControl', data) })
+bus.$on('sendUpdateOnlyAdminCanControl', (data) => { socket.emit('sendUpdateOnlyAdminCanControl', data) })
 
 bus.$on('sendUpdateFacilitatorControls', (data) => { socket.emit('sendUpdateFacilitatorControls', data) })
 

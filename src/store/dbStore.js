@@ -667,14 +667,14 @@ module.exports = {
     })
   },
 
-  updateOnlyHostCanControl: function(db, io, data, debugOn) {
+  updateOnlyAdminCanControl: function(db, io, data, debugOn) {
 
-    if (debugOn) { console.log('updateOnlyHostCanControl', data) }
+    if (debugOn) { console.log('updateOnlyAdminCanControl', data) }
 
     db.gameCollection.findOne({id: data.organisationId}, function(err, res) {
       if (err) throw err
       if (res) {
-        db.gameCollection.updateOne({'_id': res._id}, {$set: {onlyHostCanControl: data.onlyHostCanControl}}, function(err, res) {
+        db.gameCollection.updateOne({'_id': res._id}, {$set: {onlyAdminCanControl: data.onlyAdminCanControl}}, function(err, res) {
           if (err) throw err
           _loadOrganisations(db, io)
        })
