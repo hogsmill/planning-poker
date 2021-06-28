@@ -16,7 +16,8 @@ done
 REPO="https://github.com/hogsmill/planning-poker.git"
 APPS=(
   'planning-poker,planningPokerOrganisations,3004'
-  'planning-poker-guardian,planningPokerGuardianOrganisations,3029,Planning Poker,123456'
+  'planning-poker-new,planningPokerNewOrganisations,3034,Planning Poker'
+  'planning-poker-guardian,planningPokerGuardianOrganisations,3029,Planning Poker'
 )
 
 for ((i = 0; i < ${#APPS[@]}; i++))
@@ -27,13 +28,12 @@ do
   COLLECTION=`echo $REC | cut -d, -f2`
   PORT=`echo $REC | cut -d, -f3`
   APPNAME=`echo $REC | cut -d, -f4`
-  PASSWORD=`echo $REC | cut -d, -f5`
 
   echo "------------------------------------------------"
   if [ -z "$APPNAME" ]; then
     echo "Installing $APP ($COLLECTION, $PORT)"
   else
-    echo "Installing $APP ($COLLECTION, $PORT, $APPNAME, $PASSWORD)"
+    echo "Installing $APP ($COLLECTION, $PORT, $APPNAME)"
   fi
   echo "------------------------------------------------"
 
@@ -46,9 +46,6 @@ do
   echo "VUE_APP_COLLECTION=$COLLECTION" >> $ENVFILE
   if [ ! -z "$APPNAME" ]; then
     echo "VUE_APP_NAME=$APPNAME" >> $ENVFILE
-  fi
-  if [ ! -z $PASSWORD ]; then
-    echo "VUE_APP_PASSWORD=$PASSWORD" >> $ENVFILE
   fi
 
   cd $DIR
