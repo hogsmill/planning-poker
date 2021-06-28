@@ -25,5 +25,11 @@ export default {
 <style>
   .clear-storage {
     float: right;
+    margin-right: 6px;
+    color: #666;
+
+    &:hover {
+      cursor: pointer;
+    }
   }
 </style>
