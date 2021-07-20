@@ -18,6 +18,7 @@ APPS=(
   'planning-poker,planningPokerOrganisations,3004'
   'planning-poker-new,planningPokerNewOrganisations,3034,Planning Poker'
   'planning-poker-guardian,planningPokerGuardianOrganisations,3029,Planning Poker'
+  'planning-poker-ratesetter,planningPokerRatesetterOrganisations,3059,Planning Poker'
 )
 
 for ((i = 0; i < ${#APPS[@]}; i++))
