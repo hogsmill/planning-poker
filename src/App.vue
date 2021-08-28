@@ -2,6 +2,7 @@
   <div id="app" class="mb-4">
     <Header />
     <ClearStorage />
+    <RateThisGame />
     <h2>
       <span v-if="organisation.id">{{ organisation.name }}</span>
       <span v-if="team.id">, {{ team.name }}</span>
@@ -51,6 +52,7 @@ import params from './lib/params.js'
 
 import Header from './components/Header.vue'
 import ClearStorage from './components/ClearStorage.vue'
+import RateThisGame from './components/RateThisGame.vue'
 import WalkThroughView from './components/about/WalkThroughView.vue'
 import AboutView from './components/about/AboutView.vue'
 import FacilitatorView from './components/FacilitatorView.vue'
@@ -67,6 +69,7 @@ export default {
   components: {
     Header,
     ClearStorage,
+    RateThisGame,
     WalkThroughView,
     AboutView,
     FacilitatorView,

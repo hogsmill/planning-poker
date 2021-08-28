@@ -9,18 +9,29 @@ if (location.hostname == 'localhost') {
   asConnStr = 'https://agilesimulations.co.uk:3099'
   connStr = 'https://agilesimulations.co.uk:' + process.env.VUE_APP_PORT
 }
-console.log('Connecting to: ' + asConnStr)
-const asSocket = io(asConnStr)
+
 console.log('Connecting to: ' + connStr)
 const socket = io(connStr)
 
+const connectToAgileSimulations = location.hostname != 'localhost'
+let asSocket
+if (connectToAgileSimulations) {
+  console.log('Connecting to: ' + asConnStr)
+  asSocket = io(asConnStr)
+}
+
 // Agile Simulations (login)
 
-bus.$on('sendCheckLogin', (data) => { asSocket.emit('sendCheckLogin', data) })
+if (connectToAgileSimulations) {
 
-asSocket.on('loginSuccess', (data) => { bus.$emit('loginSuccess', data) })
+  bus.$on('sendCheckLogin', (data) => { asSocket.emit('sendCheckLogin', data) })
 
-asSocket.on('logout', (data) => { bus.$emit('logout', data) })
+  bus.$on('sendRating', (data) => { asSocket.emit('sendRating', data) })
+
+  asSocket.on('loginSuccess', (data) => { bus.$emit('loginSuccess', data) })
+
+  asSocket.on('logout', (data) => { bus.$emit('logout', data) })
+}
 
 // --- Send ---
 
