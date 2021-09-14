@@ -110,21 +110,23 @@ MongoClient.connect(url, { useUnifiedTopology: true }, function (err, client) {
 
     socket.on('sendLoadTeam', (data) => { dbStore.loadTeam(db, io, data, debugOn) })
 
-    socket.on('sendMakeFacilitator', (data) => { dbStore.makeFacilitator(db, io, data, debugOn) })
-
     socket.on('sendSetGameView', (data) => { dbStore.setGameView(db, io, data, debugOn) })
 
     socket.on('sendUpdateEstimationType', (data) => { dbStore.updateEstimationType(db, io, data, debugOn) })
 
-    socket.on('sendUpdateBacklog', (data) => { dbStore.updateBacklog(db, io, data, debugOn) })
+    //socket.on('sendUpdateBacklog', (data) => { dbStore.updateBacklog(db, io, data, debugOn) })
 
     socket.on('sendStartAgain', (data) => { dbStore.startAgain(db, io, data, debugOn) })
 
     socket.on('sendSelectCard', (data) => { dbStore.selectCard(db, io, data, debugOn) })
 
-    socket.on('updateCommittedCards', (data) => { dbStore.updateCommittedCards(db, io, data, debugOn) })
+    socket.on('sendStartTrain', (data) => { dbStore.startTrain(db, io, data, debugOn) })
 
-    socket.on('sendUpdateAway', (data) => { dbStore.updateAway(db, io, data, debugOn) })
+    socket.on('sendCommitCard', (data) => { dbStore.commitCard(db, io, data, debugOn) })
+    
+    socket.on('sendMoveCard', (data) => { dbStore.moveCard(db, io, data, debugOn) })
+
+    socket.on('sendUpdateMemberAttribute', (data) => { dbStore.updateMemberAttribute(db, io, data, debugOn) })
 
     socket.on('sendMemberAbstain', (data) => { dbStore.setMemberAbstain(db, io, data, debugOn) })
 
@@ -151,10 +153,6 @@ MongoClient.connect(url, { useUnifiedTopology: true }, function (err, client) {
     socket.on('sendAddOrganisation', (data) => { dbStore.addOrganisation(db, io, data, debugOn) })
 
     socket.on('sendDeleteOrganisation', (data) => { dbStore.deleteOrganisation(db, io, data, debugOn) })
-
-    socket.on('sendUpdateOnlyAdminCanControl', (data) => { dbStore.updateOnlyAdminCanControl(db, io, data, debugOn) })
-
-    socket.on('sendUpdateFacilitatorControls', (data) => { dbStore.updateFacilitatorControls(db, io, data, debugOn) })
 
     socket.on('sendAddTeam', (data) => { dbStore.addTeam(db, io, data, debugOn) })
 

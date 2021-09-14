@@ -3,6 +3,7 @@ const backlogFuns = require('./backlog.js')
 const estimation = require('./estimation.js')
 
 const demoTeams = [
+  { name: 'No Estimate', id: '5dc9358b-f2d8-49a2-81b3-b60b4055689d', estimationType: 'No Estimates', logo: 'agile_sims_icon_no_estimates.png' },
   { name: 'Eagle', id: 'd49b10b0-da70-4605-9467-b2f146e2b9bb', estimationType: 'fibonacci', logo: 'agile_sims_icon_eagle.png' },
   { name: 'Lion', id: 'd2dbf3f0-64e9-4e87-b688-7de2d2327a94', estimationType: 't-shirt', logo: 'agile_sims_icon_lion.png' },
   { name: 'Dragon', id: '399c9858-4cdd-429a-ad2e-111646eea5b8', estimationType: 'relative', logo: 'agile_sims_icon_dragon.png' },
@@ -58,6 +59,15 @@ function teams() {
   const teams = []
   for (let i = 0; i < demoTeams.length; i++) {
     const teamName = demoTeams[i].name
+    let velocity = null
+    switch(demoTeams[i].estimationType) {
+      case 'fibonacci':
+        velocity = 20
+        break
+      case 'No Estimates':
+        velocity = 3
+        break
+    }
     teams.push({
       id: demoTeams[i].id,
       protected: true,
@@ -70,7 +80,7 @@ function teams() {
       median: null,
       highest: null,
       include: true,
-      velocity: 20,
+      velocity: velocity,
       timerType: 'estimation',
       useEstimationTimer: true,
       timerAutoReveal: false,
@@ -79,7 +89,7 @@ function teams() {
       discussionTimerTime: 120,
       relativeSizing: true,
       gameView: 'poker',
-      logo:  demoTeams[i].logo
+      logo: demoTeams[i].logo
     })
   }
   return teams

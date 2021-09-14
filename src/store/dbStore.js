@@ -285,6 +285,83 @@ module.exports = {
     _startAgain(db, io, data)
   },
 
+  startTrain: function(db, io, data, debugOn) {
+
+    if (debugOn) { console.log('startTrain', data) }
+
+    db.gameCollection.findOne({id: data.organisationId}, function(err, res) {
+      if (err) throw err
+      if (res) {
+        const teams = []
+        let selectedTeam
+        for (let i = 0; i < res.teams.length; i++) {
+          const team = res.teams[i]
+          if (team.id == data.teamId) {
+            team.backlog = backlogFuns.clearCommit(team.backlog)
+            team.isNumeric = backlogFuns.isNumeric(team.estimationType)
+            team.committed = 0
+            data.team = team
+          }
+          teams.push(team)
+        }
+        db.gameCollection.updateOne({'_id': res._id}, {$set: {teams: teams}}, function(err, res) {
+          if (err) throw err
+          io.emit('loadTeam', data)
+        })
+      }
+    })
+  },
+
+  commitCard: function(db, io, data, debugOn) {
+
+    if (debugOn) { console.log('commitCard', data) }
+
+    db.gameCollection.findOne({id: data.organisationId}, function(err, res) {
+      if (err) throw err
+      if (res) {
+        const teams = []
+        for (let i = 0; i < res.teams.length; i++) {
+          const team = res.teams[i]
+          if (team.id == data.teamId) {
+            team.backlog = backlogFuns.commitCard(team.backlog, data.cardId, data.commit, team.velocity, team.estimationType)
+            team.committed = backlogFuns.committed(team.backlog, team.estimationType)
+            team.backlog = backlogFuns.overCommitted(team.backlog, team.estimationType, team.velocity)
+            data.team = team
+          }
+          teams.push(team)
+        }
+        db.gameCollection.updateOne({'_id': res._id}, {$set: {teams: teams}}, function(err, res) {
+          if (err) throw err
+          io.emit('loadTeam', data)
+        })
+      }
+    })
+  },
+
+  moveCard: function(db, io, data, debugOn) {
+
+    if (debugOn) { console.log('moveCard', data) }
+
+    db.gameCollection.findOne({id: data.organisationId}, function(err, res) {
+      if (err) throw err
+      if (res) {
+        const teams = []
+        for (let i = 0; i < res.teams.length; i++) {
+          const team = res.teams[i]
+          if (team.id == data.teamId) {
+            team.backlog = backlogFuns.moveCard(team.backlog, data.cardId, data.direction)
+            data.team = team
+          }
+          teams.push(team)
+        }
+        db.gameCollection.updateOne({'_id': res._id}, {$set: {teams: teams}}, function(err, res) {
+          if (err) throw err
+          io.emit('loadTeam', data)
+        })
+      }
+    })
+  },
+
   selectCard: function(db, io, data, debugOn) {
 
     if (debugOn) { console.log('selectCard', data) }
@@ -317,34 +394,6 @@ module.exports = {
           }
           teams.push(team)
         }
-        res.teams = teams
-        const id = res._id
-        delete res._id
-        db.gameCollection.updateOne({'_id': id}, {$set: res}, function(err, res) {
-          if (err) throw err
-          io.emit('loadTeam', data)
-        })
-      }
-    })
-  },
-
-  updateCommittedCards: function(db, io, data, debugOn) {
-
-    if (debugOn) { console.log('updateCommittedCards', data) }
-
-    db.gameCollection.findOne({id: data.organisationId}, function(err, res) {
-      if (err) throw err
-      if (res) {
-        const teams = []
-        for (let i = 0; i < res.teams.length; i++) {
-          const team = res.teams[i]
-          if (team.id == data.teamId) {
-            team.backlog = data.backlog
-            data.team = team
-          }
-          teams.push(team)
-        }
-        data.demo = res.demo
         db.gameCollection.updateOne({'_id': res._id}, {$set: {teams: teams}}, function(err, res) {
           if (err) throw err
           io.emit('loadTeam', data)
@@ -352,6 +401,31 @@ module.exports = {
       }
     })
   },
+
+  //updateCommittedCards: function(db, io, data, debugOn) {
+    //
+    //if (debugOn) { console.log('updateCommittedCards', data) }
+    //
+    //db.gameCollection.findOne({id: data.organisationId}, function(err, res) {
+    //  if (err) throw err
+    //  if (res) {
+    //    const teams = []
+    //    for (let i = 0; i < res.teams.length; i++) {
+    //      const team = res.teams[i]
+    //      if (team.id == data.teamId) {
+    //        team.backlog = data.backlog
+    //        data.team = team
+    //      }
+    //      teams.push(team)
+    //    }
+    //    data.demo = res.demo
+    //    db.gameCollection.updateOne({'_id': res._id}, {$set: {teams: teams}}, function(err, res) {
+    //      if (err) throw err
+    //      io.emit('loadTeam', data)
+    //    })
+    //  }
+    //})
+  //},
 
   setTimerType: function(db, io, data, debugOn) {
 
@@ -436,9 +510,9 @@ module.exports = {
     })
   },
 
-  updateAway: function(db, io, data, debugOn, field) {
+  updateMemberAttribute: function(db, io, data, debugOn, field) {
 
-    if (debugOn) { console.log('updateAway', data) }
+    if (debugOn) { console.log('updateMemberAttribute', data) }
 
     db.gameCollection.findOne({id: data.organisationId}, function(err, res) {
       if (err) throw err
@@ -454,7 +528,9 @@ module.exports = {
                 team.members[j].abstain = false
                 team.members[j].estimate = null
                 team.members[j].voted = false
-                team.members[j].away = data.away
+                team.members[j][data.field] = data.value
+              } else if (data.unique) {
+                team.members[j][data.field] = false
               }
               members.push(team.members[j])
             }
@@ -667,36 +743,6 @@ module.exports = {
     })
   },
 
-  updateOnlyAdminCanControl: function(db, io, data, debugOn) {
-
-    if (debugOn) { console.log('updateOnlyAdminCanControl', data) }
-
-    db.gameCollection.findOne({id: data.organisationId}, function(err, res) {
-      if (err) throw err
-      if (res) {
-        db.gameCollection.updateOne({'_id': res._id}, {$set: {onlyAdminCanControl: data.onlyAdminCanControl}}, function(err, res) {
-          if (err) throw err
-          _loadOrganisations(db, io)
-       })
-      }
-    })
-  },
-
-  updateFacilitatorControls: function(db, io, data, debugOn) {
-
-    if (debugOn) { console.log('updateFacilitatorControls', data) }
-
-    db.gameCollection.findOne({id: data.organisationId}, function(err, res) {
-      if (err) throw err
-      if (res) {
-        db.gameCollection.updateOne({'_id': res._id}, {$set: {facilitatorControls: data.facilitatorControls}}, function(err, res) {
-          if (err) throw err
-          _loadOrganisations(db, io)
-       })
-      }
-    })
-  },
-
   deleteTeam: function(db, io, data, debugOn) {
 
     if (debugOn) { console.log('deleteTeam', data) }
@@ -854,36 +900,6 @@ module.exports = {
               if (member.id != data.id) {
                 members.push(member)
               }
-            }
-            team.members = members
-          }
-          teams.push(team)
-        }
-        data.demo = res.demo
-        db.gameCollection.updateOne({'_id': res._id}, {$set: {teams: teams}}, function(err, res) {
-          if (err) throw err
-          _loadOrganisations(db, io)
-        })
-      }
-    })
-  },
-
-  makeFacilitator: function(db, io, data, debugOn) {
-
-    if (debugOn) { console.log('makeFacilitator', data) }
-
-    db.gameCollection.findOne({id: data.organisationId}, function(err, res) {
-      if (err) throw err
-      if (res) {
-        const teams = []
-        for (let i = 0; i < res.teams.length; i++) {
-          const team = res.teams[i]
-          if (team.id == data.teamId) {
-            const members = []
-            for (let j = 0; j < team.members.length; j++) {
-              const member = team.members[j]
-              member.facilitator = member.id == data.memberId
-              members.push(member)
             }
             team.members = members
           }

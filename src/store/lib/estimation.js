@@ -1,5 +1,15 @@
 
 const defValues = {
+  'No Estimates': [
+    { order: 1, name: '1', include: true },
+    { order: 2, name: 'TFB', include: true },
+    { order: 3, name: 'NFI', include: true },
+  ],
+  'No Estimates (PC)': [
+    { order: 1, name: '1', include: true },
+    { order: 2, name: 'Too Big', include: true },
+    { order: 3, name: 'No Idea', include: true },
+  ],
   'fibonacci': [
     { order: 1, name: '1', include: true },
     { order: 2, name: '2', include: true },

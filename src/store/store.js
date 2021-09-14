@@ -12,14 +12,13 @@ export const store = new Vuex.Store({
     connections: 0,
     walkThrough: false,
     showTab: 'game',
-    onlyAdminCanControl: false,
     organisations: [],
     organisation: {},
     team: {},
     member: {},
     time: 0,
     timerRunning: false,
-    revealed: false,
+    revealed: false
   },
   getters: {
     thisGame: (state) => {
@@ -44,14 +43,7 @@ export const store = new Vuex.Store({
       return state.showTab
     },
     getController: (state) => {
-      let control = true
-      if (state.organisation.onlyAdminCanControl && !state.admin) {
-        control = false
-      }
-      if (state.organisation.facilitatorControls && !state.member.facilitator) {
-        control = false
-      }
-      return control
+      return state.member.facilitator
     },
     getGameView: (state) => {
       return state.team.gameView
@@ -135,8 +127,8 @@ export const store = new Vuex.Store({
       }
       return backlog
     },
-    getVelocity: (state) => {
-      return state.team.velocity
+    getCommittedCards: (state) => {
+      return state.committedCards
     },
     getShowTeams: (state) => {
       return state.editing.showTeams

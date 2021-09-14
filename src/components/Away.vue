@@ -1,6 +1,5 @@
 <template>
   <span>
-    Away: {{ member.away }}
     <button class="btn btn-sm btn-secondary smaller-font away" title="set my status to 'away'" :class="{ 'selected': member.away }" @click="setAway()">
       <i class="fas fa-plane-departure" />
     </button>
@@ -25,7 +24,7 @@ export default {
   methods: {
     setAway() {
       const away = !this.member.away
-      bus.$emit('sendUpdateAway', {organisationId: this.organisation.id, teamId: this.team.id, memberId: this.member.id, away: away})
+      bus.$emit('sendUpdateMemberAttribute', {organisationId: this.organisation.id, teamId: this.team.id, memberId: this.member.id, field: 'away', value: away, unique: false})
     }
   }
 }

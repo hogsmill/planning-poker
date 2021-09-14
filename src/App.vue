@@ -7,7 +7,6 @@
       <span v-if="organisation.id">{{ organisation.name }}</span>
       <span v-if="team.id">, {{ team.name }}</span>
       <span v-if="member.id">, {{ member.name }}</span>
-      <i v-if="member.facilitator" class="fas fa-brain" title="I am the facilitator/controller" />
     </h2>
     <div v-if="showTab == 'about'">
       <AboutView />
@@ -17,8 +16,9 @@
     </div>
     <div v-if="showTab == 'game'">
       <div class="game-params">
-        <Away />
         <SetGame />
+        <MakeFacilitator />
+        <Away />
         <SetFacilitator v-if="organisation && organisation.facilitatorControls" />
         <WalkThroughView v-if="!organisation.id" />
         <GameView v-if="organisation.id && team.id && member.id" />
@@ -58,7 +58,7 @@ import AboutView from './components/about/AboutView.vue'
 import FacilitatorView from './components/FacilitatorView.vue'
 import Away from './components/Away.vue'
 import SetGame from './components/SetGame.vue'
-import SetFacilitator from './components/SetFacilitator.vue'
+import MakeFacilitator from './components/MakeFacilitator.vue'
 import GameView from './components/GameView.vue'
 import Backlog from './components/Backlog.vue'
 import Poker from './components/Poker.vue'
@@ -73,7 +73,7 @@ export default {
     WalkThroughView,
     AboutView,
     FacilitatorView,
-    SetFacilitator,
+    MakeFacilitator,
     Away,
     SetGame,
     GameView,
@@ -134,7 +134,9 @@ export default {
     bus.$on('loadTeam', (data) => {
       if (this.team.id == data.teamId && this.organisation.id == data.organisationId) {
         this.$store.dispatch('loadTeam', data)
-        this.$store.dispatch('updateMember', data.memberId)
+        if (data.memberId) {
+          this.$store.dispatch('updateMember', data.memberId)
+        }
       }
     })
 
@@ -224,13 +226,6 @@ export default {
   .game-params {
     height: 60px;
     text-align: center;
-  }
-
-  .fa-brain {
-    margin-left: 6px;
-    color: darksalmon;
-    display: inline-block;
-    text-shadow: 1px 1px 1px #888;
   }
 
   .poker-train {

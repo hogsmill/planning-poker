@@ -3,11 +3,8 @@
     <button class="btn btn-sm btn-secondary smaller-font" @click="startTrain()">
       Start the train!
     </button>
-    <div v-if="isNumeric(estimationType)" class="commitment" :class="{'over-committed': overCommitted() }">
-      Sprint backlog: {{ committedTotal() }} <span v-if="velocity">(Capacity: {{ velocity }})</span>
-    </div>
-    <div v-if="!isNumeric(estimationType)" class="commitment">
-      Sprint backlog: {{ committedLength() }} cards <span v-if="velocity">(Capacity: {{ velocity }} cards)</span>
+    <div class="commitment" :class="{'over-committed': overCommitted() }">
+      Sprint backlog: {{ cardsString(team.committed) }} <span v-if="team.velocity">(Capacity: {{ cardsString(team.velocity) }})</span>
     </div>
     <div class="train-holder">
       <div v-if="!trainRunning" id="train-div">
@@ -27,7 +24,7 @@
       </div>
     </div>
     <div class="backlog">
-      <div v-for="(card, index) in backlog" :key="index" class="card rounded" :class="{ 'committed' : index < trainPosition }">
+      <div v-for="(card, index) in backlog" :key="index" class="card rounded" :class="cardClass(card)">
         <div class="arrows">
           <i v-if="index > 0" class="fas fa-arrow-left" @click="cardLeft(card)" />
           <i class="fas fa-info-circle" @click="selectCard(card)" />
@@ -72,12 +69,14 @@
 <script>
 import bus from '../socket.js'
 
+import stringFuns from '../lib/stringFuns.js'
+
 export default {
   data() {
     return {
       trainPosition: 0,
       trainRunning: false,
-      selectedCard: false
+      selectedCard: false,
     }
   },
   computed: {
@@ -90,8 +89,8 @@ export default {
     backlog() {
       return this.$store.getters.getBacklog
     },
-    velocity() {
-      return this.$store.getters.getVelocity
+    committedCards() {
+      return this.$store.getters.getCommittedCards
     },
     estimationType() {
       return this.$store.getters.getEstimationType
@@ -101,87 +100,57 @@ export default {
     this.trainRunning = false
   },
   methods: {
-    isNumeric(estimationType) {
-      return estimationType == 'fibonacci'
-    },
-    committedTotal() {
-      let total = 0
-      for (let i = 0; i < this.trainPosition; i++) {
-        const estimate = this.backlog[i].estimate ? parseInt(this.backlog[i].estimate.name) : 0
-        total = total + estimate
+    cardsString(n) {
+      let cardStr = ''
+      if (this.team.isNumeric) {
+        cardStr = n
+      } else {
+        cardStr = n + ' ' + stringFuns.pluralString(n, 'card')
       }
-      return total
+      return cardStr
     },
-    committedLength() {
-      let n = 0
-      for (let  i = 0; i < this.backlog.length; i++) {
-        if (this.backlog[i].committed) {
-          n = n + 1
-        }
+    cardClass(card) {
+      let classStr = ''
+      if (card.overCommitted) {
+        classStr = 'over-committed'
+      } else if (card.committed) {
+        classStr = 'committed'
       }
-      return n
+      return classStr
     },
     overCommitted() {
-      return this.isNumeric(this.estimationType) && this.committedTotal() > parseInt(this.team.velocity)
+      return this.team.backlog.find((c) => {
+        return c.overCommitted
+      })
     },
-    updateBacklog(backlog) {
-      const newBacklog = []
-      for (let i = 0, j = 1; i < backlog.length; i++, j++) {
-        const card = backlog.find(function(c) {
-          return c.order == j
-        })
-        card.committed = i < this.trainPosition
-        newBacklog.push(card)
-      }
-      bus.$emit('sendUpdateBacklog', {organisationId: this.organisation.id, teamId: this.team.id, backlog: newBacklog})
+    commitCard(n, commit) {
+      const card = this.team.backlog.find((c) => {
+        return c.order == n
+      })
+      bus.$emit('sendCommitCard', {organisationId: this.organisation.id, teamId: this.team.id, cardId: card.id, commit: commit})
     },
     cardLeft(card) {
-      const backlog = []
-      for (let i = 0; i < this.backlog.length; i++) {
-        const backlogCard = this.backlog[i]
-        if (this.backlog[i].order == card.order - 1) {
-          backlogCard.order = backlogCard.order + 1
-        }
-        if (this.backlog[i].id == card.id) {
-          backlogCard.order = backlogCard.order - 1
-        }
-        backlog.push(backlogCard)
-      }
-      this.updateBacklog(backlog)
+      bus.$emit('sendMoveCard', {organisationId: this.organisation.id, teamId: this.team.id, cardId: card.id, direction: 'left'})
     },
     selectCard(card) {
       this.selectedCard = card
     },
     cardRight(card) {
-      const backlog = []
-      for (let i = this.backlog.length - 1; i >= 0; i--) {
-        const backlogCard = this.backlog[i]
-        if (this.backlog[i].order == card.order + 1) {
-          backlogCard.order = backlogCard.order - 1
-        }
-        if (this.backlog[i].id == card.id) {
-          backlogCard.order = backlogCard.order + 1
-        }
-        backlog.push(backlogCard)
-      }
-      this.updateBacklog(backlog)
-    },
-    resetTrain() {
-      this.trainPosition = 0
-      this.updateBacklog()
-      this.positionTrain()
+      bus.$emit('sendMoveCard', {organisationId: this.organisation.id, teamId: this.team.id, cardId: card.id, direction: 'right'})
     },
     left() {
+      this.commitCard(this.trainPosition, false)
       this.trainPosition = this.trainPosition - 1
-      this.updateBacklog(this.backlog)
       this.positionTrain()
     },
     right() {
       this.trainPosition = this.trainPosition + 1
-      this.updateBacklog(this.backlog)
+      this.commitCard(this.trainPosition, true)
       this.positionTrain()
     },
     startTrain() {
+      bus.$emit('sendStartTrain', {organisationId: this.organisation.id, teamId: this.team.id})
+      this.trainPosition = 0
       this.trainRunning = true
       this.positionTrain()
     },
@@ -294,6 +263,11 @@ export default {
 
         &.committed {
           background-color: green;
+          color: #fff;
+        }
+
+        &.over-committed {
+          background-color: red;
           color: #fff;
         }
 

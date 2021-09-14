@@ -39,8 +39,6 @@ if (connectToAgileSimulations) {
 
 bus.$on('sendCheckSystemWorkshops', (data) => { socket.emit('sendCheckSystemWorkshops', data) })
 
-bus.$on('sendMakeFacilitator', (data) => { socket.emit('sendMakeFacilitator', data) })
-
 bus.$on('sendLoadTeam', (data) => { socket.emit('sendLoadTeam', data) })
 
 bus.$on('sendSetGameView', (data) => { socket.emit('sendSetGameView', data) })
@@ -53,7 +51,7 @@ bus.$on('sendStartTimer', (data) => { socket.emit('sendStartTimer', data) })
 
 bus.$on('sendStopTimer', (data) => { socket.emit('sendStopTimer', data) })
 
-bus.$on('sendUpdateAway', (data) => { socket.emit('sendUpdateAway', data) })
+bus.$on('sendUpdateMemberAttribute', (data) => { socket.emit('sendUpdateMemberAttribute', data) })
 
 bus.$on('sendMemberAbstain', (data) => { socket.emit('sendMemberAbstain', data) })
 
@@ -67,7 +65,13 @@ bus.$on('sendReEstimate', (data) => { socket.emit('sendReEstimate', data) })
 
 bus.$on('sendUpdateAgreedEstimate', (data) => { socket.emit('sendUpdateAgreedEstimate', data) })
 
-bus.$on('sendUpdateBacklog', (data) => { socket.emit('sendUpdateBacklog', data) })
+//bus.$on('sendUpdateBacklog', (data) => { socket.emit('sendUpdateBacklog', data) })
+
+bus.$on('sendStartTrain', (data) => { socket.emit('sendStartTrain', data) })
+
+bus.$on('sendCommitCard', (data) => { socket.emit('sendCommitCard', data) })
+
+bus.$on('sendMoveCard', (data) => { socket.emit('sendMoveCard', data) })
 
 bus.$on('sendStartAgain', (data) => { socket.emit('sendStartAgain', data) })
 
@@ -79,10 +83,6 @@ bus.$on('sendOpenEditPane', (data) => { socket.emit('sendOpenEditPane', data) })
 bus.$on('sendAddOrganisation', (data) => { socket.emit('sendAddOrganisation', data) })
 
 bus.$on('sendDeleteOrganisation', (data) => { socket.emit('sendDeleteOrganisation', data) })
-
-bus.$on('sendUpdateOnlyAdminCanControl', (data) => { socket.emit('sendUpdateOnlyAdminCanControl', data) })
-
-bus.$on('sendUpdateFacilitatorControls', (data) => { socket.emit('sendUpdateFacilitatorControls', data) })
 
 bus.$on('sendSetRelativeSizing', (data) => { socket.emit('sendSetRelativeSizing', data) })
 
