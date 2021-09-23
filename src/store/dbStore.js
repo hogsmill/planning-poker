@@ -114,10 +114,26 @@ function updateTimer(io, t, data, autoReveal) {
 }
 
 function _loadOrganisations(db, io) {
-  db.gameCollection.find().toArray( function(err, res) {
+  db.gameCollection.find().toArray(function(err, res) {
     if (err) throw err
     io.emit('loadOrganisations', res)
   })
+}
+
+function _startTeamAgain(team) {
+  const backlog = [], members = []
+  for (j = 0; j < team.backlog.length; j++) {
+    const card = team.backlog[j]
+    card.estimate = null
+    backlog.push(card)
+  }
+  for (j = 0; j < team.members.length; j++) {
+    const member = memberFuns.clear(team.members[j])
+    members.push(member)
+  }
+  team.backlog = backlog
+  team.members = members
+  return team
 }
 
 function _startAgain(db, io, data) {
@@ -130,18 +146,7 @@ function _startAgain(db, io, data) {
       for (i = 0; i < res.teams.length; i++) {
         const team = res.teams[i]
         if (team.id == data.teamId) {
-          const backlog = [], members = []
-          for (j = 0; j < team.backlog.length; j++) {
-            const card = team.backlog[j]
-            card.estimate = null
-            backlog.push(card)
-          }
-          for (j = 0; j < team.members.length; j++) {
-            const member = memberFuns.clear(team.members[j])
-            members.push(member)
-          }
-          team.backlog = backlog
-          team.members = members
+          team = _startTeamAgain(team)
           data.team = team
         }
         teams.push(team)
@@ -484,19 +489,25 @@ module.exports = {
           if (team.id == data.teamId) {
             const members = []
             for (let j = 0; j < team.members.length; j++) {
-              if (team.members[j].id == data.memberId) {
-                team.members[j].voted = true
-                team.members[j].estimate = data.value
-                team.members[j].coffee = false
-                team.members[j].question = false
-                team.members[j].abstain = false
+              const member = team.members[j]
+              if (member.id == data.memberId) {
+                member.voted = true
+                member.estimate = data.value
+                member.coffee = false
+                member.question = false
+                member.abstain = false
               }
-              members.push(team.members[j])
+              members.push(member)
             }
+            const numeric = team.estimationValues[team.estimationType] == 'numeric'
             team.members = members
-            team.lowest = stats.lowest(team.members)
-            team.highest = stats.highest(team.members)
-            team.median = stats.median(team.members)
+            team.lowest = stats.lowest(team.members, numeric)
+            team.highest = stats.highest(team.members, numeric)
+            if (numeric) {
+              team.mean = stats.mean(team.members)
+            } else {
+              team.median = stats.median(team.members)
+            }
             data.team = team
           }
           teams.push(team)
@@ -1022,7 +1033,8 @@ module.exports = {
         for (let i = 0; i < res.teams.length; i++) {
           const team = res.teams[i]
           if (team.id == data.teamId) {
-            const card = backlogFuns.newCard(data, res.backlog.length + 1)
+            const l = res.backlog ? res.backlog.length + 1 : 1
+            const card = backlogFuns.newCard(data.card, l)
             team.backlog.push(card)
           }
           teams.push(team)
@@ -1074,12 +1086,12 @@ module.exports = {
       if (res) {
         const teams = []
         for (let i = 0; i < res.teams.length; i++) {
-          const team = res.teams[i]
+          let team = res.teams[i]
           if (team.id == data.teamId) {
             team.estimationType = data.estimationType
+            team = _startTeamAgain(team)
           }
           teams.push(team)
-          _startAgain(db, io, data)
         }
         db.gameCollection.updateOne({'_id': res._id}, {$set: {teams: teams}}, function(err, res) {
           if (err) throw err

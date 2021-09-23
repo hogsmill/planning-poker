@@ -134,9 +134,6 @@ export default {
     bus.$on('loadTeam', (data) => {
       if (this.team.id == data.teamId && this.organisation.id == data.organisationId) {
         this.$store.dispatch('loadTeam', data)
-        if (data.memberId) {
-          this.$store.dispatch('updateMember', data.memberId)
-        }
       }
     })
 

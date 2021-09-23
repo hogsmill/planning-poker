@@ -37,9 +37,12 @@
             <td class="backlog-title">
               {{ card.title }}
             </td>
-            <td class="backlog-estimate">
+            <td v-if="team.estimationValues[team.estimationType] != 'numeric'" class="backlog-estimate">
               <div v-if="card.estimate && card.estimate.icon" class="estimate-icon" :style="{ 'background-image': icon(card.estimate) }" />
               <span v-if="card.estimate && !card.estimate.icon"><b>{{ card.estimate.name }}</b></span>
+            </td>
+            <td v-if="team.estimationValues[team.estimationType] == 'numeric'" class="backlog-estimate">
+              {{ card.estimate }}
             </td>
           </tr>
         </table>
@@ -53,7 +56,7 @@
               {{ card.id }}
             </td>
             <td class="backlog-title">
-              {{ card.title }}
+              {{ card.title }} {{ team }}
             </td>
             <td class="backlog-estimate">
               <div v-if="card.estimate && card.estimate.icon" class="estimate-icon" :style="{ 'background-image': icon(card.estimate) }" />

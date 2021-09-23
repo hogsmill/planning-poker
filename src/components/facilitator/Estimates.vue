@@ -61,9 +61,12 @@
     </tr>
     <tr v-if="showEstimates && selectedTeamId">
       <td>
-        Estimates Values
+        Estimates Values {{ selectedTeam.estimationValues[selectedTeam.estimationType] }}
       </td>
-      <td>
+      <td v-if="selectedTeam.estimationValues[selectedTeam.estimationType] == 'numeric'">
+        Numeric
+      </td>
+      <td v-if="selectedTeam.estimationValues[selectedTeam.estimationType] != 'numeric'">
         <table v-if="selectedTeamId" class="inner-table">
           <tr>
             <td class="center">

@@ -188,9 +188,6 @@ export const store = new Vuex.Store({
     loadTeam: (state, payload) => {
       state.team = payload.team
     },
-    updateEstimationType: (state, payload) => {
-      state.estimationType = payload.estimationType
-    },
     updateEstimateTeam: (state, payload) => {
       state.editing.estimateTeam = payload.estimateTeam
     },
@@ -271,9 +268,6 @@ export const store = new Vuex.Store({
     },
     loadTeams: ({ commit }, payload) => {
       commit('loadTeams', payload)
-    },
-    updateEstimationType: ({ commit }, payload) => {
-      commit('updateEstimationType', payload)
     },
     updateEstimateTeam: ({ commit }, payload) => {
       commit('updateEstimateTeam', payload)

@@ -16,19 +16,23 @@
         <Timer v-if="team.useDiscussionTimer || team.useEstimationTimer" />
         <div v-if="controller" class="agreed-estimate">
           <span>Agreed Estimate: </span>
-          <select id="agreed-estimate-value">
+          <select v-if="estimationValues != 'numeric'" id="agreed-estimate-value">
             <option value="" />
             <option v-for="(value, index) in estimationValues" :key="index" :value="value.name">
               {{ value.name }}
             </option>
           </select>
+          <input v-if="estimationValues == 'numeric'" type="text" id="agreed-estimate-value">
           <button class="btn btn-sm btn-secondary smaller-font" :disabled="!selectedCard" @click="saveAgreedEstimate()">
             Submit
           </button>
           <div id="team-logo" :style="{ 'background-image': logo() }" />
         </div>
         <div v-if="revealed">
-          Lowest: {{ lowest() }}, Median: {{ median() }}, Highest {{ highest() }}
+          Lowest: {{ lowest() }},
+          <span v-if="numeric()">Mean: {{ mean() }}</span>
+          <span v-if="!numeric()">Median: {{ median() }}</span>
+          , Highest {{ highest() }}
         </div>
         <div>
           <button v-if="controller" class="btn btn-sm btn-secondary smaller-font reveal" :disabled="revealed" @click="reEstimate(true)">
@@ -44,58 +48,11 @@
       </div>
       <div class="members">
         <div v-for="(teamMember, index) in teamMembers" :key="index" class="member rounded"
-             :class="{ 'median': revealed && isMedian(teamMember), 'highest': revealed && isHighest(teamMember), 'lowest':revealed && isLowest(teamMember) }"
+             :class="{ 'median': revealed && !numeric() && isMedian(teamMember), 'mean': revealed && numeric() && isMean(teamMember), 'highest': revealed && isHighest(teamMember), 'lowest':revealed && isLowest(teamMember) }"
         >
           <div><b>{{ teamMember.name }}</b></div>
-
-          <!-- Card Front -->
-
-          <div v-if="teamMember.id == member.id || revealed" class="poker-card rounded">
-            <div class="options">
-              <i v-if="teamMember.id == member.id" class="coffee fas fa-mug-hot rounded" :class="{ 'selected' : memberStatus(teamMember) == 'coffee' }" @click="coffee(teamMember)" />
-              <i v-if="teamMember.id == member.id" class="question far fa-question-circle rounded" :class="{ 'selected' : memberStatus(teamMember) == 'question' }" @click="question(teamMember)" />
-            </div>
-            <div v-if="estimating" class="poker-card-value">
-              <select v-if="teamMember.id == member.id" class="estimate-dropdown" :id="'estimate-value-' + member.id" @change="saveEstimate()">
-                <option value="" />
-                <option v-for="(value, ind) in estimationValues" :key="ind" :value="value.name">
-                  {{ value.name }}
-                </option>
-              </select>
-              <div v-if="teamMember.id == member.id">
-                <i class="fas fa-comment-slash abstain-button" title="abstain" @click="abstain(teamMember)" />
-              </div>
-            </div>
-            <div v-if="!estimating" class="poker-card-value" @click="startEstimating()">
-              <div v-if="teamMember.estimate && teamMember.estimate.icon" class="estimate-icon" :style="{ 'background-image': icon(teamMember.estimate) }" />
-              <span v-if="teamMember.estimate && !teamMember.estimate.icon">{{ teamMember.estimate.name }}</span>
-              <span v-if="!teamMember.estimate && !teamMember.abstain" class="tbd">TBD</span>
-              <i v-if="teamMember.abstain" class="fas fa-comment-slash abstained" title="has abstained" />
-            </div>
-          </div>
-
-          <!-- Card Back -->
-
-          <div v-if="teamMember.id != member.id && !revealed" class="poker-card back rounded">
-            <div v-if="memberStatus(teamMember) == 'away'" class="poker-card-voted rounded-circle" away>
-              <i class="away-status fas fa-plane-departure" title="away" />
-            </div>
-            <div v-if="memberStatus(teamMember) == 'coffee'" class="poker-card-voted rounded-circle">
-              <i class="coffee-status fas fa-mug-hot" title="requested coffee break" />
-            </div>
-            <div v-if="memberStatus(teamMember) == 'question'" class="poker-card-voted rounded-circle">
-              <i class="question-status far fa-question-circle" title="wants to ask a question" />
-            </div>
-            <div v-if="memberStatus(teamMember) == 'voted'" class="poker-card-voted rounded-circle voted">
-              <i class="fas fa-check-circle" title="has voted" />
-            </div>
-            <div v-if="memberStatus(teamMember) == 'not-voted'" class="poker-card-voted rounded-circle not-voted">
-              <i class="fas fa-times-circle" title="has not voted" />
-            </div>
-            <div v-if="memberStatus(teamMember) == 'abstain'" class="poker-card-voted rounded-circle abstain">
-              <i class="fas fa-comment-slash" title="has abstained" />
-            </div>
-          </div>
+          <CardFront v-if="teamMember.id == member.id || revealed" :team-member="teamMember" />
+          <CardBack v-if="teamMember.id != member.id && !revealed" :team-member="teamMember" />
         </div>
       </div>
     </div>
@@ -105,11 +62,17 @@
 <script>
 import bus from '../socket.js'
 
+import memberFuns from '../lib/member.js'
+
 import Timer from './poker/Timer.vue'
+import CardFront from './poker/card/CardFront.vue'
+import CardBack from './poker/card/CardBack.vue'
 
 export default {
   components: {
-    Timer
+    Timer,
+    CardFront,
+    CardBack
   },
   data() {
     return {
@@ -148,48 +111,23 @@ export default {
         return 'url("../planning-poker/icons/' + this.team.logo + '")'
       }
     },
-    icon(estimate) {
-      return 'url("../planning-poker/icons/' + estimate.icon + '")'
+    numeric() {
+      return this.team.estimationValues[this.team.estimationType] == 'numeric'
+    },
+    estimateVal(estimate) {
+      return this.numeric() ? estimate : estimate.name
     },
     isHighest(member) {
-      return member.voted && !member.abstain && member.estimate.name == this.team.highest
+      return member.voted && !member.abstain && this.estimateVal(member.estimate) == this.team.highest
     },
     isLowest(member) {
-      return member.voted && !member.abstain && member.estimate.name == this.team.lowest
+      return member.voted && !member.abstain && this.estimateVal(member.estimate) == this.team.lowest
     },
     isMedian(member) {
-      return member.voted && !member.abstain && member.estimate.name == this.team.median
+      return member.voted && !member.abstain && this.estimateVal(member.estimate) == this.team.median
     },
-    memberStatus(member) {
-      let status = ''
-      if (member.away) {
-        status = 'away'
-      } else if (member.coffee) {
-        status = 'coffee'
-      } else if (member.question) {
-        status = 'question'
-      } else if (member.voted) {
-        status = 'voted'
-      } else if (member.abstain) {
-        status = 'abstain'
-      } else {
-        status = 'not-voted'
-      }
-      return status
-    },
-    startEstimating() {
-      this.estimating = true
-    },
-    abstain(member) {
-      bus.$emit('sendMemberAbstain', {organisationId: this.organisation.id, teamId: this.team.id, memberId: this.member.id})
-    },
-    coffee(member) {
-      const val = !(this.memberStatus(member) == 'coffee')
-      bus.$emit('sendSetMemberValue', {organisationId: this.organisation.id, teamId: this.team.id, memberId: this.member.id, field: 'coffee', value: val})
-    },
-    question(member) {
-      const val = !(this.memberStatus(member) == 'question')
-      bus.$emit('sendSetMemberValue', {organisationId: this.organisation.id, teamId: this.team.id, memberId: this.member.id, field: 'question', value: val})
+    isMean(member) {
+      return member.voted && !member.abstain && this.estimateVal(member.estimate) == this.team.mean
     },
     lowest() {
       return this.team.lowest
@@ -200,13 +138,8 @@ export default {
     median() {
       return this.team.median
     },
-    saveEstimate() {
-      const estValue = document.getElementById('estimate-value-' + this.member.id).value
-      const estimationValue = this.estimationValues.find(function(e) {
-        return e.name == estValue
-      })
-      bus.$emit('sendUpdateEstimateValue', {organisationId: this.organisation.id, teamId: this.team.id, memberId: this.member.id, value: estimationValue})
-      this.estimating = false
+    mean() {
+      return this.team.mean
     },
     reveal(value) {
       bus.$emit('sendReveal', {organisationId: this.organisation.id, teamId: this.team.id, reveal: value})
@@ -217,9 +150,14 @@ export default {
     },
     saveAgreedEstimate() {
       const estValue = document.getElementById('agreed-estimate-value').value
-      const estimationValue = this.estimationValues.find(function(e) {
-        return e.name == estValue
-      })
+      let estimationValue
+      if (this.estimationValues != 'numeric') {
+        estimationValue = this.estimationValues.find(function(e) {
+          return e.name == estValue
+        })
+      } else {
+        estimationValue = estValue
+      }
       bus.$emit('sendUpdateAgreedEstimate', {organisationId: this.organisation.id, teamId: this.team.id, selectedCard: this.selectedCard, value: estimationValue})
     }
   }
@@ -299,7 +237,7 @@ export default {
         background-color: green;
       }
 
-      &.median {
+      &.median, &.mean {
         background-color: orange;
       }
 

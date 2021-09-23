@@ -65,8 +65,6 @@ bus.$on('sendReEstimate', (data) => { socket.emit('sendReEstimate', data) })
 
 bus.$on('sendUpdateAgreedEstimate', (data) => { socket.emit('sendUpdateAgreedEstimate', data) })
 
-//bus.$on('sendUpdateBacklog', (data) => { socket.emit('sendUpdateBacklog', data) })
-
 bus.$on('sendStartTrain', (data) => { socket.emit('sendStartTrain', data) })
 
 bus.$on('sendCommitCard', (data) => { socket.emit('sendCommitCard', data) })
@@ -90,7 +88,7 @@ bus.$on('sendLoadBacklog', (data) => { socket.emit('sendLoadBacklog', data) })
 
 bus.$on('sendAddBacklogCard', (data) => { socket.emit('sendAddBacklogCard', data) })
 
-bus.$on('sendAddBacklogCard', (data) => { socket.emit('sendAddBacklogCard', data) })
+bus.$on('sendDeleteBacklogCard', (data) => { socket.emit('sendDeleteBacklogCard', data) })
 
 bus.$on('sendSaveBacklog', (data) => { socket.emit('sendSaveBacklog', data) })
 
@@ -141,7 +139,7 @@ socket.on('loadTeam', (data) => { bus.$emit('loadTeam', data) })
 
 socket.on('memberAction', (data) => { bus.$emit('memberAction', data) })
 
-socket.on('updateEstimationType', (data) => { bus.$emit('updateEstimationType', data) })
+//socket.on('updateEstimationType', (data) => { bus.$emit('updateEstimationType', data) })
 
 socket.on('updateEstimateTeam', (data) => { bus.$emit('updateEstimateTeam', data) })
 
