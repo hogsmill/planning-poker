@@ -37,7 +37,7 @@
                 <option value="">
                   -- Select --
                 </option>
-                <option v-for="(t, tindex) in organisation.teams" :key="tindex" :value="t.id" :selected="team.id == t.id">
+                <option v-for="(t, tindex) in includedTeams" :key="tindex" :value="t.id" :selected="team.id == t.id">
                   {{ t.name }}
                 </option>
               </select>

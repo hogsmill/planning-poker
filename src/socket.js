@@ -82,6 +82,8 @@ bus.$on('sendAddOrganisation', (data) => { socket.emit('sendAddOrganisation', da
 
 bus.$on('sendDeleteOrganisation', (data) => { socket.emit('sendDeleteOrganisation', data) })
 
+bus.$on('sendUpdateControl', (data) => { socket.emit('sendUpdateControl', data) })
+
 bus.$on('sendSetRelativeSizing', (data) => { socket.emit('sendSetRelativeSizing', data) })
 
 bus.$on('sendLoadBacklog', (data) => { socket.emit('sendLoadBacklog', data) })
@@ -108,7 +110,9 @@ bus.$on('sendDeleteTeamMember', (data) => { socket.emit('sendDeleteTeamMember', 
 
 bus.$on('sendAddTeam', (data) => { socket.emit('sendAddTeam', data) })
 
-bus.$on('sendIncludeTeam', (data) => { socket.emit('sendAddTeam', data) })
+bus.$on('sendIncludeTeam', (data) => { socket.emit('sendIncludeTeam', data) })
+
+bus.$on('sendSetTeamGameView', (data) => { socket.emit('sendSetTeamGameView', data) })
 
 bus.$on('sendDeleteTeam', (data) => { socket.emit('sendDeleteTeam', data) })
 
@@ -138,8 +142,6 @@ socket.on('loadTeams', (data) => { bus.$emit('loadTeams', data) })
 socket.on('loadTeam', (data) => { bus.$emit('loadTeam', data) })
 
 socket.on('memberAction', (data) => { bus.$emit('memberAction', data) })
-
-//socket.on('updateEstimationType', (data) => { bus.$emit('updateEstimationType', data) })
 
 socket.on('updateEstimateTeam', (data) => { bus.$emit('updateEstimateTeam', data) })
 

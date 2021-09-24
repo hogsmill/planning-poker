@@ -9,7 +9,7 @@
     </tr>
     <tr v-if="showControl">
       <td>
-        Admin <span v-if="selectedOrganisation">{{ selectedOrganisation.onlyAdminCanControl }}</span>
+        Admin
       </td>
       <td>
         <select id="organisation-select" @change="setSelectedOrganisation()">
@@ -78,11 +78,11 @@ export default {
     },
     updateOnlyAdminCanControl() {
       const onlyAdminCanControl = !this.selectedOrganisation.onlyAdminCanControl
-      bus.$emit('sendUpdateOnlyAdminCanControl', {organisationId: this.selectedOrganisation.id, onlyAdminCanControl: onlyAdminCanControl})
+      bus.$emit('sendUpdateControl', {organisationId: this.selectedOrganisation.id, field: 'onlyAdminCanControl', value: onlyAdminCanControl})
     },
     updateFacilitatorControls() {
       const facilitatorControls = !this.selectedOrganisation.facilitatorControls
-      bus.$emit('sendUpdateFacilitatorControls', {organisationId: this.selectedOrganisation.id, facilitatorControls: facilitatorControls})
+      bus.$emit('sendUpdateControl', {organisationId: this.selectedOrganisation.id, field: 'facilitatorControls', value: facilitatorControls})
     }
   }
 }

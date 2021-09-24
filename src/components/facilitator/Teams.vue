@@ -41,6 +41,9 @@
               Include?
             </td>
             <td>
+              Start With
+            </td>
+            <td>
               Capacity/Velocity<br>(<i>if using SPs</i>)
             </td>
             <td>
@@ -60,6 +63,10 @@
             </td>
             <td class="center">
               <input type="checkbox" :checked="team.include" @click="includeTeam(team)">
+            </td>
+            <td>
+              <div class="start-with poker" :class="{ 'selected': team.gameView == 'poker' }" @click="setGameView(team, 'poker')" />
+              <div class="start-with train" :class="{ 'selected': team.gameView == 'train' }" @click="setGameView(team, 'train')" />
             </td>
             <td class="center">
               <input type="number" class="velocity" :id="'velocity-' + sanitized(team.name)" :value="team.velocity">
@@ -191,7 +198,11 @@ export default {
       bus.$emit('sendDeleteTeam', {organisationId: this.selectedOrganisationId, id: team.id})
     },
     includeTeam(team) {
-      bus.$emit('sendIncludeTeam', {organisationId: this.selectedOrganisationId, id: team.id})
+      const include = !team.include
+      bus.$emit('sendIncludeTeam', {organisationId: this.selectedOrganisationId, id: team.id, include: include})
+    },
+    setGameView(team, view) {
+      bus.$emit('sendSetTeamGameView', {organisationId: this.selectedOrganisationId, id: team.id, view: view})
     },
     toggleDiscussionTimer(team) {
       bus.$emit('sendSetUseDiscussionTimer', {organisationId: this.selectedOrganisationId, id: team.id})
@@ -238,6 +249,38 @@ export default {
     &:hover {
       cursor: pointer;
       color: #444;
+    }
+  }
+  .start-with {
+    height: 24px;
+    width: 24px;
+    display: inline-block;
+    background-size: 16px 16px;
+    background-repeat: no-repeat;
+    background-position: center;
+    margin: 2px;
+    border: 1px solid #888;
+    border-radius: 4px;
+
+    &.selected {
+      background-color: green;
+      border-color: #fff;
+    }
+
+    &.poker {
+      background-image: url("../../assets/img/poker-black.png");
+
+      &.selected {
+        background-image: url("../../assets/img/poker-white.png");
+      }
+
+    }
+    &.train {
+      background-image: url("../../assets/img/train-black.png");
+
+      &.selected {
+        background-image: url("../../assets/img/train-white.png");
+      }
     }
   }
 </style>

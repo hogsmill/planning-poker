@@ -123,7 +123,7 @@ MongoClient.connect(url, { useUnifiedTopology: true }, function (err, client) {
     socket.on('sendStartTrain', (data) => { dbStore.startTrain(db, io, data, debugOn) })
 
     socket.on('sendCommitCard', (data) => { dbStore.commitCard(db, io, data, debugOn) })
-    
+
     socket.on('sendMoveCard', (data) => { dbStore.moveCard(db, io, data, debugOn) })
 
     socket.on('sendUpdateMemberAttribute', (data) => { dbStore.updateMemberAttribute(db, io, data, debugOn) })
@@ -154,9 +154,13 @@ MongoClient.connect(url, { useUnifiedTopology: true }, function (err, client) {
 
     socket.on('sendDeleteOrganisation', (data) => { dbStore.deleteOrganisation(db, io, data, debugOn) })
 
+    socket.on('sendUpdateControl', (data) => { dbStore.updateControl(db, io, data, debugOn) })
+
     socket.on('sendAddTeam', (data) => { dbStore.addTeam(db, io, data, debugOn) })
 
     socket.on('sendIncludeTeam', (data) => { dbStore.includeTeam(db, io, data, debugOn) })
+
+    socket.on('sendSetTeamGameView', (data) => { dbStore.setTeamGameView(db, io, data, debugOn) })
 
     socket.on('sendDeleteTeam', (data) => { dbStore.deleteTeam(db, io, data, debugOn) })
 

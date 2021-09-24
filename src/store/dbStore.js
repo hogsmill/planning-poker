@@ -11,6 +11,7 @@ function newTeam(name) {
   return {
     id: uuidv4(),
     name: name,
+    include: true,
     estimationType: 'fibonacci',
     estimationValues: estimation.defaultValues(),
     timerType: 'estimation',
@@ -736,6 +737,22 @@ module.exports = {
     })
   },
 
+  updateControl: function(db, io, data, debugOn) {
+
+    if (debugOn) { console.log('updateControl', data) }
+
+    db.gameCollection.findOne({id: data.organisationId}, function(err, res) {
+      if (err) throw err
+      res[data.field] = data.value
+      const id = res._id
+      delete res._id
+      db.gameCollection.updateOne({'_id': id}, {$set: res}, function(err, res) {
+        if (err) throw err
+        _loadOrganisations(db, io)
+      })
+    })
+  },
+
   addTeam: function(db, io, data, debugOn) {
 
     if (debugOn) { console.log('addTeam', data) }
@@ -766,6 +783,52 @@ module.exports = {
           if (res.teams[i].id != data.id) {
             teams.push(res.teams[i])
           }
+        }
+        db.gameCollection.updateOne({'_id': res._id}, {$set: {teams: teams}}, function(err, res) {
+          if (err) throw err
+          _loadOrganisations(db, io)
+        })
+      }
+    })
+  },
+
+  includeTeam: function(db, io, data, debugOn) {
+
+    if (debugOn) { console.log('includeTeam', data) }
+
+    db.gameCollection.findOne({id: data.organisationId}, function(err, res) {
+      if (err) throw err
+      if (res) {
+        const teams = []
+        for (let i = 0; i < res.teams.length; i++) {
+          const team = res.teams[i]
+          if (team.id == data.id) {
+            team.include = data.include
+          }
+          teams.push(team)
+        }
+        db.gameCollection.updateOne({'_id': res._id}, {$set: {teams: teams}}, function(err, res) {
+          if (err) throw err
+          _loadOrganisations(db, io)
+        })
+      }
+    })
+  },
+
+  setTeamGameView: function(db, io, data, debugOn) {
+
+    if (debugOn) { console.log('setTeamGameView', data) }
+
+    db.gameCollection.findOne({id: data.organisationId}, function(err, res) {
+      if (err) throw err
+      if (res) {
+        const teams = []
+        for (let i = 0; i < res.teams.length; i++) {
+          const team = res.teams[i]
+          if (team.id == data.id) {
+            team.gameView = data.view
+          }
+          teams.push(team)
         }
         db.gameCollection.updateOne({'_id': res._id}, {$set: {teams: teams}}, function(err, res) {
           if (err) throw err
