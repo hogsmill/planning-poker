@@ -131,9 +131,7 @@
               </select>
             </td>
             <td>
-              <button class="btn btn-sm btn-secondary smaller-font" @click="deleteTeam(team)" :disabled="team.protected">
-                Delete
-              </button>
+              <i class="fas fa-trash-alt"  @click="deleteTeam(team)" :disabled="team.protected" /> 
             </td>
           </tr>
         </table>

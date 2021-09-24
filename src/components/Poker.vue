@@ -14,6 +14,9 @@
       </div>
       <div class="final-estimate">
         <Timer v-if="team.useDiscussionTimer || team.useEstimationTimer" />
+        <div v-if="organisation.showEstimationType">
+          (Estimating using: {{ team.estimationType }})
+        </div>
         <div v-if="controller" class="agreed-estimate">
           <span>Agreed Estimate: </span>
           <select v-if="estimationValues != 'numeric'" id="agreed-estimate-value">

@@ -65,7 +65,7 @@ export const store = new Vuex.Store({
     },
     getIncludedTeams: (state) => {
       const teams = []
-      if (state.organisation) {
+      if (state.organisation.teams) {
         for (let i = 0; i < state.organisation.teams.length; i++) {
           if (state.organisation.teams[i].include) {
             teams.push(state.organisation.teams[i])

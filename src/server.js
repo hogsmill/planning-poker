@@ -127,6 +127,8 @@ MongoClient.connect(url, { useUnifiedTopology: true }, function (err, client) {
     socket.on('sendMoveCard', (data) => { dbStore.moveCard(db, io, data, debugOn) })
 
     socket.on('sendUpdateMemberAttribute', (data) => { dbStore.updateMemberAttribute(db, io, data, debugOn) })
+    
+    socket.on('sendShowEstimationType', (data) => { dbStore.showEstimationType(db, io, data, debugOn) })
 
     socket.on('sendMemberAbstain', (data) => { dbStore.setMemberAbstain(db, io, data, debugOn) })
 

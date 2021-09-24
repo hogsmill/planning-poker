@@ -102,7 +102,7 @@ module.exports = {
       id: id,
       protected: true,
       name: 'Demo',
-      gameView: 'poker',
+      showEstimationType: true,
       created: new Date().toISOString(),
       lastaccess: new Date().toISOString(),
       teams: teams()

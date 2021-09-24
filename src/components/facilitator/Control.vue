@@ -9,7 +9,7 @@
     </tr>
     <tr v-if="showControl">
       <td>
-        Admin
+        Organisation
       </td>
       <td>
         <select id="organisation-select" @change="setSelectedOrganisation()">
@@ -20,6 +20,14 @@
             {{ org.name }}
           </option>
         </select>
+      </td>
+    </tr>
+    <tr v-if="showControl && selectedOrganisation">
+      <td>
+        Show Estimation Type
+      </td>
+      <td colspan="2">
+        <input type="checkbox" :checked="selectedOrganisation && selectedOrganisation.showEstimationType" @click="updateShowEstimationType()">
       </td>
     </tr>
     <tr v-if="showControl && selectedOrganisation">
@@ -75,6 +83,10 @@ export default {
       this.selectedOrganisation = this.organisations.find(function(o) {
         return o.id == orgId
       })
+    },
+    updateShowEstimationType() {
+      const showEstimationType = !this.selectedOrganisation.onlyAdminCanControl
+      bus.$emit('sendUpdateControl', {organisationId: this.selectedOrganisation.id, field: 'showEstimationType', value: showEstimationType})
     },
     updateOnlyAdminCanControl() {
       const onlyAdminCanControl = !this.selectedOrganisation.onlyAdminCanControl
