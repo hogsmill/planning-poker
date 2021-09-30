@@ -716,7 +716,7 @@ module.exports = {
       id: uuidv4(),
       protected: false,
       name: data.name,
-      gameView: 'poker',
+      showEstimationType: true,
       created: new Date().toISOString(),
       lastaccess: new Date().toISOString(),
       teams: []
