@@ -15,6 +15,7 @@ do
 done
 
 REPO="https://github.com/hogsmill/planning-poker.git"
+MAINAPP="planning-poker"
 APPS=(
   'planning-poker,planningPokerOrganisations,3004'
   'planning-poker-new,planningPokerNewOrganisations,3034,Planning Poker'
@@ -87,8 +88,13 @@ do
       kill -9 $SERVER
     fi
   fi
-  rm -rf $DIR/dist
-  rm -rf $DIR/node_modules/.cache
+  if [ $i == 0 ]; then
+      rm -rf $DIR/node_modules/.cache
+    else
+      rm -rf node_modules
+      ln -s ../$MAINAPP/node_modules node_modules
+    fi
+    rm -rf $DIR/dist
 done
 
 ps -ef | grep php | grep outdated
