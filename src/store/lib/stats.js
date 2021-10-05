@@ -25,7 +25,7 @@ function lowestNumeric(members) {
   return lowest
 }
 
-function higestObject(members) {
+function highestObject(members) {
   let highest = null
   for (let i = 0; i < members.length; i++) {
     const member = members[i]

@@ -131,7 +131,7 @@
               </select>
             </td>
             <td>
-              <i class="fas fa-trash-alt"  @click="deleteTeam(team)" :disabled="team.protected" /> 
+              <i class="fas fa-trash-alt" @click="deleteTeam(team)" :disabled="team.protected" /> 
             </td>
           </tr>
         </table>
