@@ -14,25 +14,35 @@ do
   shift
 done
 
+BASEPORT=4200
 REPO="https://github.com/hogsmill/planning-poker.git"
 MAINAPP="planning-poker"
-APPS=(
-  'planning-poker,planningPokerOrganisations,3004'
-  'planning-poker-new,planningPokerNewOrganisations,3034,Planning Poker'
-  'planning-poker-guardian,planningPokerGuardianOrganisations,3029,Planning Poker'
-  'planning-poker-ratesetter,planningPokerRatesetterOrganisations,3059,Planning Poker'
-  'planning-poker-eagile,planningPokerEverydayAgileOrganisations,3067,Planning Poker'
-  'planning-poker-and,planningPokerAndOrganisations,3106,Planning Poker'
+MAINCOLLECTION="planningPokerOrganisations"
+MAINNAME="Planning Poker"
+ROUTES=(
+  '',''
+  'new','New'
+  'guardian','Guardian'
+  'eagile','EverydayAgile'
+  'and','And'
 )
 
-for ((i = 0; i < ${#APPS[@]}; i++))
+for ((i = 0; i < ${#ROUTES[@]}; i++))
 do
-  REC="${APPS[$i]}"
+  REC="${ROUTES[$i]}"
+  ROUTE=`echo $REC | cut -d, -f1`
+  COLLECTIONSUFFIX=`echo $REC | cut -d, -f2`
 
-  APP=`echo $REC | cut -d, -f1`
-  COLLECTION=`echo $REC | cut -d, -f2`
-  PORT=`echo $REC | cut -d, -f3`
-  APPNAME=`echo $REC | cut -d, -f4`
+  APP=$MAINAPP
+  if [ "$ROUTE" != "" ]; then
+    APP="${APP}-${ROUTE}"
+  fi
+  COLLECTION=$MAINCOLLECTION
+  if [ "$COLLECTIONSUFFIX" != "" ]; then
+    COLLECTION="${COLLECTION}${COLLECTIONSUFFIX}"
+  fi
+  APPNAME=$MAINNAME
+  let PORT=$BASEPORT+$i
 
   echo "------------------------------------------------"
   if [ -z "$APPNAME" ]; then
