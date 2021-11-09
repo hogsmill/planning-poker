@@ -17,7 +17,7 @@
     "package.json": "^2.0.1",
     "papaparse": "^5.3.1",
     "sass": "^1.43.4",
-    "socket.io": "^4.3.1",
+    "socket.io": "^4.3.2",
     "socket.io-client": "^4.3.2",
     "uuid": "^8.3.2",
     "vue": "^2.6.14",
