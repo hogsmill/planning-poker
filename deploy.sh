@@ -25,6 +25,7 @@ ROUTES=(
   'guardian','Guardian'
   'eagile','EverydayAgile'
   'and','And'
+  'ratesetter','Ratesetter'
   'richemont','Richemont'
 )
 
