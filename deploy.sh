@@ -22,7 +22,7 @@ MAINNAME="Planning Poker"
 ROUTES=(
   '',''
   'new','New'
-  'guardian','Guardian'
+  'abn','Abn'
   'eagile','EverydayAgile'
   'and','And'
   'ratesetter','Ratesetter'
