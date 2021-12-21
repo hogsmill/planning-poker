@@ -27,7 +27,7 @@ ROUTES=(
   'and','And'
   'ratesetter','Ratesetter'
   'richemont','Richemont'
-  'matt-phillip', 'Matt Phillip'
+  'mattphillip', 'MattPhillip'
 )
 
 for ((i = 0; i < ${#ROUTES[@]}; i++))
