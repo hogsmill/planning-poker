@@ -145,7 +145,7 @@ function _startAgain(db, io, data) {
       const teams = []
       let i, j
       for (i = 0; i < res.teams.length; i++) {
-        const team = res.teams[i]
+        let team = res.teams[i]
         if (team.id == data.teamId) {
           team = _startTeamAgain(team)
           data.team = team
