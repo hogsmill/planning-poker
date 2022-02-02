@@ -1,0 +1,4 @@
+1	Build an API	Build the API by updating the domain model to allow feature x to connect
+2	Do the UI	Update the GUI to allow product selection. Date comes from the API
+3	Build the login	Store user details in database
+4	Add Logging	Update logging system to log new feature
