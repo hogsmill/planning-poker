@@ -1,0 +1,4 @@
+001,4,Comma Build an API,"Build the API by updating the domain model to allow feature x to connect, etc."
+002,3,Comma Do the UI,"Update the GUI to allow product dropdown. Date comes from the API"
+003,2,Comma Build the login,"Store user details in database"
+004,1,Comma Add Logging,"Update logging system to log 'new' feature"
