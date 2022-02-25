@@ -8,7 +8,6 @@
     <div class="mt-4">
       <h4>Game Set Up</h4>
       <table class="setup-table">
-
         <!-- Organisation -->
 
         <tr>
@@ -56,7 +55,6 @@
             </select>
           </td>
         </tr>
-
       </table>
       <button class="btn btn-sm btn-primary smaller-font" @click="hide()">
         Done

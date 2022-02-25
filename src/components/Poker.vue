@@ -50,8 +50,9 @@
         </div>
       </div>
       <div class="members">
-        <div v-for="(teamMember, index) in teamMembers" :key="index" class="member rounded"
-             :class="{ 'median': revealed && !numeric() && isMedian(teamMember), 'mean': revealed && numeric() && isMean(teamMember), 'highest': revealed && isHighest(teamMember), 'lowest':revealed && isLowest(teamMember) }"
+        <div
+          v-for="(teamMember, index) in teamMembers" :key="index" class="member rounded"
+          :class="{ 'median': revealed && !numeric() && isMedian(teamMember), 'mean': revealed && numeric() && isMean(teamMember), 'highest': revealed && isHighest(teamMember), 'lowest':revealed && isLowest(teamMember) }"
         >
           <div><b>{{ teamMember.name }}</b></div>
           <CardFront v-if="teamMember.id == member.id || revealed" :team-member="teamMember" />

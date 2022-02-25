@@ -123,13 +123,13 @@ function _loadOrganisations(db, io) {
 
 function _startTeamAgain(team) {
   const backlog = [], members = []
-  for (j = 0; j < team.backlog.length; j++) {
-    const card = team.backlog[j]
+  for (let i = 0; i < team.backlog.length; i++) {
+    const card = team.backlog[i]
     card.estimate = null
     backlog.push(card)
   }
-  for (j = 0; j < team.members.length; j++) {
-    const member = memberFuns.clear(team.members[j])
+  for (let i = 0; i < team.members.length; i++) {
+    const member = memberFuns.clear(team.members[i])
     members.push(member)
   }
   team.backlog = backlog
@@ -143,8 +143,7 @@ function _startAgain(db, io, data) {
     if (err) throw err
     if (res) {
       const teams = []
-      let i, j
-      for (i = 0; i < res.teams.length; i++) {
+      for (let i = 0; i < res.teams.length; i++) {
         let team = res.teams[i]
         if (team.id == data.teamId) {
           team = _startTeamAgain(team)
