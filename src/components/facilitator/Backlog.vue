@@ -172,30 +172,30 @@ export default {
     }
   },
   created() {
-    bus.$on('loadOrganisations', (data) => {
+    bus.on('loadOrganisations', (data) => {
       if (this.showBacklog) {
         this.setSelectedOrganisationId(false)
         this.setSelectedTeamId()
       }
     })
-    bus.$on('openEditPane', (data) => {
+    bus.on('openEditPane', (data) => {
       if (data != 'showBacklog') {
         this.showBacklog = false
       }
     })
-    bus.$on('backlogLoaded', (data) => {
+    bus.on('backlogLoaded', (data) => {
       if (this.selectedOrganisationId == data.organisationId) {
         alert('Backlog for ' + data.teamName + ' loaded. Backlog now has ' + data.backlogLength + ' items')
         document.getElementById('backlog-file').value = ''
       }
     })
-    bus.$on('backlogSaved', (data) => {
+    bus.on('backlogSaved', (data) => {
       if (this.selectedOrganisationId == data.organisationId) {
         if (data.status) {
           alert('File Saved')
         } else if (data.errType == 'fileExists') {
           if (confirm('File exists, overwrite?')) {
-            bus.$emit('sendSaveBacklog', {organisationId: data.organisationId, teamId: data.teamId, file: data.file, overwrite: true, separator: data.separator})
+            bus.emit('sendSaveBacklog', {organisationId: data.organisationId, teamId: data.teamId, file: data.file, overwrite: true, separator: data.separator})
           }
         } else {
           alert('Error saving file: ' +  data.err)
@@ -208,7 +208,7 @@ export default {
     setShowBacklog(val) {
       this.showBacklog = val
       if (val) {
-        bus.$emit('sendOpenEditPane', 'showBacklog')
+        bus.emit('sendOpenEditPane', 'showBacklog')
       }
     },
     setSelectedOrganisationId(clear) {
@@ -233,7 +233,7 @@ export default {
     },
     toggleRelativeSizing() {
       const sizing = document.getElementById('relative-sizing').checked
-      bus.$emit('sendSetRelativeSizing', {organisationId: this.selectedOrganisationId, teamId: this.selectedTeamId, relativeSizing: sizing})
+      bus.emit('sendSetRelativeSizing', {organisationId: this.selectedOrganisationId, teamId: this.selectedTeamId, relativeSizing: sizing})
     },
     loadBacklog() {
       const file = document.getElementById('backlog-file').files[0]
@@ -247,17 +247,17 @@ export default {
         title: document.getElementById('card-title').value,
         description: document.getElementById('card-description').value
       }
-      bus.$emit('sendAddBacklogCard', {organisationId: this.selectedOrganisationId, teamId: this.selectedTeamId, card: card})
+      bus.emit('sendAddBacklogCard', {organisationId: this.selectedOrganisationId, teamId: this.selectedTeamId, card: card})
     },
     deleteCard(card) {
       if (confirm('Delete card ' + card.cardId + ': ' + card.title)) {
-        bus.$emit('sendDeleteBacklogCard', {organisationId: this.selectedOrganisationId, teamId: this.selectedTeamId, id: card.id})
+        bus.emit('sendDeleteBacklogCard', {organisationId: this.selectedOrganisationId, teamId: this.selectedTeamId, id: card.id})
       }
     },
     saveBacklog() {
       const saveFile = document.getElementById('backlog-save-file').value
       const separator = document.getElementById('backlog-save-file-separator').value
-      bus.$emit('sendSaveBacklog', {organisationId: this.selectedOrganisationId, teamId: this.selectedTeamId, file: saveFile, separator: separator})
+      bus.emit('sendSaveBacklog', {organisationId: this.selectedOrganisationId, teamId: this.selectedTeamId, file: saveFile, separator: separator})
     }
   }
 }

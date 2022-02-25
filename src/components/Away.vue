@@ -24,7 +24,7 @@ export default {
   methods: {
     setAway() {
       const away = !this.member.away
-      bus.$emit('sendUpdateMemberAttribute', {organisationId: this.organisation.id, teamId: this.team.id, memberId: this.member.id, field: 'away', value: away, unique: false})
+      bus.emit('sendUpdateMemberAttribute', {organisationId: this.organisation.id, teamId: this.team.id, memberId: this.member.id, field: 'away', value: away, unique: false})
     }
   }
 }

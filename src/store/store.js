@@ -1,12 +1,15 @@
-import Vue from 'vue'
-import Vuex from 'vuex'
 
-Vue.use(Vuex)
+import { createStore } from 'vuex'
 
-export const store = new Vuex.Store({
+export const store = createStore({
   state: {
     thisGame: 'Planning Poker',
     session: null,
+    modals: {
+      'feedback': false,
+      'walkThrough': false,
+      'setGame': false
+    },
     userName: '',
     admin: false,
     connections: 0,
@@ -36,8 +39,8 @@ export const store = new Vuex.Store({
     getAdmin: (state) => {
       return state.admin
     },
-    getWalkThrough: (state) => {
-      return state.walkThrough
+    getModals: (state) => {
+      return state.modals
     },
     getShowTab: (state) => {
       return state.showTab
@@ -155,11 +158,19 @@ export const store = new Vuex.Store({
       state.userName = payload.userName
       state.admin = payload.loggedInAsAdmin
     },
-    updateWalkThrough: (state, payload) => {
-      state.walkThrough = payload
-    },
     updateAdmin: (state, payload) => {
       state.admin = payload
+    },
+    showModal: (state, payload) => {
+      const modals = Object.keys(state.modals)
+      for (let i = 0; i < modals.length; i++) {
+        state.modals[modals[i]] = false
+      }
+      state.modals[payload] = true
+      console.log(state.modals)
+    },
+    hideModal: (state, payload) => {
+      state.modals[payload] = false
     },
     updateShowTab: (state, payload) => {
       state.showTab = payload
@@ -242,8 +253,11 @@ export const store = new Vuex.Store({
     updateAdmin: ({ commit }, payload) => {
       commit('updateAdmin', payload)
     },
-    updateWalkThrough: ({ commit }, payload) => {
-      commit('updateWalkThrough', payload)
+    showModal: ({ commit }, payload) => {
+      commit('showModal', payload)
+    },
+    hideModal: ({ commit }, payload) => {
+      commit('hideModal', payload)
     },
     updateHost: ({ commit }, payload) => {
       commit('updateHost', payload)

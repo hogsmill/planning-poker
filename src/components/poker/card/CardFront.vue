@@ -69,15 +69,15 @@ export default {
       this.estimating = true
     },
     abstain() {
-      bus.$emit('sendMemberAbstain', {organisationId: this.organisation.id, teamId: this.team.id, memberId: this.teamMember.id})
+      bus.emit('sendMemberAbstain', {organisationId: this.organisation.id, teamId: this.team.id, memberId: this.teamMember.id})
     },
     coffee() {
       const val = !(this.memberStatus(this.teamMember) == 'coffee')
-      bus.$emit('sendSetMemberValue', {organisationId: this.organisation.id, teamId: this.team.id, memberId: this.member.id, field: 'coffee', value: val})
+      bus.emit('sendSetMemberValue', {organisationId: this.organisation.id, teamId: this.team.id, memberId: this.member.id, field: 'coffee', value: val})
     },
     question() {
       const val = !(this.memberStatus(this.teamMember) == 'question')
-      bus.$emit('sendSetMemberValue', {organisationId: this.organisation.id, teamId: this.team.id, memberId: this.member.id, field: 'question', value: val})
+      bus.emit('sendSetMemberValue', {organisationId: this.organisation.id, teamId: this.team.id, memberId: this.member.id, field: 'question', value: val})
     },
     saveEstimate() {
       const estValue = document.getElementById('estimate-value-' + this.teamMember.id).value
@@ -89,7 +89,7 @@ export default {
       } else {
         estimationValue = estValue
       }
-      bus.$emit('sendUpdateEstimateValue', {organisationId: this.organisation.id, teamId: this.team.id, memberId: this.teamMember.id, value: estimationValue})
+      bus.emit('sendUpdateEstimateValue', {organisationId: this.organisation.id, teamId: this.team.id, memberId: this.teamMember.id, value: estimationValue})
       this.estimating = false
     }
   }

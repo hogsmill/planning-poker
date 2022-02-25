@@ -96,11 +96,11 @@ export default {
     },
     selectCard(id) {
       if (this.controller) {
-        bus.$emit('sendSelectCard', {organisationId: this.organisation.id, teamId: this.team.id, id: id})
+        bus.emit('sendSelectCard', {organisationId: this.organisation.id, teamId: this.team.id, id: id})
       }
     },
     startAgain() {
-      bus.$emit('sendStartAgain', {organisationId: this.organisation.id, teamId: this.team.id})
+      bus.emit('sendStartAgain', {organisationId: this.organisation.id, teamId: this.team.id})
     }
   }
 }

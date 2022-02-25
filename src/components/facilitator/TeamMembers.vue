@@ -92,13 +92,13 @@ export default {
     }
   },
   created() {
-    bus.$on('loadOrganisations', (data) => {
+    bus.on('loadOrganisations', (data) => {
       if (this.showTeamMembers) {
         this.setSelectedOrganisationId(false)
         this.setSelectedTeamId()
       }
     })
-    bus.$on('openEditPane', (data) => {
+    bus.on('openEditPane', (data) => {
       if (data != 'showTeamMembers') {
         this.showTeamMembers = false
       }
@@ -108,7 +108,7 @@ export default {
     setShowTeamMembers(val) {
       this.showTeamMembers = val
       if (val) {
-        bus.$emit('sendOpenEditPane', 'showTeamMembers')
+        bus.emit('sendOpenEditPane', 'showTeamMembers')
       }
     },
     setSelectedOrganisationId(clear) {
@@ -133,13 +133,13 @@ export default {
     },
     addTeamMember() {
       const name = document.getElementById('new-team-member').value
-      bus.$emit('sendAddTeamMember', {organisationId: this.selectedOrganisationId, teamId: this.selectedTeamId, name: name})
+      bus.emit('sendAddTeamMember', {organisationId: this.selectedOrganisationId, teamId: this.selectedTeamId, name: name})
     },
     includeTeamMember(id) {
-      bus.$emit('sendIncludeTeamMember', {organisationId: this.selectedOrganisationId, teamId: this.selectedTeamId, id: id})
+      bus.emit('sendIncludeTeamMember', {organisationId: this.selectedOrganisationId, teamId: this.selectedTeamId, id: id})
     },
     deleteTeamMember(id) {
-      bus.$emit('sendDeleteTeamMember', {organisationId: this.selectedOrganisationId, teamId: this.selectedTeamId, id: id})
+      bus.emit('sendDeleteTeamMember', {organisationId: this.selectedOrganisationId, teamId: this.selectedTeamId, id: id})
     }
   }
 }

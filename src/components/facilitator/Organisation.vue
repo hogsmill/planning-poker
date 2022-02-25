@@ -48,7 +48,7 @@ export default {
     }
   },
   created() {
-    bus.$on('openEditPane', (data) => {
+    bus.on('openEditPane', (data) => {
       if (data != 'showOrganisation') {
         this.showOrganisation = false
       }
@@ -58,16 +58,16 @@ export default {
     setShowOrganisation(val) {
       this.showOrganisation = val
       if (val) {
-        bus.$emit('openEditPane', 'showOrganisation')
+        bus.emit('openEditPane', 'showOrganisation')
       }
     },
     addOrganisation() {
       const name = document.getElementById('new-organisation').value
-      bus.$emit('sendAddOrganisation', {name: name})
+      bus.emit('sendAddOrganisation', {name: name})
     },
     deleteOrganisation(organisation) {
       if (confirm('Delete ' + organisation.name)) {
-        bus.$emit('sendDeleteOrganisation', {id: organisation.id})
+        bus.emit('sendDeleteOrganisation', {id: organisation.id})
       }
     }
   }

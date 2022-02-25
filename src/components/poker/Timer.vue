@@ -58,15 +58,15 @@ export default {
       return this.time > 0 && this.time < 10
     },
     setTimerType(timerType) {
-      bus.$emit('sendSetTimerType', {organisationId: this.organisation.id, teamId: this.team.id, timerType: timerType})
+      bus.emit('sendSetTimerType', {organisationId: this.organisation.id, teamId: this.team.id, timerType: timerType})
     },
     startTimer() {
       this.$store.dispatch('startTimer')
-      bus.$emit('sendStartTimer', {organisationId: this.organisation.id, teamId: this.team.id })
+      bus.emit('sendStartTimer', {organisationId: this.organisation.id, teamId: this.team.id })
     },
     stopTimer() {
       this.$store.dispatch('stopTimer')
-      bus.$emit('sendStopTimer', {organisationId: this.organisation.id, teamId: this.team.id })
+      bus.emit('sendStopTimer', {organisationId: this.organisation.id, teamId: this.team.id })
     }
   }
 }

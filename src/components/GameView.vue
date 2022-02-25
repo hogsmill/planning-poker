@@ -33,7 +33,7 @@ export default {
   methods: {
     setGameView(view) {
       if (this.controller) {
-        bus.$emit('sendSetGameView', {organisationId: this.organisation.id, teamId: this.team.id, view: view})
+        bus.emit('sendSetGameView', {organisationId: this.organisation.id, teamId: this.team.id, view: view})
       }
     }
   }

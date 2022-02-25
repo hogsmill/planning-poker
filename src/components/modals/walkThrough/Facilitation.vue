@@ -14,7 +14,7 @@
 </template>
 
 <script>
-import mailFuns from '../../lib/mail.js'
+import mailFuns from '../../../lib/mail.js'
 
 export default {
   computed: {

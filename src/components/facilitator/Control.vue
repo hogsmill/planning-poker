@@ -65,7 +65,7 @@ export default {
     }
   },
   created() {
-    bus.$on('loadOrganisations', (data) => {
+    bus.on('loadOrganisations', (data) => {
       if (this.showControl) {
         this.setSelectedOrganisation()
       }
@@ -75,7 +75,7 @@ export default {
     setShowControl(val) {
       this.showControl = val
       if (val) {
-        bus.$emit('openEditPane', 'showControl')
+        bus.emit('openEditPane', 'showControl')
       }
     },
     setSelectedOrganisation() {
@@ -86,15 +86,15 @@ export default {
     },
     updateShowEstimationType() {
       const showEstimationType = !this.selectedOrganisation.onlyAdminCanControl
-      bus.$emit('sendUpdateControl', {organisationId: this.selectedOrganisation.id, field: 'showEstimationType', value: showEstimationType})
+      bus.emit('sendUpdateControl', {organisationId: this.selectedOrganisation.id, field: 'showEstimationType', value: showEstimationType})
     },
     updateOnlyAdminCanControl() {
       const onlyAdminCanControl = !this.selectedOrganisation.onlyAdminCanControl
-      bus.$emit('sendUpdateControl', {organisationId: this.selectedOrganisation.id, field: 'onlyAdminCanControl', value: onlyAdminCanControl})
+      bus.emit('sendUpdateControl', {organisationId: this.selectedOrganisation.id, field: 'onlyAdminCanControl', value: onlyAdminCanControl})
     },
     updateFacilitatorControls() {
       const facilitatorControls = !this.selectedOrganisation.facilitatorControls
-      bus.$emit('sendUpdateControl', {organisationId: this.selectedOrganisation.id, field: 'facilitatorControls', value: facilitatorControls})
+      bus.emit('sendUpdateControl', {organisationId: this.selectedOrganisation.id, field: 'facilitatorControls', value: facilitatorControls})
     }
   }
 }

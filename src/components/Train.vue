@@ -127,16 +127,16 @@ export default {
       const card = this.team.backlog.find((c) => {
         return c.order == n
       })
-      bus.$emit('sendCommitCard', {organisationId: this.organisation.id, teamId: this.team.id, cardId: card.id, commit: commit})
+      bus.emit('sendCommitCard', {organisationId: this.organisation.id, teamId: this.team.id, cardId: card.id, commit: commit})
     },
     cardLeft(card) {
-      bus.$emit('sendMoveCard', {organisationId: this.organisation.id, teamId: this.team.id, cardId: card.id, direction: 'left'})
+      bus.emit('sendMoveCard', {organisationId: this.organisation.id, teamId: this.team.id, cardId: card.id, direction: 'left'})
     },
     selectCard(card) {
       this.selectedCard = card
     },
     cardRight(card) {
-      bus.$emit('sendMoveCard', {organisationId: this.organisation.id, teamId: this.team.id, cardId: card.id, direction: 'right'})
+      bus.emit('sendMoveCard', {organisationId: this.organisation.id, teamId: this.team.id, cardId: card.id, direction: 'right'})
     },
     left() {
       this.commitCard(this.trainPosition, false)
@@ -149,7 +149,7 @@ export default {
       this.positionTrain()
     },
     startTrain() {
-      bus.$emit('sendStartTrain', {organisationId: this.organisation.id, teamId: this.team.id})
+      bus.emit('sendStartTrain', {organisationId: this.organisation.id, teamId: this.team.id})
       this.trainPosition = 0
       this.trainRunning = true
       this.positionTrain()

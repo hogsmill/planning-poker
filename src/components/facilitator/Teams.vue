@@ -131,7 +131,7 @@
               </select>
             </td>
             <td>
-              <i class="fas fa-trash-alt" @click="deleteTeam(team)" :disabled="team.protected" /> 
+              <i class="fas fa-trash-alt" @click="deleteTeam(team)" :disabled="team.protected" />
             </td>
           </tr>
         </table>
@@ -158,12 +158,12 @@ export default {
     }
   },
   created() {
-    bus.$on('loadOrganisations', (data) => {
+    bus.on('loadOrganisations', (data) => {
       if (this.showTeams) {
         this.setSelectedOrganisationId()
       }
     })
-    bus.$on('openEditPane', (data) => {
+    bus.on('openEditPane', (data) => {
       if (data != 'showTeams') {
         this.showTeams = false
       }
@@ -173,7 +173,7 @@ export default {
     setShowTeams(val) {
       this.showTeams = val
       if (val) {
-        bus.$emit('openEditPane', 'showTeams')
+        bus.emit('openEditPane', 'showTeams')
       }
     },
     setSelectedOrganisationId() {
@@ -190,38 +190,38 @@ export default {
     },
     addTeam() {
       const team = document.getElementById('new-team').value
-      bus.$emit('sendAddTeam', {organisationId: this.selectedOrganisationId, name: team})
+      bus.emit('sendAddTeam', {organisationId: this.selectedOrganisationId, name: team})
     },
     deleteTeam(team) {
-      bus.$emit('sendDeleteTeam', {organisationId: this.selectedOrganisationId, id: team.id})
+      bus.emit('sendDeleteTeam', {organisationId: this.selectedOrganisationId, id: team.id})
     },
     includeTeam(team) {
       const include = !team.include
-      bus.$emit('sendIncludeTeam', {organisationId: this.selectedOrganisationId, id: team.id, include: include})
+      bus.emit('sendIncludeTeam', {organisationId: this.selectedOrganisationId, id: team.id, include: include})
     },
     setGameView(team, view) {
-      bus.$emit('sendSetTeamGameView', {organisationId: this.selectedOrganisationId, id: team.id, view: view})
+      bus.emit('sendSetTeamGameView', {organisationId: this.selectedOrganisationId, id: team.id, view: view})
     },
     toggleDiscussionTimer(team) {
-      bus.$emit('sendSetUseDiscussionTimer', {organisationId: this.selectedOrganisationId, id: team.id})
+      bus.emit('sendSetUseDiscussionTimer', {organisationId: this.selectedOrganisationId, id: team.id})
     },
     toggleEstimationTimer(team) {
       bus.e$mit('sendSetUseEstimationTimer', {organisationId: this.selectedOrganisationId, id: team.id})
     },
     toggleTimerAutoReveal(team) {
-      bus.$emit('sendSetTimerAutoReveal', {organisationId: this.selectedOrganisationId, id: team.id})
+      bus.emit('sendSetTimerAutoReveal', {organisationId: this.selectedOrganisationId, id: team.id})
     },
     setVelocity(team) {
       const velocity = document.getElementById('velocity-' + this.sanitized(team.name)).value
-      bus.$emit('sendSetVelocity', {organisationId: this.selectedOrganisationId, id: team.id, velocity: velocity})
+      bus.emit('sendSetVelocity', {organisationId: this.selectedOrganisationId, id: team.id, velocity: velocity})
     },
     setEstimationTimerTime(team) {
       const timerTime = document.getElementById('estimation-timer-time-' + this.sanitized(team.name)).value
-      bus.$emit('sendSetEstimationTimerTime', {organisationId: this.selectedOrganisationId, id: team.id, value: timerTime})
+      bus.emit('sendSetEstimationTimerTime', {organisationId: this.selectedOrganisationId, id: team.id, value: timerTime})
     },
     setDiscussionTimerTime(team) {
       const timerTime = document.getElementById('discussion-timer-time-' + this.sanitized(team.name)).value
-      bus.$emit('sendSetDiscussionTimerTime', {organisationId: this.selectedOrganisationId, id: team.id, value: timerTime})
+      bus.emit('sendSetDiscussionTimerTime', {organisationId: this.selectedOrganisationId, id: team.id, value: timerTime})
     }
   }
 }

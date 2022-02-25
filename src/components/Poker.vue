@@ -145,11 +145,11 @@ export default {
       return this.team.mean
     },
     reveal(value) {
-      bus.$emit('sendReveal', {organisationId: this.organisation.id, teamId: this.team.id, reveal: value})
+      bus.emit('sendReveal', {organisationId: this.organisation.id, teamId: this.team.id, reveal: value})
     },
     reEstimate() {
       this.reveal(false)
-      bus.$emit('sendReEstimate', {organisationId: this.organisation.id, teamId: this.team.id})
+      bus.emit('sendReEstimate', {organisationId: this.organisation.id, teamId: this.team.id})
     },
     saveAgreedEstimate() {
       const estValue = document.getElementById('agreed-estimate-value').value
@@ -161,7 +161,7 @@ export default {
       } else {
         estimationValue = estValue
       }
-      bus.$emit('sendUpdateAgreedEstimate', {organisationId: this.organisation.id, teamId: this.team.id, selectedCard: this.selectedCard, value: estimationValue})
+      bus.emit('sendUpdateAgreedEstimate', {organisationId: this.organisation.id, teamId: this.team.id, selectedCard: this.selectedCard, value: estimationValue})
     }
   }
 }

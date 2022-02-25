@@ -22,7 +22,7 @@ export default {
   methods: {
     makeFacilitator() {
       const facilitator = !this.member.facilitator
-      bus.$emit('sendUpdateMemberAttribute', {organisationId: this.organisation.id, teamId: this.team.id, memberId: this.member.id, field: 'facilitator', value: facilitator, unique: true})
+      bus.emit('sendUpdateMemberAttribute', {organisationId: this.organisation.id, teamId: this.team.id, memberId: this.member.id, field: 'facilitator', value: facilitator, unique: true})
     }
   }
 }

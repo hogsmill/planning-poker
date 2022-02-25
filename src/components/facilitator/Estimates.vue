@@ -122,13 +122,13 @@ export default {
     }
   },
   created() {
-    bus.$on('loadOrganisations', (data) => {
+    bus.on('loadOrganisations', (data) => {
       if (this.showEstimates) {
         this.setSelectedOrganisationId(false)
         this.setSelectedTeamId()
       }
     })
-    bus.$on('openEditPane', (data) => {
+    bus.on('openEditPane', (data) => {
       if (data != 'showEstimates') {
         this.showEstimates = false
       }
@@ -138,7 +138,7 @@ export default {
     setShowEstimates(val) {
       this.showEstimates = val
       if (val) {
-        bus.$emit('openEditPane', 'showEstimates')
+        bus.emit('openEditPane', 'showEstimates')
       }
     },
     setSelectedOrganisationId(clear) {
@@ -173,22 +173,22 @@ export default {
     },
     setEstimationType() {
       const estimationType = document.getElementById('set-estimation-type').value
-      bus.$emit('sendUpdateEstimationType', {organisationId: this.selectedOrganisationId, teamId: this.selectedTeamId, estimationType: estimationType})
+      bus.emit('sendUpdateEstimationType', {organisationId: this.selectedOrganisationId, teamId: this.selectedTeamId, estimationType: estimationType})
     },
     addEstimationType() {
       const estimationType = document.getElementById('new-estimation-type').value
       const allTeams = document.getElementById('new-estimation-type-all-teams').checked
-      bus.$emit('sendAddEstimationType', {organisationId: this.selectedOrganisationId, teamId: this.selectedTeamId, estimationType: estimationType, allTeams: allTeams})
+      bus.emit('sendAddEstimationType', {organisationId: this.selectedOrganisationId, teamId: this.selectedTeamId, estimationType: estimationType, allTeams: allTeams})
     },
     addEstimationValue() {
       const estimationType = document.getElementById('set-estimation-type').value
       const estimationValue = document.getElementById('add-estimation-value').value
       const allTeams = document.getElementById('add-estimation-value-all-teams').checked
-      bus.$emit('sendAddEstimationValue', {organisationId: this.selectedOrganisationId, teamId: this.selectedTeamId, estimationType: estimationType, value: estimationValue, allTeams: allTeams})
+      bus.emit('sendAddEstimationValue', {organisationId: this.selectedOrganisationId, teamId: this.selectedTeamId, estimationType: estimationType, value: estimationValue, allTeams: allTeams})
     },
     deleteEstimationValue(value) {
       const estimationType = document.getElementById('set-estimation-type').value
-      bus.$emit('sendDeleteEstimationValue', {organisationId: this.selectedOrganisationId, teamId: this.selectedTeamId, estimationType: estimationType, value: value.name})
+      bus.emit('sendDeleteEstimationValue', {organisationId: this.selectedOrganisationId, teamId: this.selectedTeamId, estimationType: estimationType, value: value.name})
     }
   }
 }

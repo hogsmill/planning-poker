@@ -19,7 +19,7 @@
         <SetGame />
         <MakeFacilitator />
         <Away />
-        <SetFacilitator v-if="organisation && organisation.facilitatorControls" />
+        <MakeFacilitator v-if="organisation && organisation.facilitatorControls" />
         <WalkThroughView v-if="!organisation.id" />
         <GameView v-if="organisation.id && team.id && member.id" />
       </div>
@@ -42,6 +42,7 @@
         <Train v-if="organisation && gameView == 'train'" />
       </div>
     </div>
+    <Modals />
   </div>
 </template>
 
@@ -63,6 +64,7 @@ import GameView from './components/GameView.vue'
 import Backlog from './components/Backlog.vue'
 import Poker from './components/Poker.vue'
 import Train from './components/Train.vue'
+import Modals from './components/Modals.vue'
 
 export default {
   name: 'App',
@@ -79,7 +81,8 @@ export default {
     GameView,
     Backlog,
     Poker,
-    Train
+    Train,
+    Modals
   },
   computed: {
     admin() {
@@ -109,9 +112,9 @@ export default {
       this.$store.dispatch('updateAdmin', true)
     }
 
-    bus.$emit('sendCheckSystemWorkshops')
+    bus.emit('sendCheckSystemWorkshops')
 
-    bus.$on('loadOrganisations', (data) => {
+    bus.on('loadOrganisations', (data) => {
       this.$store.dispatch('updateOrganisations', data)
 
       const orgId = localStorage.getItem('organisation-pp')
@@ -122,7 +125,7 @@ export default {
       const teamId = localStorage.getItem('team-pp')
       if (orgId && teamId) {
         this.$store.dispatch('updateTeam', teamId)
-        bus.$emit('sendLoadTeam', {organisationId: orgId, teamId: teamId})
+        bus.emit('sendLoadTeam', {organisationId: orgId, teamId: teamId})
       }
 
       const memberId = localStorage.getItem('member-pp')
@@ -131,43 +134,43 @@ export default {
       }
     })
 
-    bus.$on('loadTeam', (data) => {
+    bus.on('loadTeam', (data) => {
       if (this.team.id == data.teamId && this.organisation.id == data.organisationId) {
         this.$store.dispatch('loadTeam', data)
       }
     })
 
-    bus.$on('memberAction', (data) => {
+    bus.on('memberAction', (data) => {
       if (this.team.id == data.teamId && this.organisation.id == data.organisationId) {
         this.setMemberStatus(data)
       }
     })
 
-    bus.$on('loadOrganisation', (data) => {
+    bus.on('loadOrganisation', (data) => {
       if (this.organisation.id == data.organisationId) {
         this.$store.dispatch('loadOrganisation', data)
       }
     })
 
-    bus.$on('loadTeams', (data) => {
+    bus.on('loadTeams', (data) => {
       if (this.organisation.id == data.organisationId) {
         this.$store.dispatch('loadTeams', data)
       }
     })
 
-    bus.$on('updateEstimationType', (data) => {
+    bus.on('updateEstimationType', (data) => {
       if (this.team.id == data.teamId && this.organisation.id == data.organisationId) {
         this.$store.dispatch('updateEstimationType', data)
       }
     })
 
-    bus.$on('updateEstimateTeam', (data) => {
+    bus.on('updateEstimateTeam', (data) => {
       if (this.organisation.id == data.organisationId) {
         this.$store.dispatch('updateEstimateTeam', data)
       }
     })
 
-    bus.$on('updateTimer', (data) => {
+    bus.on('updateTimer', (data) => {
       if (this.team.id == data.teamId && this.organisation.id == data.organisationId) {
         if (this.$store.getters.getTimerRunning) {
           this.$store.dispatch('updateTimer', data)
@@ -175,19 +178,19 @@ export default {
       }
     })
 
-    bus.$on('stopTimer', (data) => {
+    bus.on('stopTimer', (data) => {
       if (this.team.id == data.teamId && this.organisation.id == data.organisationId) {
         this.$store.dispatch('stopTimer', data)
       }
     })
 
-    bus.$on('reveal', (data) => {
+    bus.on('reveal', (data) => {
       if (this.team.id == data.teamId && this.organisation.id == data.organisationId) {
         this.$store.dispatch('reveal', data)
       }
     })
 
-    bus.$on('updateConnections', (data) => {
+    bus.on('updateConnections', (data) => {
       this.$store.dispatch('updateConnections', data)
     })
   },
